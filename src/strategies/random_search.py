@@ -9,7 +9,7 @@ import numpy as np
 # Imports des utilitaires
 from src.utils.functions import snr_loss, tsnr_loss
 from src.utils.plotting_manager import PlottingManager
-from src.models.p3mg.algo import P3MGNet
+from src.models.p3mg.algo import P3MG_algo
 
 def get_criterion(name):
     """Factory pour la fonction de perte."""
@@ -78,7 +78,7 @@ def train(loader, args, paths):
     print(f"[INFO] Dataset total: {len(full_data)} batchs -> Calibration sur: {subset_size} batchs")
 
     # 2. Instanciation de l'Algorithme
-    p3mg_algo = P3MGNet(num_layers=1).to(device).double()
+    p3mg_algo = P3MG_algo(num_layers=1).to(device).double()
     
     # Récupération dimensions depuis le premier batch
     sample_batch = calibration_set[0]
@@ -177,7 +177,7 @@ def test(loader, args, paths):
         best_params = {'lmbd': l_def, 'tau': t_def}
 
     # 2. Instanciation Algo
-    p3mg_algo = P3MGNet(num_layers=1).to(device).double()
+    p3mg_algo = P3MG_algo(num_layers=1).to(device).double()
     
     sample_batch = next(iter(loader))
     xt_s, y_s, _ = _unpack_batch(sample_batch, device)

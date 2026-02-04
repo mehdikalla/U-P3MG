@@ -9,7 +9,7 @@ import numpy as np
 # Imports des utilitaires existants
 from src.utils.functions import snr_loss, tsnr_loss 
 from src.utils.plotting_manager import PlottingManager
-from src.models.p3mg.algo import P3MGNet
+from src.models.p3mg.algo import P3MG_algo
 
 def get_criterion(name):
     """Factory pour la fonction de perte."""
@@ -46,15 +46,15 @@ def _unpack_batch(batch, device):
     
     return xt, y, x0
 
-def init_static_params(rho, gamma, N_dim, M_dim, device):
+def init_static_params(alpha, beta, eta, N_dim, M_dim, device):
     """Initialise les paramètres statiques via P3MGNet."""
     # Instanciation temporaire pour calculer les statiques
-    p3mg_tmp = P3MGNet(num_layers=1).to(device).double()
+    p3mg_tmp = P3MG_algo(num_pd_layers=1).to(device).double()
     
     dx = torch.zeros(1, N_dim).double().to(device)
     dy = torch.zeros(1, M_dim).double().to(device)
     
-    params = [rho, gamma]
+    params = [alpha, beta, eta]
     static = p3mg_tmp.init_P3MG(params, dx, dy)
     
     return static, p3mg_tmp
@@ -92,7 +92,7 @@ def train(model, train_loader, val_loader, args, paths):
     xt_s, y_s, _ = _unpack_batch(sample_batch, device)
     N_dim, M_dim = xt_s.shape[1], y_s.shape[1]
     
-    static, p3mg_tmp = init_static_params(args.rho, args.gamma, N_dim, M_dim, device)
+    static, p3mg_tmp = init_static_params(args.alpha, args.beta, args.eta, N_dim, M_dim, device)
 
     plot_manager = PlottingManager(
         model=model,
@@ -100,7 +100,7 @@ def train(model, train_loader, val_loader, args, paths):
         val_loader=val_loader,
         N_dim=N_dim,
         M_dim=M_dim,
-        static_params=[args.rho, args.gamma],
+        static_params=[args.alpha, args.beta, args.eta],
         device=device,
         path_plots=path_plots,
         criterion=criterion,
@@ -218,11 +218,11 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
     xt_s, y_s, _ = _unpack_batch(sample_batch, device)
     N_dim, M_dim = xt_s.shape[1], y_s.shape[1]
     
-    static, p3mg_tmp = init_static_params(args.rho, args.gamma, N_dim, M_dim, device)
+    static, p3mg_tmp = init_static_params(args.alpha, args.beta, args.eta, N_dim, M_dim, device)
 
     plot_manager = PlottingManager(
         model=model, p3mg_tmp=p3mg_tmp, val_loader=None,
-        N_dim=N_dim, M_dim=M_dim, static_params=[args.rho, args.gamma],
+        N_dim=N_dim, M_dim=M_dim, static_params=[args.alpha, args.beta, args.eta],
         device=device, path_plots=path_plots, criterion=get_criterion(criterion_name), metric_name=criterion_name
     )
 

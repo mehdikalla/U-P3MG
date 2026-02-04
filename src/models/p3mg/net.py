@@ -1,7 +1,7 @@
 import torch as tc
 import torch.nn as nn
-from .P3MG_func import P3MGNet
-from .FC_block import FC_block
+from src.models.p3mg.algo import P3MG_algo
+from src.models.FC_block import FC_block
 S = nn.Softplus()
 
 def S2(x):
@@ -13,7 +13,7 @@ def S2(x):
 class layer_0(nn.Module):
     def __init__(self, num_pd_layers: int):
         super().__init__()
-        self.p3mg_func = P3MGNet(num_pd_layers)
+        self.p3mg_algo = P3MG_algo(num_pd_layers)
         
         # 1. Lambda (Dynamique)
         self.f_act = FC_block([100, 50, 25, 12, 1])
@@ -39,14 +39,14 @@ class layer_0(nn.Module):
         else:
              tau_params = S2(self.tau_k) 
 
-        x_new, dynamic_new = self.p3mg_func.iter_P3MG_base(static, x, y, lmbd, tau_params)
+        x_new, dynamic_new = self.p3mg_algo.iter_P3MG_base(static, x, y, lmbd, tau_params)
         return x_new, dynamic_new, lmbd
 
 
 class layer_k(nn.Module):
     def __init__(self, num_pd_layers: int):
         super().__init__()
-        self.p3mg_func = P3MGNet(num_pd_layers)
+        self.p3mg_algo = P3MG_algo(num_pd_layers)
         self.f_act = FC_block([100, 50, 25, 12, 1])
         self.tau_k = nn.Parameter(tc.empty(num_pd_layers).double().fill_(0.5), requires_grad=True)
 
@@ -66,7 +66,7 @@ class layer_k(nn.Module):
         else:
              tau_params = S2(self.tau_k)
             
-        x_new, dynamic_new = self.p3mg_func.iter_P3MG(static, dynamic, x, y, lmbd, tau_params)
+        x_new, dynamic_new = self.p3mg_algo.iter_P3MG(static, dynamic, x, y, lmbd, tau_params)
         return x_new, dynamic_new, lmbd
 
 

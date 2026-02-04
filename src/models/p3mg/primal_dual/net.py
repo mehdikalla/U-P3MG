@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from .PD_func import PrimalDualNet  
+from src.models.p3mg.primal_dual.algo import PrimalDual_algo  
 S = nn.Softplus()
 
 # -------------------------
@@ -10,10 +10,10 @@ class PD_layer(nn.Module):
     
     def __init__(self):
         super().__init__()
-        self.pd = PrimalDualNet()
+        self.pd_algo = PrimalDual_algo()
 
     def forward(self, sub_static, w_new, tau_scalar):
-        w_new = self.pd.iter_PD(sub_static, w_new, tau_scalar)
+        w_new = self.pd_algo.iter_PD(sub_static, w_new, tau_scalar)
         return w_new
 
 class PD_model(nn.Module):

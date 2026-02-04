@@ -1,13 +1,13 @@
 import torch as tc
 import torch.nn as nn
 from src.utils.functions import*
-from src.models.PD_func import PrimalDualNet
-from src.models.PD_model import PD_model 
+from src.models.p3mg.primal_dual.algo import PrimalDual_algo
+from src.models.p3mg.primal_dual.net import PD_model 
 
-class P3MGNet(nn.Module):
+class P3MG_algo(nn.Module):
     def __init__(self, num_pd_layers: int = 3):
         super().__init__()
-        self.pd_net = PrimalDualNet()
+        self.pd_algo = PrimalDual_algo()
         self.num_pd_layers = num_pd_layers
         
     # -------------------------
@@ -111,7 +111,7 @@ class P3MGNet(nn.Module):
         sub_static_input = [xb, Dx, Bx, gradxb, P, N]
 
         # 1) init via PDInit_layer
-        w0, sub_static = self.pd_net.init_PD(sub_static_input)
+        w0, sub_static = self.pd_algo.init_PD(sub_static_input)
 
         # 2) unrolling PD via PD_model (PASSAGE DES PARAMÈTRES TAU)
         # NOTE: PD_model doit accepter tau_params et les utiliser.
@@ -203,7 +203,7 @@ class P3MGNet(nn.Module):
         sub_static_input = [xb, Dx, Bx, gradxb, P, N]
 
         # 1) init via PDInit_layer
-        w0, sub_static = self.pd_net.init_PD(sub_static_input)
+        w0, sub_static = self.pd_algo.init_PD(sub_static_input)
 
         # 2) unrolling PD via PD_model (PASSAGE DES PARAMÈTRES TAU)
         w_final = pd_model_instance(sub_static, w0, tau_params) # <-- CORRECTION ICI

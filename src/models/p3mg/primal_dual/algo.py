@@ -4,7 +4,7 @@ import torch.nn as nn
 from src.utils.functions import*
 
 
-class PrimalDualNet(nn.Module):
+class PrimalDual_algo(nn.Module):
     def __init__(self):
         super().__init__()
 
