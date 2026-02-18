@@ -204,37 +204,40 @@ def dosy_mat(N, M, tmin, tmax, Dmin, Dmax, dtype=tc.float64, device='cpu'):
 
 # --- CLASSES DE LOSS (Pour compatibilité nn.Module) ---
 
+
 class snr_loss(nn.Module):
     """
-    SNR Loss = -10 * log10(signal / noise)
+    -20log(signal/noise)
     """
     def __init__(self):
         super().__init__()
         
-    def forward(self, output, target):
-        noise = target - output
-        signal_power = tc.mean(target ** 2)
-        noise_power = tc.mean(noise ** 2)
-        # On minimise -SNR pour maximiser SNR
-        snr = 10 * tc.log10(signal_power / (noise_power + 1e-8))
-        return -snr
+    def forward(self, x_est, x_true):
+        batch_snr = []
+        
+        for xp, xt in zip(x_est, x_true):
+            noise = xt - xp
+            signal_power = tc.linalg.norm(xt)
+            noise_power = tc.linalg.norm(noise)
+            snr = 20 * tc.log10(signal_power / (noise_power + 1e-8))
+            batch_snr.append(snr)
+        
+        return -tc.mean(tc.stack(batch_snr))
+
 
 class tsnr_loss(nn.Module):
     """
-    TSNR Loss (Time-averaged SNR)
+    masked snr
     """
     def __init__(self):
         super().__init__()
         
-    def forward(self, output, target):
-        # Calcul du SNR par élément du batch
-        batch_snr = []
-        for o, t in zip(output, target):
-            noise = t - o
-            signal_power = tc.mean(t ** 2)
-            noise_power = tc.mean(noise ** 2)
-            snr = 10 * tc.log10(signal_power / (noise_power + 1e-8))
-            batch_snr.append(snr)
+    def forward(self, x_est, x_true):
+        noise = x_true - x_est
         
-        # Moyenne sur le batch
-        return -tc.mean(tc.stack(batch_snr))
+        mask = (x_true != 0)
+        signal_power = tc.linalg.norm(x_true[mask])
+        noise_power = tc.linalg.norm(noise[mask])
+        snr = 20 * tc.log10(signal_power / (noise_power + 1e-8))
+        
+        return -snr

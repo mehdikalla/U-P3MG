@@ -8,7 +8,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4            # Augmenté légèrement pour le chargement des données
 #SBATCH --mem=16G                    # Augmenté par sécurité
-#SBATCH --time=01:30:00
+#SBATCH --time=5:30:00
 #SBATCH --output=logs/P3MG_unrolling/slurm-%j.out        # Log à la racine (ignoré par ton gitignore)
 #SBATCH --error=logs/P3MG_unrolling/slurm-%j.err
 
@@ -37,11 +37,11 @@ python main.py \
     --strategy unrolling \
     --mode full \
     --device cuda \
-    --num_layers 2 \
-    --num_pd_layers 2 \
-    --epochs 10 \
+    --num_layers 25 \
+    --num_pd_layers 10 \
+    --epochs 50 \
     --lr 9e-3 \
     --batch_size 10 \
-    --criterion MSE
+    --criterion TSNR
 
 echo "--- Fin du job Slurm ---"
