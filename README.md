@@ -14,13 +14,12 @@
 </p>
 
 # U-P3MG
-@Mehdi add a description of the project here.
+The goal of the project is to optimize the hyperparameters of the P3MG algorithm using a deep learning approach.
 
 ---
 
 ### **A. Overview**
-@Mehdi complete the overview of the project here.
-This repositorie contains the implementation of the U-P3MG model, a deep learning approach for [briefly describe the purpose of the model, e.g., "image segmentation", "object detection", etc.]. The model is designed to [mention key features or advantages, e.g., "handle multi-scale features", "improve accuracy on small objects", etc.].
+This repositorie contains the implementation of the U-P3MG model, a deep learning approach for spectroscopîc signal reconstruction in analytical chemistry. The model is designed to improve the quality of reconstitution of already established algorithm P3MG.
 
 This repository includes tools for:
 - Data preprocessing and augmentation
@@ -30,7 +29,6 @@ This repository includes tools for:
 ---
 
 ### **B. Getting Started**
-@Mehdi I think you should rename the repository to the method name "U-P3MG" instead of "project_unrolling".
 
 #### **1. Clone the Repository**
 ```bash
