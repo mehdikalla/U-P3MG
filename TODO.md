@@ -2,8 +2,8 @@
 Each time you complete a task, please check it off the list below, putting an "x" in the brackets. This will help us keep track of our progress and ensure that we cover all necessary aspects of the project.
 
 ## Refactoring and Documentation should be done by mid May.
-- [ ] Complete the overview of the project in section A "README.md".
-- [ ] Rename the repository to "U-P3MG".
+- [x] Complete the overview of the project in section A "README.md".
+- [x] Rename the repository to "U-P3MG".
 - [ ] Follow the instructions in section B.2 to install Mamba in the README.md file.
 - [ ] Create an `env.yml` file with the necessary dependencies for the project.
 - [ ] Create a `config.yaml` file with the necessary configuration for training and evaluation.
