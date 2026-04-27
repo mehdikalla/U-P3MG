@@ -1,0 +1,48 @@
+# ==============================================================================
+# Fichier de configuration principal (config.yaml)
+# ==============================================================================
+
+# --- 1. Paramètres généraux et stratégie ---
+model: "p3mg"               # Architecture à utiliser ('p3mg', etc.)
+strategy: "unrolling"       # Stratégie de résolution ('unrolling' ou 'random_search')
+seed: 42                    # Graine aléatoire pour la reproductibilité
+
+# --- 2. Chemins et données ---
+dataset_dir: "./Dataset"
+train: "train.pt"
+val: "val.pt"
+test: "test.pt"
+save_dir: "./Results"
+
+# --- 3. Paramètres d'entraînement (Unrolling) ---
+epochs: 25                  # Nombre total d'époques
+lr: 9e-05                   # Taux d'apprentissage (Learning Rate)
+batch_size: 10              # Taille des batchs globale (utilisée par le Dataloader générique)
+train_batch_size: 10        # Taille des batchs pour l'entraînement
+val_batch_size: 1           # Taille des batchs pour la validation
+test_batch_size: 1          # Taille des batchs pour le test
+criterion: "MSE"            # Métrique d'évaluation ('MSE', 'SNR', 'TSNR')
+Loss: "MSE"                 # Fonction de coût principale
+
+# --- 4. Architecture du réseau ---
+num_layers: 25              # Nombre de couches déroulées (K)
+num_pd_layers: 10           # Nombre de sous-couches Primal-Dual (T)
+number_layers: 25           # Rétrocompatibilité avec l'ancien formalisme
+number_pd_layers: 10        # Rétrocompatibilité avec l'ancien formalisme
+
+# --- 5. Paramètres statiques P3MG ---
+alpha: 1.0e-05
+beta: 1.0e-05
+eta: 0.01
+
+# --- 6. Paramètres algorithmiques (Random Search / Oracle) ---
+n_samples: 50               # Nombre de configurations à tester (calibration)
+algo_iters: 200             # Nombre d'itérations pour l'algorithme itératif standard
+lmbd_min: 1e-8              # Borne inférieure pour la recherche de Lambda
+lmbd_max: 1.0               # Borne supérieure pour la recherche de Lambda
+tau_min: 0.01               # Borne inférieure pour la recherche de Tau
+tau_max: 2.0                # Borne supérieure pour la recherche de Tau
+
+# --- 7. Sauvegarde et chargement ---
+checkpoint: null            # Chemin vers un poids spécifique (ex: "./Results/best_model.pt")
+resume: null                # Rétrocompatibilité pour la reprise d'entraînement

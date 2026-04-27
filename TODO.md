@@ -4,14 +4,14 @@ Each time you complete a task, please check it off the list below, putting an "x
 ## Refactoring and Documentation should be done by mid May.
 - [x] Complete the overview of the project in section A "README.md".
 - [x] Rename the repository to "U-P3MG".
-- [ ] Follow the instructions in section B.2 to install Mamba in the README.md file.
-- [ ] Create an `env.yml` file with the necessary dependencies for the project.
-- [ ] Create a `config.yaml` file with the necessary configuration for training and evaluation.
-- [ ] Provide a script for training the model that uses the configuration file and handles GPU if available.
-- [ ] Provide a script for evaluating the model that uses the configuration file and handles GPU if available.
-- [ ] Provide a script to run traditional algorithms for comparison with the U-P3MG model.
-- [ ] Complete the instructions on how to train the model in section D of the README.md file.
-- [ ] Provide instructions on how to visualize the results and analyze the performance of the model in section E of the README.md file.
+- [x] Follow the instructions in section B.2 to install Mamba in the README.md file.
+- [x] Create an `env.yml` file with the necessary dependencies for the project.
+- [x] Create a `config.yaml` file with the necessary configuration for training and evaluation.
+- [x] Provide a script for training the model that uses the configuration file and handles GPU if available.
+- [x] Provide a script for evaluating the model that uses the configuration file and handles GPU if available.
+- [x] Provide a script to run traditional algorithms for comparison with the U-P3MG model.
+- [x] Complete the instructions on how to train the model in section D of the README.md file.
+- [x] Provide instructions on how to visualize the results and analyze the performance of the model in section E of the README.md file.
 - [ ] By creating the scripts for training, evaluation, and running traditional algorithms, remove the slurm scripts since they will no longer be needed.
 
 ## Future Work

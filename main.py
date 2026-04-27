@@ -3,60 +3,61 @@ import torch
 import sys
 import os
 import time
+import yaml 
 from torch.utils.data import DataLoader
 
-# --- Imports du Framework ---
 from src.models import NET_ARCHITECTURES
 from src.strategies import network
 from src.strategies import random_search
-
-# --- Import correct du Dataset ---
-#
 from Dataset.module import MyDataset
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Framework de Reconstruction (Unrolling & Grid Search)")
+    parser = argparse.ArgumentParser(description="Framework de Reconstruction")
 
-    # --- 1. Choix du Modèle et de la Stratégie ---
-    parser.add_argument('--model', type=str, default='p3mg', choices=['p3mg', 'model2'],
-                        help="Architecture du modèle à utiliser.")
-    parser.add_argument('--strategy', type=str, default='unrolling', choices=['unrolling', 'random_search'],
-                        help="Méthode de résolution : 'unrolling' (NN) ou 'random_search' (Algo itératif).")
-    parser.add_argument('--mode', type=str, default='full', choices=['train', 'test', 'full'],
-                        help="Action à effectuer : 'train', 'test', ou 'full'.")
+    # Ajout de l'argument de configuration
+    parser.add_argument('--config', type=str, default=None, help="Chemin vers le fichier YAML de configuration")
     
-    # --- 2. Paramètres Généraux & Hardware ---
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu',
-                        help="Device de calcul (cuda/cpu).")
-    parser.add_argument('--seed', type=int, default=42, help="Graine aléatoire.")
-    parser.add_argument('--batch_size', type=int, default=4, help="Taille des batchs.")
-    parser.add_argument('--criterion', type=str, default='MSE', choices=['MSE', 'SNR', 'TSNR'],
-                        help="Fonction de coût.")
-
-    # --- 3. Paramètres Unrolling (NN) ---
-    parser.add_argument('--epochs', type=int, default=100, help="Nombre d'époques (Unrolling).")
-    parser.add_argument('--lr', type=float, default=1e-3, help="Learning rate (Unrolling).")
-    parser.add_argument('--num_layers', type=int, default=8, help="Nombre de couches déroulées (K).")
-    parser.add_argument('--num_pd_layers', type=int, default=5, help="Nombre de sous-couches Primal-Dual (T).")
-    parser.add_argument('--checkpoint', type=str, default=None, 
-                        help="Chemin vers un checkpoint (.pt) pour le mode 'test'.")
-
-    # --- 4. Paramètres Random Search & Algo ---
-    parser.add_argument('--n_samples', type=int, default=50, help="Nombre de configurations à tester (Calibration).")
-    parser.add_argument('--algo_iters', type=int, default=200, help="Nombre d'itérations pour l'algo itératif.")
-    
-    # Paramètres Statiques initiaux
+    # Conservation de tous vos arguments existants
+    parser.add_argument('--model', type=str, default='p3mg', choices=['p3mg', 'ista'])
+    parser.add_argument('--strategy', type=str, default='unrolling', choices=['unrolling', 'random_search'])
+    parser.add_argument('--mode', type=str, default='full', choices=['train', 'test', 'full'])
+    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu')
+    parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--criterion', type=str, default='MSE', choices=['MSE', 'SNR', 'TSNR'])
+    parser.add_argument('--epochs', type=int, default=100)
+    parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--num_layers', type=int, default=8)
+    parser.add_argument('--num_pd_layers', type=int, default=5)
+    parser.add_argument('--checkpoint', type=str, default=None)
+    parser.add_argument('--n_samples', type=int, default=50)
+    parser.add_argument('--algo_iters', type=int, default=200)
     parser.add_argument("--alpha", type=float, default=1e-5)
     parser.add_argument("--beta",  type=float, default=1e-5)
     parser.add_argument("--eta",   type=float, default=1e-2)
+    parser.add_argument('--lmbd_min', type=float, default=0.1)
+    parser.add_argument('--lmbd_max', type=float, default=5.0)
+    parser.add_argument('--tau_min', type=float, default=0.01)
+    parser.add_argument('--tau_max', type=float, default=2.0)
 
-    # Bornes de recherche (Random Search)
-    parser.add_argument('--lmbd_min', type=float, default=0.1, help="Borne Min pour Lambda.")
-    parser.add_argument('--lmbd_max', type=float, default=5.0, help="Borne Max pour Lambda.")
-    parser.add_argument('--tau_min', type=float, default=0.01, help="Borne Min pour Tau.")
-    parser.add_argument('--tau_max', type=float, default=2.0, help="Borne Max pour Tau.")
+    args = parser.parse_args()
 
-    return parser.parse_args()
+    # Surcharge des arguments via le fichier YAML s'il est fourni
+    if args.config:
+        if not os.path.isfile(args.config):
+            print(f"[ERREUR] Fichier de configuration introuvable : {args.config}")
+            sys.exit(1)
+            
+        with open(args.config, 'r') as f:
+            yaml_config = yaml.safe_load(f)
+            
+        for key, value in yaml_config.items():
+            if hasattr(args, key):
+                setattr(args, key, value)
+            else:
+                print(f"[AVERTISSEMENT] Paramètre '{key}' du YAML non reconnu par argparse.")
+
+    return args
 
 def setup_paths(args):
     """Prépare l'arborescence de sauvegarde (runs/MODEL_STRATEGY_DATE/)."""

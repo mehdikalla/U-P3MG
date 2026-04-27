@@ -19,7 +19,7 @@ The goal of the project is to optimize the hyperparameters of the P3MG algorithm
 ---
 
 ### **A. Overview**
-This repositorie contains the implementation of the U-P3MG model, a deep learning approach for spectroscopîc signal reconstruction in analytical chemistry. The model is designed to improve the quality of reconstitution of already established algorithm P3MG.
+This repository contains the implementation of the U-P3MG model, a deep learning approach for spectroscopîc signal reconstruction in analytical chemistry. The model is designed to improve the quality of reconstitution of already established algorithm P3MG.
 
 This repository includes tools for:
 - Data preprocessing and augmentation
@@ -53,7 +53,6 @@ mamba --version
 ```
 
 #### **3. Create the Environment**
-@Mehdi you should create a `env.yml` file in the repository with the necessary dependencies for the project. Then, users can create the environment and use it to run the code, when you get to that point ask me to write the `env.yml` file with you.
 
 ```bash
 mamba env create -f env.yml
@@ -71,59 +70,68 @@ conda activate U-P3MG
 
 #### **1. Simulated Data**
 
+
 ---
 
 ### **D. Training and Evaluation**
-@Mehdi you should provide instructions on how to train the model and evaluate its performance here.
-
 ---
 
-#### **1. Create the Configuration File**
-@Mehdi you should create a `config.yaml` file in the repository with the necessary configuration for training and evaluation. Then, users can modify the configuration file according to their needs.
+#### **1. Configuration File**
+The config.yaml file allows precise modification of the neural network and traditional algorithms hyperparameters (learning rate, epochs, number of layers and iterations ...).
 
-```yaml
-# Example configuration file for training and evaluation
-training:
-  batch_size: 32
-  num_epochs: 100
-  learning_rate: 0.001
-  optimizer: "Adam"
-evaluation:
-  metrics: ["accuracy", "precision", "recall"]
-  save_results: true
-```
 
-#### **2. Train the Model**
-@Mehdi you should provide a script in the `scripts` directory that deal with GPU if available and use the configuration file for training the model. Then, users can run the training script to train the model.
+#### **2. Train the Model **
+To train the neural network models, you can run the following scripts :
 
 ```bash
-./scripts/run.sh --config config.yaml --gpu 0 --train
+# Train the P3MG unrolled model
+./scripts/run.sh --config config.yaml --gpu 0 --train --model p3mg --strategy unrolling
+
+# Train the ISTA unrolled model
+./scripts/run.sh --config config.yaml --gpu 0 --train --model ista --strategy unrolling
 ```
 
 #### **3. Evaluate the Model**
-@Mehdi use a test flag to indicate evaluation mode.
+To evaluate a trained model, use the ```--test``` flag. Ensure that the checkpoint parameter in your config.yaml points to the correct trained weights.
 
 ```bash
-./scripts/run.sh --config config.yaml --gpu 0 --test
+# Evaluate the P3MG model
+./scripts/run.sh --config config.yaml --gpu 0 --test --model p3mg --strategy unrolling
+
+# Evaluate the ISTA model
+./scripts/run.sh --config config.yaml --gpu 0 --train --model ista --strategy unrolling
+
 ```
 
-#### **6. Run Traditional Algorithms**
-@Mehdi since you have a well structed codebase, you can also provide a script to run traditional algorithms for comparison with the U-P3MG model.
+#### **4. Run Random searches**
+To run traditional iterative baseline algorithms, use the `random_search` strategy. This mode performs an algorithmic search over hyperparameters (such as Lambda and Tau) instead of training a neural network.
 
 ```bash
-./scripts/run_traditional.sh --config config.yaml
+# Run random search for the P3MG model
+./scripts/run.sh --config config.yaml --gpu 0 --full --model p3mg --strategy random_search
+
+# Run random search for the ISTA model
+./scripts/run.sh --config config.yaml --gpu 0 --full --model ista --strategy random_search
 ```
 
 ---
-
 ### **E. Results and Visualization**
-@Mehdi you should provide instructions on how to visualize the results and analyze the performance of the model here.
-
+---
 #### **1. Visualize Results**
+All generated plots and visualizations are automatically saved in the `plots/` subdirectory within your specific run folder (e.g., `./Results/p3mg_unrolling_<timestamp>/plots/`). 
 
+Depending on the chosen mode and strategy, you will find:
+* **`loss.png`**: Training and validation loss curves over epochs.
+* **`best_sig.png` & `test_*_MSE.png`**: Visual comparisons between the true signal and the predicted signal. The framework automatically plots the Best, Worst, Median, and Mean reconstruction samples.
+* **`learnt_lambda_curve.png` & `learnt_tau_heatmap.png`**: Evolution of the learned parameters (step sizes and thresholds) across the network layers. This is specific to the `unrolling` strategy and allows you to interpret the network's behavior.
+* **`test_error_distribution.png`**: An histogram displaying the distribution of the chosen evaluation metric (MSE, SNR, or TSNR) across the entire test dataset.
 
 #### **2. Analyze Performance**
+Quantitative performance metrics are computed and saved during the evaluation phase :
 
+* **Test Results Table (`test_results_table.txt`)**: Located in the `logs/` directory, this file provides a comprehensive statistical summary of the model's performance on the test set.
+
+* **Oracle Statistics (`oracle_stats.json`)**: When running the `random_search` mode, this file records the absolute best theoretical performance and the optimal $( \lambda, \tau )$ hyperparameters for each individual sample in the test set.
 
 ---
 
