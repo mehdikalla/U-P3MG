@@ -1,15 +1,15 @@
 <p align="center">
   <img src="static/images/logo-cvn.png"
-       style="width:180px; height:100px; object-fit:contain; background:white;
+       style="width:150px; height:100px; object-fit:contain; background:white;
               border: 2px solid #ccc; border-radius: 6px; padding: 6px; margin: 0 12px;">
   <img src="static/images/logo-cs.png"
-       style="width:180px; height:100px; object-fit:contain; background:white;
+       style="width:150px; height:100px; object-fit:contain; background:white;
               border: 2px solid #ccc; border-radius: 6px; padding: 6px; margin: 0 12px;">
   <img src="static/images/universite-paris-saclay-logo.png"
-       style="width:180px; height:100px; object-fit:contain; background:white;
+       style="width:150px; height:100px; object-fit:contain; background:white;
               border: 2px solid #ccc; border-radius: 6px; padding: 6px; margin: 0 12px;">
   <img src="static/images/logo-inria.png"
-       style="width:180px; height:100px; object-fit:contain; background:white;
+       style="width:150px; height:100px; object-fit:contain; background:white;
               border: 2px solid #ccc; border-radius: 6px; padding: 6px; margin: 0 12px;">
 </p>
 
