@@ -18,9 +18,10 @@ Each time you complete a task, please check it off the list below, putting an "x
 ## Future Work
 
 ### **1. Implementing and Evaluating Models** should be done by the end of June.
-- [ ] Fix one loss function and one metric for evaluation and use them consistently throughout the project.
-- [ ] Fix the learning rate and the optimizer for all the models you will implement.
+- [x] Fix one loss function and one metric for evaluation and use them consistently throughout the project.
+- [x] Fix the learning rate and the optimizer for all the models you will implement.
 - [ ] Implement the P3MG traditional algorithm and evaluate its performance on the easiest dataset.
+- [ ] Implement the ISTA traditional algorithm and evaluate its performance on the easiest dataset.
 - [ ] Implement the PMMS traditional algorithm and evaluate its performance on the easiest dataset.
 - [ ] Implement the ISM traditional algorithm and evaluate its performance on the easiest dataset.
 - [ ] Implement the U-HQ model and evaluate its performance on the easiest dataset.
