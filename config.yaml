@@ -15,8 +15,8 @@ test: "test.pt"
 save_dir: "./Results"
 
 # --- 3. Paramètres d'entraînement (Unrolling) ---
-epochs: 25                  # Nombre total d'époques
-lr: 9e-05                   # Taux d'apprentissage (Learning Rate)
+epochs: 1                 # Nombre total d'époques
+lr: 9.0e-05                   # Taux d'apprentissage (Learning Rate)
 batch_size: 10              # Taille des batchs globale (utilisée par le Dataloader générique)
 train_batch_size: 10        # Taille des batchs pour l'entraînement
 val_batch_size: 1           # Taille des batchs pour la validation
@@ -25,10 +25,10 @@ criterion: "MSE"            # Métrique d'évaluation ('MSE', 'SNR', 'TSNR')
 Loss: "MSE"                 # Fonction de coût principale
 
 # --- 4. Architecture du réseau ---
-num_layers: 25              # Nombre de couches déroulées (K)
-num_pd_layers: 10           # Nombre de sous-couches Primal-Dual (T)
-number_layers: 25           # Rétrocompatibilité avec l'ancien formalisme
-number_pd_layers: 10        # Rétrocompatibilité avec l'ancien formalisme
+num_layers: 2              # Nombre de couches déroulées (K)
+num_pd_layers: 1           # Nombre de sous-couches Primal-Dual (T)
+number_layers: 2           # Rétrocompatibilité avec l'ancien formalisme
+number_pd_layers: 1        # Rétrocompatibilité avec l'ancien formalisme
 
 # --- 5. Paramètres statiques P3MG ---
 alpha: 1.0e-05

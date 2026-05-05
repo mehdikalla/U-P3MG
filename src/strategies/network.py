@@ -83,7 +83,7 @@ def train(model, train_loader, val_loader, args, paths):
     
     optimizer = optim.Adam([
         {'params': other_params, 'lr': args.lr},
-        {'params': tau_params, 'lr': args.lr * 5.0}
+        {'params': tau_params, 'lr': args.lr * int(5.0)}
     ], lr=args.lr)
 
     # 2. Initialisation Statique & PlottingManager

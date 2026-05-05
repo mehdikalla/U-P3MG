@@ -4,12 +4,24 @@
 GPU_ID=""
 ARGS=()
 
-# Extraction exclusive de l'argument --gpu, conservation des autres
+# Extraction du GPU et conversion des raccourcis --train/--test en --mode
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --gpu)
             GPU_ID="$2"
             shift 2
+            ;;
+        --train)
+            ARGS+=("--mode" "train")
+            shift
+            ;;
+        --test)
+            ARGS+=("--mode" "test")
+            shift
+            ;;
+        --full)
+            ARGS+=("--mode" "full")
+            shift
             ;;
         *)
             ARGS+=("$1")
@@ -24,5 +36,5 @@ if [ -n "$GPU_ID" ]; then
     echo "[INFO] Exécution verrouillée sur le GPU : $GPU_ID"
 fi
 
-# Transfert des arguments restants vers le script principal
+# Transfert des arguments formatés vers le script principal
 python main.py "${ARGS[@]}"
