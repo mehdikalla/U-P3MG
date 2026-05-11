@@ -12,7 +12,7 @@ Each time you complete a task, please check it off the list below, putting an "x
 - [x] Provide a script to run traditional algorithms for comparison with the U-P3MG model.
 - [x] Complete the instructions on how to train the model in section D of the README.md file.
 - [x] Provide instructions on how to visualize the results and analyze the performance of the model in section E of the README.md file.
-- [ ] Provide a code to simulate signals
+- [x] Provide a code to simulate signals
 - [ ] By creating the scripts for training, evaluation, and running traditional algorithms, remove the slurm scripts since they will no longer be needed.
 
 ## Future Work
