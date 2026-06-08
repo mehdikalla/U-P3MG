@@ -69,7 +69,11 @@ conda activate U-P3MG
 ### **C. Dataset**
 
 #### **1. Simulated Data**
+To simulate a dataset, execute the following command: 
 
+```bash
+python generate_dataset.py --noise 0.01
+```
 
 ---
 

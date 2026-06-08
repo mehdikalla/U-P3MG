@@ -1,7 +1,9 @@
 # TODO list for the project
 Each time you complete a task, please check it off the list below, putting an "x" in the brackets. This will help us keep track of our progress and ensure that we cover all necessary aspects of the project.
 
-## Refactoring and Documentation should be done by mid May.
+## Refactoring and Documentation should be done by mid May — ✅ Completed. 
+**Fully completed by Mehdi.**
+
 - [x] Complete the overview of the project in section A "README.md".
 - [x] Rename the repository to "U-P3MG".
 - [x] Follow the instructions in section B.2 to install Mamba in the README.md file.
@@ -12,8 +14,8 @@ Each time you complete a task, please check it off the list below, putting an "x
 - [x] Provide a script to run traditional algorithms for comparison with the U-P3MG model.
 - [x] Complete the instructions on how to train the model in section D of the README.md file.
 - [x] Provide instructions on how to visualize the results and analyze the performance of the model in section E of the README.md file.
-- [ ] Provide a code to simulate signals
-- [ ] By creating the scripts for training, evaluation, and running traditional algorithms, remove the slurm scripts since they will no longer be needed.
+- [x] Provide a code to simulate signals
+- [x] By creating the scripts for training, evaluation, and running traditional algorithms, remove the slurm scripts since they will no longer be needed.
 
 ## Future Work
 
