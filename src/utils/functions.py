@@ -202,6 +202,22 @@ def dosy_mat(N, M, tmin, tmax, Dmin, Dmax, dtype=tc.float64, device='cpu'):
     Hmat = tc.exp(-kron_t_T)
     return T, Hmat
 
+def phi_prime_cvx(x, delta):
+    """Dérivée de la pénalité convexe (ex: L1 lissée)."""
+    return x / tc.sqrt(x**2 + delta**2)
+
+def weight_cvx(x, delta):
+    """Poids de la matrice majorante pour la pénalité convexe."""
+    return 1.0 / tc.sqrt(x**2 + delta**2)
+
+def phi_prime_ncvx(x, delta):
+    """Dérivée de la pénalité non-convexe (ex: Cauchy/Geman-McClure)."""
+    return x / (1.0 + (x**2) / (delta**2))
+
+def weight_ncvx(x, delta):
+    """Poids de la matrice majorante pour la pénalité non-convexe."""
+    return 1.0 / (1.0 + (x**2) / (delta**2))
+
 # --- CLASSES DE LOSS (Pour compatibilité nn.Module) ---
 
 
