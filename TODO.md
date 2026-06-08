@@ -22,13 +22,13 @@ Each time you complete a task, please check it off the list below, putting an "x
 ### **1. Implementing and Evaluating Models** should be done by the end of June.
 - [x] Fix one loss function and one metric for evaluation and use them consistently throughout the project.
 - [x] Fix the learning rate and the optimizer for all the models you will implement.
-- [x] [ ] Implement the P3MG traditional algorithm and evaluate its performance on the easiest dataset.
-- [x] [ ] Implement the ISTA traditional algorithm and evaluate its performance on the easiest dataset.
-- [x] [ ] Implement the PMMS traditional algorithm and evaluate its performance on the easiest dataset.
-- [ ] [ ] Implement the ISM traditional algorithm and evaluate its performance on the easiest dataset.
-- [x] [ ] Implement the U-HQ model and evaluate its performance on the easiest dataset.
-- [x] [ ] Implement the Primal-Dual model and evaluate its performance on the easiest dataset.
-- [x] [ ] Implement the U-P3MG model and evaluate its performance on all datasets.
+- [ ] Implement the P3MG traditional algorithm and evaluate its performance on the easiest dataset.
+- [ ] Implement the ISTA traditional algorithm and evaluate its performance on the easiest dataset.
+- [ ] Implement the PMMS traditional algorithm and evaluate its performance on the easiest dataset.
+- [ ] Implement the ISM traditional algorithm and evaluate its performance on the easiest dataset.
+- [ ] Implement the U-HQ model and evaluate its performance on the easiest dataset.
+- [ ] Implement the Primal-Dual model and evaluate its performance on the easiest dataset.
+- [ ] Implement the U-P3MG model and evaluate its performance on all datasets.
 
 Once we have completed the above tasks, we can consider fully deep learning approaches and compare them with the U-P3MG model.
 
