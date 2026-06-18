@@ -12,4 +12,5 @@ src/pmms/__pycache__
 src/strategies/__pycache__
 
 *.slurm
-*/__pycache__/
+__pycache__/*   
+*.py[cod]
