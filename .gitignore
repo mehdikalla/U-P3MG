@@ -3,6 +3,13 @@
 /runs
 
 /Dataset/__pycache__
+src/models/__pycache__
+src/hq/__pycache__
+src/ista/__pycache__
+src/p3mg/__pycache__
+src/pd/__pycache__
+src/pmms/__pycache__
 src/strategies/__pycache__
 
 *.slurm
+*/__pycache__/

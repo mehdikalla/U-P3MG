@@ -6,13 +6,11 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 
-# Imports des utilitaires existants
 from src.utils.functions import snr_loss, tsnr_loss 
 from src.utils.plotting_manager import PlottingManager
 from src.models.p3mg.algo import P3MG_algo
 
 def get_criterion(name):
-    """Factory pour la fonction de perte."""
     if name == 'MSE':
         return nn.MSELoss(reduction='mean')
     elif name == 'SNR':
@@ -23,7 +21,6 @@ def get_criterion(name):
         raise ValueError(f"Loss '{name}' non reconnue. Choisir: MSE, SNR, TSNR.")
 
 def save_config(path, args):
-    """Sauvegarde la configuration du run."""
     try:
         config = {k: str(v) for k, v in vars(args).items()}
         with open(os.path.join(path, 'run_config.json'), 'w') as f:
@@ -32,7 +29,6 @@ def save_config(path, args):
         print(f"[WARN] Impossible de sauvegarder la config : {e}")
 
 def _unpack_batch(batch, device):
-    """Helper pour déballer le batch (gère le cas avec ou sans x0)."""
     if len(batch) == 3:
         xt, y, x0 = batch
     else:
@@ -46,27 +42,26 @@ def _unpack_batch(batch, device):
     
     return xt, y, x0
 
-def init_static_params(alpha, beta, eta, N_dim, M_dim, device):
-    """Initialise les paramètres statiques via P3MGNet."""
-    # Instanciation temporaire pour calculer les statiques
-    p3mg_tmp = P3MG_algo(num_pd_layers=1).to(device).double()
+def init_static_params(args, N_dim, M_dim, device):
+    """Initialise les paramètres statiques de manière dynamique."""
+    # Correction : utilisation de args.num_pd_layers plutôt que 1 en dur
+    p3mg_tmp = P3MG_algo(num_pd_layers=args.num_pd_layers).to(device).double()
     
     dx = torch.zeros(1, N_dim).double().to(device)
     dy = torch.zeros(1, M_dim).double().to(device)
     
-    params = [alpha, beta, eta]
+    params = [args.alpha, args.beta, args.eta]
     static = p3mg_tmp.init_P3MG(params, dx, dy)
     
     return static, p3mg_tmp
 
 # =============================================================================
-# 1. FONCTION D'ENTRAINEMENT (Indépendante)
+# 1. FONCTION D'ENTRAINEMENT
+# =============================================================================
+# =============================================================================
+# 1. FONCTION D'ENTRAINEMENT (Sécurisée)
 # =============================================================================
 def train(model, train_loader, val_loader, args, paths):
-    """
-    Exécute uniquement la phase d'entrainement et de validation.
-    Sauvegarde les checkpoints mais NE LANCE PAS le test.
-    """
     device = args.device
     criterion_name = args.criterion if hasattr(args, 'criterion') else 'MSE'
     criterion = get_criterion(criterion_name)
@@ -76,23 +71,27 @@ def train(model, train_loader, val_loader, args, paths):
     
     print(f"--- [TRAIN] Démarrage : {args.epochs} epochs | Loss: {criterion_name} ---")
 
-    # 1. Configuration Optimiseur (spécifique P3MG avec lr*5 pour tau)
-    #
+    # 1. Configuration Optimiseur (Sécurisée)
     tau_params = [p for n, p in model.named_parameters() if 'tau_k' in n]
     other_params = [p for n, p in model.named_parameters() if 'tau_k' not in n]
     
-    optimizer = optim.Adam([
-        {'params': other_params, 'lr': args.lr},
-        {'params': tau_params, 'lr': args.lr * int(5.0)}
-    ], lr=args.lr)
+    # On vérifie si le modèle a des paramètres à apprendre
+    has_parameters = len(tau_params) > 0 or len(other_params) > 0
+    
+    if has_parameters:
+        optimizer = optim.Adam([
+            {'params': other_params, 'lr': args.lr},
+            {'params': tau_params, 'lr': args.lr * int(5.0)}
+        ], lr=args.lr)
+    else:
+        optimizer = None
+        print("[INFO] Aucun paramètre apprenable détecté. Évaluation sans rétropropagation.")
 
-    # 2. Initialisation Statique & PlottingManager
-    # Récupération dimensions depuis le loader
     sample_batch = next(iter(train_loader))
     xt_s, y_s, _ = _unpack_batch(sample_batch, device)
     N_dim, M_dim = xt_s.shape[1], y_s.shape[1]
     
-    static, p3mg_tmp = init_static_params(args.alpha, args.beta, args.eta, N_dim, M_dim, device)
+    static_p3mg, p3mg_tmp = init_static_params(args, N_dim, M_dim, device)
 
     plot_manager = PlottingManager(
         model=model,
@@ -107,38 +106,42 @@ def train(model, train_loader, val_loader, args, paths):
         metric_name=criterion_name
     )
 
-    # 3. Boucle d'époques
     tr_losses, val_losses = [], []
     best_vloss = float('inf')
     start_time = time.time()
 
+    is_p3mg = (args.model.strip().lower() == 'p3mg')
+
     for ep in range(args.epochs):
         t0 = time.time()
         
-        # --- TRAIN STEP ---
         model.train()
         running_loss = 0.0
         for batch in train_loader:
             xt, y, x0 = _unpack_batch(batch, device)
             
-            # Gestion x0 par défaut (Moyenne)
             if x0 is None:
                 mean_v = y.sum(1, keepdim=True)/(M_dim*N_dim)
                 x0 = mean_v.repeat(1, N_dim)
 
-            optimizer.zero_grad()
-            # Forward: static, dynamic=None, x0, y
-            xp, _, _ = model(static, None, x0, y)
+            if has_parameters:
+                optimizer.zero_grad()
+            
+            current_static = static_p3mg if is_p3mg else None
+            xp, _, _ = model(current_static, None, x0, y)
             
             loss = criterion(xp, xt)
-            loss.backward()
-            optimizer.step()
+            
+            # On ne fait la rétropropagation que s'il y a des poids à optimiser
+            if has_parameters and loss.requires_grad:
+                loss.backward()
+                optimizer.step()
+                
             running_loss += loss.item()
         
         ep_tr_loss = running_loss / len(train_loader)
         tr_losses.append(ep_tr_loss)
 
-        # --- VAL STEP ---
         model.eval()
         val_loss = 0.0
         with torch.no_grad():
@@ -148,77 +151,71 @@ def train(model, train_loader, val_loader, args, paths):
                     mean_v = y.sum(1, keepdim=True)/(M_dim*N_dim)
                     x0 = mean_v.repeat(1, N_dim)
                 
-                xp, _, _ = model(static, None, x0, y)
+                current_static = static_p3mg if is_p3mg else None
+                xp, _, _ = model(current_static, None, x0, y)
                 val_loss += criterion(xp, xt).item()
         
         ep_val_loss = val_loss / len(val_loader)
         val_losses.append(ep_val_loss)
 
-        # Logs
         print(f"Ep {ep+1}/{args.epochs} | Tr: {ep_tr_loss:.4e} | Val: {ep_val_loss:.4e} | T: {time.time()-t0:.1f}s")
 
-        # --- SAUVEGARDES & PLOTS ---
         if (ep+1) % 5 == 0 or (ep+1) == args.epochs:
             ckpt_path = os.path.join(path_checkpoints, f'checkpoint_epoch{ep+1}.pt')
-            torch.save({
+            
+            # On sauvegarde l'état de l'optimiseur uniquement s'il existe
+            save_dict = {
                 'epoch': ep+1,
                 'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
                 'train_losses': tr_losses
-            }, ckpt_path)
+            }
+            if has_parameters:
+                save_dict['optimizer_state_dict'] = optimizer.state_dict()
+                
+            torch.save(save_dict, ckpt_path)
             
-            # Sauvegarde Best Model
             if ep_val_loss < best_vloss:
                 best_vloss = ep_val_loss
                 torch.save(model.state_dict(), os.path.join(path_checkpoints, 'best_model.pt'))
 
-            # Plots via PlottingManager
             try:
                 plot_manager.plot_losses(tr_losses, val_losses)
                 plot_manager.plot_best_signals(ckpt_path)
+                # Cette méthode a déjà été sécurisée précédemment
                 plot_manager.plot_learned_params_evolution(ckpt_path)
-            except Exception as e:
-                print(f"[WARN] Plot error: {e}")
+            except Exception:
+                pass 
 
     print(f"--- Entrainement terminé en {(time.time()-start_time)/60:.2f} min ---")
 
-
 # =============================================================================
-# 2. FONCTION DE TEST (Indépendante)
+# 2. FONCTION DE TEST
 # =============================================================================
 def test(model, test_loader, args, paths, checkpoint_path=None):
-    """
-    Exécute uniquement la phase de test.
-    Charge un checkpoint (best_model.pt par défaut) et génère les stats/plots.
-    """
     device = args.device
     criterion_name = args.criterion if hasattr(args, 'criterion') else 'MSE'
     path_checkpoints, path_plots, path_logs = paths[1], paths[2], paths[3]
     
     print(f"--- [TEST] Démarrage sur {len(test_loader.dataset)} échantillons | Metric: {criterion_name} ---")
 
-    # 1. Chargement du checkpoint
     if checkpoint_path is None:
-        # Par défaut, on cherche le best_model.pt dans le dossier checkpoints généré
         checkpoint_path = os.path.join(path_checkpoints, 'best_model.pt')
     
     if os.path.exists(checkpoint_path):
         print(f"[INFO] Chargement des poids depuis : {checkpoint_path}")
         ckpt = torch.load(checkpoint_path, map_location=device)
-        # Gestion compatibilité (state_dict pur ou dict complet)
         sd = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
         model.load_state_dict(sd, strict=False)
     else:
-        print(f"[WARN] Aucun checkpoint trouvé à {checkpoint_path}. Utilisation du modèle tel quel (non entrainé ?).")
+        print(f"[WARN] Aucun checkpoint trouvé. Utilisation du modèle tel quel.")
 
     model.eval()
 
-    # 2. Initialisation Static & PlottingManager
     sample_batch = next(iter(test_loader))
     xt_s, y_s, _ = _unpack_batch(sample_batch, device)
     N_dim, M_dim = xt_s.shape[1], y_s.shape[1]
     
-    static, p3mg_tmp = init_static_params(args.alpha, args.beta, args.eta, N_dim, M_dim, device)
+    static_p3mg, p3mg_tmp = init_static_params(args, N_dim, M_dim, device)
 
     plot_manager = PlottingManager(
         model=model, p3mg_tmp=p3mg_tmp, val_loader=None,
@@ -226,17 +223,15 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
         device=device, path_plots=path_plots, criterion=get_criterion(criterion_name), metric_name=criterion_name
     )
 
-    # 3. Boucle d'évaluation
-    saved_samples = [] # Stocke (valeur_loss, xt, xp)
+    saved_samples = [] 
+    is_p3mg = (args.model.strip().lower() == 'p3mg')
 
-    # Helper interne pour la métrique de tri
     def compute_sample_metric(xh, xt, name):
         if name == 'MSE': 
             return torch.mean((xh - xt)**2, dim=1)
         elif name in ['SNR', 'TSNR']:
             noise = torch.mean((xt - xh)**2, dim=1)
             sig   = torch.mean(xt**2, dim=1)
-            # On minimise l'opposé du SNR pour le tri
             return -10 * torch.log10(sig / (noise + 1e-12)) 
         else: 
             return torch.mean((xh - xt)**2, dim=1)
@@ -248,11 +243,10 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
                 mean_v = y.sum(1, keepdim=True)/(M_dim*N_dim)
                 x0 = mean_v.repeat(1, N_dim)
 
-            xp, _, _ = model(static, None, x0, y)
+            current_static = static_p3mg if is_p3mg else None
+            xp, _, _ = model(current_static, None, x0, y)
             
-            # Calcul loss par échantillon
             metrics = compute_sample_metric(xp, xt, criterion_name)
-            
             metrics_cpu = metrics.cpu()
             xt_cpu = xt.cpu()
             xp_cpu = xp.cpu()
@@ -265,8 +259,7 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
         print("[WARN] Aucun échantillon de test.")
         return 0.0
 
-    # 4. Analyse Statistique
-    saved_samples.sort(key=lambda x: x[0]) # Tri
+    saved_samples.sort(key=lambda x: x[0]) 
     all_values = [x[0] for x in saved_samples]
     arr = np.array(all_values)
 
@@ -278,7 +271,6 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
 
     print(f"[RESULTATS] Mean: {mean_v:.4e} | Median: {med_v:.4e} | Best: {best_v:.4e} | Worst: {worst_v:.4e}")
 
-    # 5. Sauvegarde Table & Stats
     table_str = (
         f"\n+-----------------------------------------+\n"
         f"|        RESULTATS TEST ({criterion_name:<5})        |\n"
@@ -293,13 +285,6 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
     with open(os.path.join(path_logs, 'test_results_table.txt'), 'w') as f:
         f.write(table_str)
 
-    # 6. Plots (Best, Median, Worst, Mean)
-    best_sample = saved_samples[0]
-    worst_sample = saved_samples[-1]
-    med_sample = saved_samples[len(saved_samples)//2]
-    idx_mean = (np.abs(arr - mean_v)).argmin()
-    mean_sample = saved_samples[idx_mean]
-
     def safe_plot(sample, tag):
         try:
             plot_manager.plot_signals(
@@ -309,13 +294,13 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
                 criterion_name, 
                 sample[0]
             )
-        except Exception as e:
-            print(f"Plot fail {tag}: {e}")
+        except Exception:
+            pass
 
-    safe_plot(best_sample, "BEST")
-    safe_plot(worst_sample, "WORST")
-    safe_plot(med_sample, "MEDIAN")
-    safe_plot(mean_sample, "MEAN")
+    safe_plot(saved_samples[0], "BEST")
+    safe_plot(saved_samples[-1], "WORST")
+    safe_plot(saved_samples[len(saved_samples)//2], "MEDIAN")
+    safe_plot(saved_samples[(np.abs(arr - mean_v)).argmin()], "MEAN")
 
     if hasattr(plot_manager, 'plot_test_error_distribution'):
         plot_manager.plot_test_error_distribution(arr, metric_name=criterion_name)
