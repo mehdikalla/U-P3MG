@@ -3,7 +3,7 @@
 # ==============================================================================
 
 # --- 1. Paramètres généraux et stratégie ---
-model: "pmms"               # Choix de l'architecture : 'p3mg', 'ista', 'hq', 'pmms', 'pd'
+model: "p3mg"               # Choix de l'architecture : 'p3mg', 'ista', 'hq', 'pmms', 'pd'
 strategy: "unrolling"       # Stratégie de résolution : 'unrolling' ou 'random_search'
 seed: 42                    # Graine aléatoire pour la reproductibilité
 
@@ -16,7 +16,7 @@ save_dir: "./Results"
 
 # --- 3. Paramètres d'entraînement (Unrolling) ---
 epochs: 50                 # Nombre total d'époques
-lr: 9.0e-03                # Taux d'apprentissage (Learning Rate)
+lr: 5.0e-03                # Taux d'apprentissage (Learning Rate)
 batch_size: 10             # Taille des batchs globale (utilisée par le Dataloader générique)
 train_batch_size: 10       # Taille des batchs pour l'entraînement
 val_batch_size: 1          # Taille des batchs pour la validation
@@ -25,9 +25,9 @@ criterion: "MSE"           # Métrique d'évaluation ('MSE', 'SNR', 'TSNR')
 Loss: "MSE"                # Fonction de coût principale
 
 # --- 4. Architecture du réseau ---
-num_layers: 100000             # Nombre de couches déroulées (K) pour tous les modèles
+num_layers: 30             # Nombre de couches déroulées (K) pour tous les modèles
 num_pd_layers: 10          # Nombre de sous-couches Primal-Dual (T) (utilisé par P3MG et HQ)
-number_layers: 100000         # Rétrocompatibilité avec l'ancien formalisme
+number_layers: 30         # Rétrocompatibilité avec l'ancien formalisme
 number_pd_layers: 10       # Rétrocompatibilité avec l'ancien formalisme
 
 # --- 5. Paramètres statiques (Spécifiques aux modèles) ---

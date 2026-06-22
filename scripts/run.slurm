@@ -32,7 +32,7 @@ mkdir -p logs
 # 2. Paramètres de l'expérience
 # -------------------------------------------------------------
 CONFIG="config.yaml"
-MODE="test"
+MODE="train"
   # Mode de fonctionnement (train/test)
 echo "--- Démarrage du Job Slurm ID: $SLURM_JOB_ID ---"
 echo "--- Mode: $MODE | Config: $CONFIG ---"
