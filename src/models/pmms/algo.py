@@ -6,7 +6,7 @@ class PMMS_algo(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def init_PMMS(self, x0, y, sigma=0.01, beta=1.0, eta=0.01, nu=0.1):
+    def init_PMMS(self, x0, y, sigma=0.01, beta=1.0, eta=0.01):
         """
         Initialisation des variables statiques et dynamiques.
         """
@@ -25,16 +25,16 @@ class PMMS_algo(nn.Module):
         dx_old = tc.zeros_like(x0)
         iter_count = 1
         
-        static = (Hmat, sigma, beta, eta, nu, Cg2)
+        static = (Hmat, sigma, beta, eta, Cg2)
         dynamic = (dx_old, countj, gamma_pen, epsilon, iter_count)
         
         return static, dynamic
 
-    def iter_PMMS(self, static, dynamic, x, y):
+    def iter_PMMS(self, static, dynamic, x, y, nu):
         """
         Itération principale PMMS.
         """
-        Hmat, sigma, beta, eta, nu, Cg2 = static
+        Hmat, sigma, beta, eta, Cg2 = static
         dx_old, countj, gamma_pen, epsilon, iter_count = dynamic
         
         # 1. Utilisation de ton gradient_x existant (Attache aux données + SOOT)

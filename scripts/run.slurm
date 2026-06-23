@@ -2,7 +2,7 @@
 # =============================================================
 # Configuration SLURM - Test Modèle HQ
 # =============================================================
-#SBATCH --job-name=Test_HQ
+#SBATCH --job-name=Test
 #SBATCH --partition=opis
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
@@ -32,7 +32,7 @@ mkdir -p logs
 # 2. Paramètres de l'expérience
 # -------------------------------------------------------------
 CONFIG="config.yaml"
-MODE="train"
+MODE="full"
   # Mode de fonctionnement (train/test)
 echo "--- Démarrage du Job Slurm ID: $SLURM_JOB_ID ---"
 echo "--- Mode: $MODE | Config: $CONFIG ---"

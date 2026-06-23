@@ -70,8 +70,53 @@ class PlottingManager:
             safe_id = str(identifier).replace(" ", "_").replace(":", "").replace(".", "p")
             plt.savefig(os.path.join(self.path_plots, f'sig_{safe_id}_s{i}.png'))
             plt.close()
-    
+
+    def plot_statistical_samples(self, saved_samples, metric_name=None, prefix=""):
+        """
+        Génère systématiquement les 4 graphiques (Best, Worst, Median, Mean) 
+        à partir d'une liste d'échantillons.
+        """
+        if metric_name is None:
+            metric_name = self.metric_name
+
+        if not saved_samples:
+            return
+
+        # Tri des échantillons par valeur d'erreur croissante
+        saved_samples.sort(key=lambda x: x[0])
+        arr = np.array([x[0] for x in saved_samples])
+        mean_v = np.mean(arr)
+
+        def _custom_plot(sample, filename, title_prefix):
+            val, xt_numpy, xp_numpy = sample
+            plt.figure(figsize=(10, 3))
+            plt.plot(xt_numpy, label='True Signal')
+            plt.plot(xp_numpy, '--', label='Predicted Signal')
+            plt.legend()
+            plt.grid()
+            plt.title(f"{title_prefix} | {metric_name}: {val:.4e}")
+            
+            save_path = os.path.join(self.path_plots, filename)
+            plt.savefig(save_path)
+            plt.close()
+
+        try:
+            # On utilise les suffixes logiques en fonction de l'index trié
+            _custom_plot(saved_samples[0], f"{prefix}best.png", f"{prefix.upper()}BEST")
+            _custom_plot(saved_samples[-1], f"{prefix}worst.png", f"{prefix.upper()}WORST")
+            _custom_plot(saved_samples[len(saved_samples)//2], f"{prefix}median.png", f"{prefix.upper()}MEDIAN")
+            
+            idx_mean = (np.abs(arr - mean_v)).argmin()
+            _custom_plot(saved_samples[idx_mean], f"{prefix}mean.png", f"{prefix.upper()}MEAN")
+            
+        except Exception as e:
+            print(f"[PlottingManager] Erreur lors de la génération des graphes statistiques : {e}")
+
     def plot_best_signals(self, path):
+        """
+        Cette fonction est appelée pendant l'entraînement. 
+        Elle évalue tout le set de validation et produit les 4 statistiques.
+        """
         if not os.path.isfile(path): return
         try:
             ckpt = torch.load(path, map_location=self.device)
@@ -83,14 +128,21 @@ class PlottingManager:
         self.model.eval()
         if self.val_loader is None: return
 
-        best_sample_loss = float('inf')
-        best_xt, best_xp = None, None
+        saved_samples = []
         
         dx = torch.zeros(1, self.N_dim).double().to(self.device)
         dy = torch.zeros(1, self.M_dim).double().to(self.device)
-        
-        # ROUTAGE DE LA VARIABLE STATIQUE
         current_static = self._get_static_for_model(dx, dy)
+
+        def compute_sample_metric(xh, xt, name):
+            if name == 'MSE': 
+                return torch.mean((xh - xt)**2, dim=1)
+            elif name in ['SNR', 'TSNR']:
+                noise = torch.mean((xt - xh)**2, dim=1)
+                sig   = torch.mean(xt**2, dim=1)
+                return -10 * torch.log10(sig / (noise + 1e-12)) 
+            else: 
+                return torch.mean((xh - xt)**2, dim=1)
 
         with torch.no_grad():
             for batch in self.val_loader:
@@ -100,22 +152,18 @@ class PlottingManager:
                 
                 xp, _, _ = self.model(current_static, None, x0, y)
 
-                current_loss = self.criterion(xp, xt).item()
+                metrics = compute_sample_metric(xp, xt, self.metric_name)
+                metrics_cpu = metrics.cpu()
+                xt_cpu = xt.cpu()
+                xp_cpu = xp.cpu()
                 
-                if current_loss < best_sample_loss:
-                    best_sample_loss = current_loss
-                    best_xt = xt[0].cpu().numpy()
-                    best_xp = xp[0].detach().cpu().numpy()
+                for k in range(xt.size(0)):
+                    val = metrics_cpu[k].item()
+                    # On convertit immédiatement en numpy pour alléger la RAM
+                    saved_samples.append((val, xt_cpu[k].numpy(), xp_cpu[k].detach().numpy()))
         
-        if best_xt is not None:
-            plt.figure(figsize=(10,3))
-            plt.plot(best_xt, label='True')
-            plt.plot(best_xp, '--', label='Pred')
-            plt.title(f'Best Model (Lowest Sample {self.metric_name}: {best_sample_loss:.4e})')
-            plt.grid()
-            plt.legend()
-            plt.savefig(os.path.join(self.path_plots, 'best_sig.png'))
-            plt.close()
+        # On trace les 4 graphes avec le préfixe 'val_'
+        self.plot_statistical_samples(saved_samples, self.metric_name, prefix="val_")
    
     def plot_learned_params_evolution(self, path):
         if not os.path.isfile(path): return
@@ -144,11 +192,9 @@ class PlottingManager:
             
         for k, layer in enumerate(self.model.Layers):
             if k < len(dl): 
-                # Les lambdas de HQ/PD peuvent être des tuples, on récupère le 1er élément
                 val = dl[k][0] if isinstance(dl[k], tuple) else dl[k]
                 lmbd_vals.append(val.squeeze().item())
                 
-            # Tous les algos n'ont pas de tau_k
             if hasattr(layer, 'tau_k'): 
                 tau_rows.append(S(layer.tau_k).detach().cpu().numpy().flatten())
             
