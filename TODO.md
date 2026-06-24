@@ -23,10 +23,10 @@ Each time you complete a task, please check it off the list below, putting an "x
 - [x] Fix one loss function and one metric for evaluation and use them consistently throughout the project.
 - [x] Fix the learning rate and the optimizer for all the models you will implement.
 - [x] Implement the P3MG traditional algorithm and evaluate its performance on the easiest dataset.
-- [ ] Implement the HQ traditional algorithm and evaluate its performance on the easiest dataset.
+- [x] Implement the HQ traditional algorithm and evaluate its performance on the easiest dataset.
 - [x] Implement the ISTA traditional algorithm and evaluate its performance on the easiest dataset.
-- [ ] Implement the PMMS traditional algorithm and evaluate its performance on the easiest dataset.
-- [ ] Implement the U-HQ model and evaluate its performance on the easiest dataset.
+- [x] Implement the PMMS traditional algorithm and evaluate its performance on the easiest dataset.
+- [x] Implement the U-HQ model and evaluate its performance on the easiest dataset.
 - [x] Implement the U-ISTA model and evaluate its performance on the easiest dataset.
 - [x] Implement the U-P3MG model and evaluate its performance on all datasets.
 
@@ -34,7 +34,6 @@ Once we have completed the above tasks, we can consider fully deep learning appr
 
 The following are some of the deep learning approaches token from the U-HQ paper that we can implement and compare with the U-P3MG model:
 - [ ] Implement FCU-Net and evaluate its performance on the easiest dataset.
-- [ ] Implement Auto-Encoder and evaluate its performance on the easiest dataset.
 - [ ] Implement ResUNet and evaluate its performance on the easiest dataset.
 
 ### **2. Evaluating Models on Different Datasets** should be done by mid July.
