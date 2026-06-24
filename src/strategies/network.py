@@ -53,10 +53,11 @@ def init_static_params(args, N_dim, M_dim, device):
         params = [args.alpha, args.beta, args.eta]
         static = algo_tmp.init_P3MG(params, dx, dy)
         
-    elif model_name == 'ista':
-        from src.models.ista.algo import ISTA_algo
-        algo_tmp = ISTA_algo().to(device).double()
-        static = algo_tmp.init_ISTA(dx, dy)
+    elif model_name == 'hq':
+        from src.models.hq.algo import HQ_algo
+        algo_tmp = HQ_algo().to(device).double()
+        # Initialisation une seule fois
+        static = algo_tmp.init_HQ(dx, dy) 
         
     else:
         algo_tmp = None
@@ -136,12 +137,15 @@ def train(model, train_loader, val_loader, args, paths):
             
             # CORRECTION MAJEURE: Ne passer les statiques que pour P3MG.
             # ISTA/PMMS doivent recevoir `None` sinon ils by-passent leurs poids appris !
-            current_static = static_params if model_name == 'p3mg' else None
+            current_static = static_params
             xp, _, _ = model(current_static, None, x0, y)
             
             loss = criterion(xp, xt)
             
             if has_parameters and loss.requires_grad:
+                if torch.isnan(loss).any():
+                    print("ALERT: NaN détecté avant backward ! Vérifiez vos lambdas.")
+                    return # Arrêtez l'entraînement
                 loss.backward()
                 optimizer.step()
                 
@@ -159,7 +163,7 @@ def train(model, train_loader, val_loader, args, paths):
                     mean_v = y.sum(1, keepdim=True)/(M_dim*N_dim)
                     x0 = mean_v.repeat(1, N_dim)
                 
-                current_static = static_params if model_name == 'p3mg' else None
+                current_static = static_params 
                 xp, _, _ = model(current_static, None, x0, y)
                 val_loss += criterion(xp, xt).item()
         

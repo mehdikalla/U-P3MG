@@ -60,8 +60,11 @@ class HQ_algo(nn.Module):
         # `solve` est nativement optimisé pour les GPU (résolution LU) et 
         # son backward est infiniment plus rapide que celui de `lstsq`.
         # ---------------------------------------------------------------------
-        eps = 1e-5 
+        eps = 1e-4 
         D_diag = lmbd_cvx * w_cvx + lmbd_ncvx * w_ncvx + eps
+
+        if tc.isnan(D_diag).any() or tc.isinf(D_diag).any():
+            D_diag = tc.nan_to_num(D_diag, nan=1.0, posinf=1.0, neginf=1.0)
         
         # Construction du système A = H^T H + diag(D)
         Ht_H_batch = Ht_H.unsqueeze(0).expand(P, -1, -1)

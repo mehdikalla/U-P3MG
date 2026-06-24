@@ -67,21 +67,21 @@ def get_algo_and_static(args, N_dim, M_dim, device):
     else:
         raise NotImplementedError(f"Le Random Search n'est pas configuré pour le modèle : {model_name.upper()}.")
 
-def run_iterative_algo(model_name, algo, y, x0, static, lmbd_val, tau_val=None, nu_val=None, max_iter=100):
-    """Exécute la boucle itérative adaptée au modèle choisi."""
+def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
+    """Exécute la boucle itérative adaptée au modèle avec ses hyperparamètres explicites."""
     device = y.device
 
     if model_name == 'p3mg':
-        lmbd = torch.tensor(lmbd_val, device=device, dtype=torch.float64)
-        tau = torch.full((algo.num_pd_layers,), tau_val, device=device, dtype=torch.float64)
+        lmbd = torch.tensor(hp['lmbd'], device=device, dtype=torch.float64)
+        tau = torch.full((algo.num_pd_layers,), hp['tau'], device=device, dtype=torch.float64)
         x, dyn = algo.iter_P3MG_base(static, x0, y, lmbd, tau)
         for _ in range(1, max_iter):
             x, dyn = algo.iter_P3MG(static, dyn, x, y, lmbd, tau)
         return x
 
     elif model_name == 'pd':
-        tau = torch.tensor(tau_val, device=device, dtype=torch.float64)
-        sigma = torch.tensor(lmbd_val, device=device, dtype=torch.float64)
+        tau = torch.tensor(hp['tau'], device=device, dtype=torch.float64)
+        sigma = torch.tensor(hp['lmbd'], device=device, dtype=torch.float64)
         rho = torch.tensor(0.1, device=device, dtype=torch.float64)
         Hmat = static
         _, p0, d0 = algo.init_PD(x0, y)
@@ -95,8 +95,7 @@ def run_iterative_algo(model_name, algo, y, x0, static, lmbd_val, tau_val=None, 
         return p
 
     elif model_name == 'pmms':
-        # PMMS n'a besoin que d'un paramètre scalaire (nu), mappé sur lmbd_val
-        nu = float(lmbd_val)
+        nu = float(hp['nu'])
         eta, sigma, beta = static
         static_pmms, dyn = algo.init_PMMS(x0, y, sigma=sigma, beta=beta, eta=eta)
         x = x0
@@ -107,18 +106,20 @@ def run_iterative_algo(model_name, algo, y, x0, static, lmbd_val, tau_val=None, 
     elif model_name == 'ista':
         Hmat, L = static
         gamma = 1.0 / L
+        lmbd = float(hp['lmbd'])
         x = x0
         for _ in range(max_iter):
-            x = algo.iter_ISTA(x, y, Hmat, gamma, lmbd_val)
+            x = algo.iter_ISTA(x, y, Hmat, gamma, lmbd)
         return x
 
     elif model_name == 'hq':
         Hmat, Ht_y, Ht_H = static
-        gamma = 1.0 # Pas théorique de la Minimisation Majorée
+        gamma = float(hp['gamma'])
+        lmbd_cvx = float(hp['lmbd_cvx'])
+        lmbd_ncvx = float(hp['lmbd_ncvx'])
         x = x0
         for _ in range(max_iter):
-            # lmbd_cvx est piloté par lmbd_val, lmbd_ncvx par nu_val
-            x = algo.iter_HQ(x, y, Hmat, Ht_y, Ht_H, gamma, lmbd_val, nu_val)
+            x = algo.iter_HQ(x, y, Hmat, Ht_y, Ht_H, gamma, lmbd_cvx, lmbd_ncvx)
         return x
 
 # =============================================================================
@@ -130,10 +131,7 @@ def train(loader, args, paths):
     path_checkpoints, _, path_logs = paths[1], paths[2], paths[3]
     model_name = args.model.strip().lower()
     
-    use_tau = model_name in ['p3mg', 'pd']
-    use_nu = model_name in ['hq'] # Activation du 2nd scalaire log-uniforme
-    
-    print(f"--- [RANDOM SEARCH] Calibration {model_name.upper()} | Alpha={args.alpha}, Beta={args.beta} ---")
+    print(f"--- [RANDOM SEARCH] Calibration {model_name.upper()} ---")
 
     full_data = list(loader)
     subset_size = max(1, int(len(full_data) * 0.10))
@@ -151,20 +149,27 @@ def train(loader, args, paths):
     l_mid_log = (np.log10(float(lmbd_min)) + np.log10(float(lmbd_max))) / 2
     best_loss = float('inf')
     
-    best_params = {'lmbd': 10**l_mid_log}
-    if use_tau:
-        tau_min, tau_max = args.tau_bounds
-        best_params['tau'] = (float(tau_min) + float(tau_max)) / 2
-    if use_nu:
-        best_params['nu'] = 10**l_mid_log
+    best_params = {}
     
     start = time.time()
     for i in range(args.n_samples):
         log_l_min, log_l_max = np.log10(float(lmbd_min)), np.log10(float(lmbd_max))
+        hp = {}
         
-        curr_lmbd = 10 ** random.uniform(log_l_min, log_l_max)
-        curr_tau = random.uniform(float(tau_min), float(tau_max)) if use_tau else None
-        curr_nu = 10 ** random.uniform(log_l_min, log_l_max) if use_nu else None
+        # Attribution explicite des hyperparamètres selon le modèle
+        if model_name == 'hq':
+            tau_min, tau_max = args.tau_bounds
+            hp['lmbd_cvx'] = 10 ** random.uniform(log_l_min, log_l_max)
+            hp['lmbd_ncvx'] = 10 ** random.uniform(log_l_min, log_l_max)
+            hp['gamma'] = random.uniform(float(tau_min), float(tau_max))
+        elif model_name == 'pmms':
+            hp['nu'] = 10 ** random.uniform(log_l_min, log_l_max)
+        elif model_name == 'ista':
+            hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
+        elif model_name in ['p3mg', 'pd']:
+            tau_min, tau_max = args.tau_bounds
+            hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
+            hp['tau'] = random.uniform(float(tau_min), float(tau_max))
         
         val_loss = 0.0
         with torch.no_grad():
@@ -173,22 +178,17 @@ def train(loader, args, paths):
                 if x0 is None: 
                     x0 = y.sum(1, keepdim=True).repeat(1, N_dim)/(M_dim*N_dim)
                 
-                xh = run_iterative_algo(model_name, algo, y, x0, static, curr_lmbd, tau_val=curr_tau, nu_val=curr_nu, max_iter=algo_iters)
+                xh = run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=algo_iters)
                 val_loss += criterion(xh, xt).item()
         
         avg_loss = val_loss / len(calibration_set)
         
         if avg_loss < best_loss:
             best_loss = avg_loss
-            best_params['lmbd'] = curr_lmbd
-            if use_tau:
-                best_params['tau'] = curr_tau
-                print(f"   [{i+1}/{args.n_samples}] New Best! L={curr_lmbd:.4e} T={curr_tau:.4f} | Loss={best_loss:.4e}")
-            elif use_nu:
-                best_params['nu'] = curr_nu
-                print(f"   [{i+1}/{args.n_samples}] New Best! L_cvx={curr_lmbd:.4e} L_ncvx={curr_nu:.4e} | Loss={best_loss:.4e}")
-            else:
-                print(f"   [{i+1}/{args.n_samples}] New Best! L={curr_lmbd:.4e} | Loss={best_loss:.4e}")
+            best_params = hp.copy()
+            
+            hp_str = " ".join([f"{k}={v:.4e}" if 'lmbd' in k or 'nu' in k else f"{k}={v:.4f}" for k, v in hp.items()])
+            print(f"   [{i+1}/{args.n_samples}] New Best! {hp_str} | Loss={best_loss:.4e}")
 
     print(f"[RESULT] Best Params: {best_params} (Time: {time.time()-start:.1f}s)")
     with open(os.path.join(path_checkpoints, 'best_params.json'), 'w') as f:
@@ -203,9 +203,6 @@ def test(loader, args, paths):
     path_checkpoints, path_plots, path_logs = paths[1], paths[2], paths[3]
     model_name = args.model.strip().lower()
     
-    use_tau = model_name in ['p3mg', 'pd']
-    use_nu = model_name in ['hq']
-    
     print(f"--- [RANDOM SEARCH] Test Final {model_name.upper()} ---")
     
     try:
@@ -213,9 +210,15 @@ def test(loader, args, paths):
             best_params = json.load(f)
         print(f"[INFO] Paramètres chargés : {best_params}")
     except:
-        best_params = {'lmbd': 1.0}
-        if use_tau: best_params['tau'] = 0.5
-        if use_nu: best_params['nu'] = 1.0
+        # Fallback explicite
+        if model_name == 'hq':
+            best_params = {'lmbd_cvx': 1.0, 'lmbd_ncvx': 1.0, 'gamma': 1.0}
+        elif model_name == 'pmms':
+            best_params = {'nu': 0.1}
+        elif model_name == 'ista':
+            best_params = {'lmbd': 1.0}
+        else:
+            best_params = {'lmbd': 1.0, 'tau': 0.5}
         print("[WARN] Paramètres par défaut chargés.")
 
     sample = next(iter(loader))
@@ -234,26 +237,17 @@ def test(loader, args, paths):
              return -10 * torch.log10(s / (n + 1e-12))
         return torch.mean((xh - xt)**2, dim=1)
 
-    if use_tau:
-        print(f"[INFO] Application sur {len(loader)} batchs avec L={best_params.get('lmbd', 1.0):.4e}, T={best_params.get('tau', 0.5):.4f}...")
-    elif use_nu:
-        print(f"[INFO] Application sur {len(loader)} batchs avec L_cvx={best_params.get('lmbd', 1.0):.4e}, L_ncvx={best_params.get('nu', 1.0):.4e}...")
-    else:
-        print(f"[INFO] Application sur {len(loader)} batchs avec L={best_params.get('lmbd', 1.0):.4e}...")
+    hp_str = " ".join([f"{k}={v:.4e}" if 'lmbd' in k or 'nu' in k else f"{k}={v:.4f}" for k, v in best_params.items()])
+    print(f"[INFO] Application sur {len(loader)} batchs avec {hp_str}...")
 
     with torch.no_grad():
         for batch in loader:
             xt, y, x0 = _unpack_batch(batch, device)
             if x0 is None: x0 = y.sum(1, keepdim=True).repeat(1, N_dim)/(M_dim*N_dim)
             
-            curr_tau = best_params.get('tau', None) if use_tau else None
-            curr_nu = best_params.get('nu', None) if use_nu else None
-            
             xh = run_iterative_algo(
                 model_name, algo, y, x0, static, 
-                lmbd_val=best_params.get('lmbd', 1.0), 
-                tau_val=curr_tau, 
-                nu_val=curr_nu, 
+                hp=best_params, 
                 max_iter=args.algo_iters
             )
             
