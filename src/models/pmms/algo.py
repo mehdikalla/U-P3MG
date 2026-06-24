@@ -1,6 +1,6 @@
 import torch as tc
 import torch.nn as nn
-from src.utils.functions import*
+from src.utils.functions import *
 
 class PMMS_algo(nn.Module):
     def __init__(self):
@@ -32,12 +32,12 @@ class PMMS_algo(nn.Module):
 
     def iter_PMMS(self, static, dynamic, x, y, nu):
         """
-        Itération principale PMMS.
+        Itération principale PMMS. L'hyperparamètre nu est passé dynamiquement.
         """
         Hmat, sigma, beta, eta, Cg2 = static
         dx_old, countj, gamma_pen, epsilon, iter_count = dynamic
         
-        # 1. Utilisation de ton gradient_x existant (Attache aux données + SOOT)
+        # 1. Utilisation du gradient existant avec nu optimisé
         grad_base, l1 = gradient_x(x, y, Hmat, sigma, beta, eta, nu)
         
         # 2. Ajout manuel de la pénalité du simplexe spécifique à PMMS
@@ -51,12 +51,10 @@ class PMMS_algo(nn.Module):
             
         D = tc.stack(Dx_list, dim=1) # (P, L, N)
         
-        # Construction de la matrice B en utilisant ta fonction Majorante_x
+        # Construction de la matrice B
         Ad_list = []
         for d_vec in Dx_list:
-            # Majorante de base via utils/functions.py
             Ad_base = Majorante_x(d_vec, x, sigma, l1, beta, Cg2, Hmat, nu)
-            # Ajout du terme de pénalité PMMS
             Ad_temp = Ad_base + gamma_pen * d_vec
             Ad_list.append(Ad_temp)
             

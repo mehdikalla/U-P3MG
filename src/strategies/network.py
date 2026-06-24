@@ -8,7 +8,6 @@ import numpy as np
 
 from src.utils.functions import snr_loss, tsnr_loss 
 from src.utils.plotting_manager import PlottingManager
-from src.models.p3mg.algo import P3MG_algo
 
 def get_criterion(name):
     if name == 'MSE':
@@ -43,46 +42,56 @@ def _unpack_batch(batch, device):
     return xt, y, x0
 
 def init_static_params(args, N_dim, M_dim, device):
-    """Initialise les paramètres statiques de manière dynamique."""
-    # Correction : utilisation de args.num_pd_layers plutôt que 1 en dur
-    p3mg_tmp = P3MG_algo(num_pd_layers=args.num_pd_layers).to(device).double()
-    
+    """Initialise les paramètres statiques de manière dynamique selon le modèle."""
+    model_name = args.model.strip().lower()
     dx = torch.zeros(1, N_dim).double().to(device)
     dy = torch.zeros(1, M_dim).double().to(device)
     
-    params = [args.alpha, args.beta, args.eta]
-    static = p3mg_tmp.init_P3MG(params, dx, dy)
-    
-    return static, p3mg_tmp
+    if model_name == 'p3mg':
+        from src.models.p3mg.algo import P3MG_algo
+        algo_tmp = P3MG_algo(num_pd_layers=getattr(args, 'num_pd_layers', 5)).to(device).double()
+        params = [args.alpha, args.beta, args.eta]
+        static = algo_tmp.init_P3MG(params, dx, dy)
+        
+    elif model_name == 'ista':
+        from src.models.ista.algo import ISTA_algo
+        algo_tmp = ISTA_algo().to(device).double()
+        static = algo_tmp.init_ISTA(dx, dy)
+        
+    else:
+        algo_tmp = None
+        static = None
+        
+    return static, algo_tmp
 
 # =============================================================================
-# 1. FONCTION D'ENTRAINEMENT
-# =============================================================================
-# =============================================================================
-# 1. FONCTION D'ENTRAINEMENT (Sécurisée)
+# 1. FONCTION D'ENTRAINEMENT (Sécurisée et Dynamique)
 # =============================================================================
 def train(model, train_loader, val_loader, args, paths):
     device = args.device
     criterion_name = args.criterion if hasattr(args, 'criterion') else 'MSE'
     criterion = get_criterion(criterion_name)
+    model_name = args.model.strip().lower()
     
     path_save, path_checkpoints, path_plots, path_logs = paths
     save_config(path_logs, args)
     
     print(f"--- [TRAIN] Démarrage : {args.epochs} epochs | Loss: {criterion_name} ---")
 
-    # 1. Configuration Optimiseur (Sécurisée)
-    tau_params = [p for n, p in model.named_parameters() if 'tau_k' in n]
-    other_params = [p for n, p in model.named_parameters() if 'tau_k' not in n]
+    # Sécurisation de l'optimiseur (uniquement les variables avec requires_grad)
+    tau_params = [p for n, p in model.named_parameters() if 'tau_k' in n and p.requires_grad]
+    other_params = [p for n, p in model.named_parameters() if 'tau_k' not in n and p.requires_grad]
     
-    # On vérifie si le modèle a des paramètres à apprendre
-    has_parameters = len(tau_params) > 0 or len(other_params) > 0
+    param_groups = []
+    if len(other_params) > 0:
+        param_groups.append({'params': other_params, 'lr': args.lr})
+    if len(tau_params) > 0:
+        param_groups.append({'params': tau_params, 'lr': args.lr * 5.0})
+        
+    has_parameters = len(param_groups) > 0
     
     if has_parameters:
-        optimizer = optim.Adam([
-            {'params': other_params, 'lr': args.lr},
-            {'params': tau_params, 'lr': args.lr * int(5.0)}
-        ], lr=args.lr)
+        optimizer = optim.Adam(param_groups, lr=args.lr)
     else:
         optimizer = None
         print("[INFO] Aucun paramètre apprenable détecté. Évaluation sans rétropropagation.")
@@ -91,11 +100,11 @@ def train(model, train_loader, val_loader, args, paths):
     xt_s, y_s, _ = _unpack_batch(sample_batch, device)
     N_dim, M_dim = xt_s.shape[1], y_s.shape[1]
     
-    static_p3mg, p3mg_tmp = init_static_params(args, N_dim, M_dim, device)
+    static_params, algo_tmp = init_static_params(args, N_dim, M_dim, device)
 
     plot_manager = PlottingManager(
         model=model,
-        p3mg_tmp=p3mg_tmp,
+        p3mg_tmp=algo_tmp,
         val_loader=val_loader,
         N_dim=N_dim,
         M_dim=M_dim,
@@ -109,8 +118,6 @@ def train(model, train_loader, val_loader, args, paths):
     tr_losses, val_losses = [], []
     best_vloss = float('inf')
     start_time = time.time()
-
-    is_p3mg = (args.model.strip().lower() == 'p3mg')
 
     for ep in range(args.epochs):
         t0 = time.time()
@@ -127,12 +134,13 @@ def train(model, train_loader, val_loader, args, paths):
             if has_parameters:
                 optimizer.zero_grad()
             
-            current_static = static_p3mg if is_p3mg else None
+            # CORRECTION MAJEURE: Ne passer les statiques que pour P3MG.
+            # ISTA/PMMS doivent recevoir `None` sinon ils by-passent leurs poids appris !
+            current_static = static_params if model_name == 'p3mg' else None
             xp, _, _ = model(current_static, None, x0, y)
             
             loss = criterion(xp, xt)
             
-            # On ne fait la rétropropagation que s'il y a des poids à optimiser
             if has_parameters and loss.requires_grad:
                 loss.backward()
                 optimizer.step()
@@ -151,7 +159,7 @@ def train(model, train_loader, val_loader, args, paths):
                     mean_v = y.sum(1, keepdim=True)/(M_dim*N_dim)
                     x0 = mean_v.repeat(1, N_dim)
                 
-                current_static = static_p3mg if is_p3mg else None
+                current_static = static_params if model_name == 'p3mg' else None
                 xp, _, _ = model(current_static, None, x0, y)
                 val_loss += criterion(xp, xt).item()
         
@@ -163,7 +171,6 @@ def train(model, train_loader, val_loader, args, paths):
         if (ep+1) % 5 == 0 or (ep+1) == args.epochs:
             ckpt_path = os.path.join(path_checkpoints, f'checkpoint_epoch{ep+1}.pt')
             
-            # On sauvegarde l'état de l'optimiseur uniquement s'il existe
             save_dict = {
                 'epoch': ep+1,
                 'model_state_dict': model.state_dict(),
@@ -181,7 +188,6 @@ def train(model, train_loader, val_loader, args, paths):
             try:
                 plot_manager.plot_losses(tr_losses, val_losses)
                 plot_manager.plot_best_signals(ckpt_path)
-                # Cette méthode a déjà été sécurisée précédemment
                 plot_manager.plot_learned_params_evolution(ckpt_path)
             except Exception:
                 pass 
@@ -189,12 +195,13 @@ def train(model, train_loader, val_loader, args, paths):
     print(f"--- Entrainement terminé en {(time.time()-start_time)/60:.2f} min ---")
 
 # =============================================================================
-# 2. FONCTION DE TEST
+# 2. FONCTION DE TEST (Dynamique)
 # =============================================================================
 def test(model, test_loader, args, paths, checkpoint_path=None):
     device = args.device
     criterion_name = args.criterion if hasattr(args, 'criterion') else 'MSE'
     path_checkpoints, path_plots, path_logs = paths[1], paths[2], paths[3]
+    model_name = args.model.strip().lower()
     
     print(f"--- [TEST] Démarrage sur {len(test_loader.dataset)} échantillons | Metric: {criterion_name} ---")
 
@@ -215,16 +222,15 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
     xt_s, y_s, _ = _unpack_batch(sample_batch, device)
     N_dim, M_dim = xt_s.shape[1], y_s.shape[1]
     
-    static_p3mg, p3mg_tmp = init_static_params(args, N_dim, M_dim, device)
+    static_params, algo_tmp = init_static_params(args, N_dim, M_dim, device)
 
     plot_manager = PlottingManager(
-        model=model, p3mg_tmp=p3mg_tmp, val_loader=None,
+        model=model, p3mg_tmp=algo_tmp, val_loader=None,
         N_dim=N_dim, M_dim=M_dim, static_params=[args.alpha, args.beta, args.eta],
         device=device, path_plots=path_plots, criterion=get_criterion(criterion_name), metric_name=criterion_name
     )
 
     saved_samples = [] 
-    is_p3mg = (args.model.strip().lower() == 'p3mg')
 
     def compute_sample_metric(xh, xt, name):
         if name == 'MSE': 
@@ -243,7 +249,7 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
                 mean_v = y.sum(1, keepdim=True)/(M_dim*N_dim)
                 x0 = mean_v.repeat(1, N_dim)
 
-            current_static = static_p3mg if is_p3mg else None
+            current_static = static_params if model_name == 'p3mg' else None
             xp, _, _ = model(current_static, None, x0, y)
             
             metrics = compute_sample_metric(xp, xt, criterion_name)
@@ -255,54 +261,54 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
                 val = metrics_cpu[k].item()
                 saved_samples.append((val, xt_cpu[k], xp_cpu[k]))
 
-    if not saved_samples:
-        print("[WARN] Aucun échantillon de test.")
-        return 0.0
+            if not saved_samples:
+                print("[WARN] Aucun échantillon de test.")
+                return 0.0
 
-    saved_samples.sort(key=lambda x: x[0]) 
-    all_values = [x[0] for x in saved_samples]
-    arr = np.array(all_values)
+            saved_samples.sort(key=lambda x: x[0]) 
+            all_values = [x[0] for x in saved_samples]
+            arr = np.array(all_values)
 
-    mean_v = np.mean(arr)
-    med_v  = np.median(arr)
-    std_v  = np.std(arr)
-    best_v = arr[0]
-    worst_v = arr[-1]
+            mean_v = np.mean(arr)
+            med_v  = np.median(arr)
+            std_v  = np.std(arr)
+            best_v = arr[0]
+            worst_v = arr[-1]
 
-    print(f"[RESULTATS] Mean: {mean_v:.4e} | Median: {med_v:.4e} | Best: {best_v:.4e} | Worst: {worst_v:.4e}")
+            print(f"[RESULTATS] Mean: {mean_v:.4e} | Median: {med_v:.4e} | Best: {best_v:.4e} | Worst: {worst_v:.4e}")
 
-    table_str = (
-        f"\n+-----------------------------------------+\n"
-        f"|        RESULTATS TEST ({criterion_name:<5})        |\n"
-        f"+-----------------------+-----------------+\n"
-        f"| Mean                  | {mean_v:<15.4e} |\n"
-        f"| Median                | {med_v:<15.4e} |\n"
-        f"| Std                   | {std_v:<15.4e} |\n"
-        f"| Min (Best)            | {best_v:<15.4e} |\n"
-        f"| Max (Worst)           | {worst_v:<15.4e} |\n"
-        f"+-----------------------+-----------------+\n"
-    )
-    with open(os.path.join(path_logs, 'test_results_table.txt'), 'w') as f:
-        f.write(table_str)
-
-    def safe_plot(sample, tag):
-        try:
-            plot_manager.plot_signals(
-                sample[1].unsqueeze(0), 
-                sample[2].unsqueeze(0), 
-                f'test_{tag}', 
-                criterion_name, 
-                sample[0]
+            table_str = (
+                f"\n+-----------------------------------------+\n"
+                f"|        RESULTATS TEST ({criterion_name:<5})        |\n"
+                f"+-----------------------+-----------------+\n"
+                f"| Mean                  | {mean_v:<15.4e} |\n"
+                f"| Median                | {med_v:<15.4e} |\n"
+                f"| Std                   | {std_v:<15.4e} |\n"
+                f"| Min (Best)            | {best_v:<15.4e} |\n"
+                f"| Max (Worst)           | {worst_v:<15.4e} |\n"
+                f"+-----------------------+-----------------+\n"
             )
-        except Exception:
-            pass
+            with open(os.path.join(path_logs, 'test_results_table.txt'), 'w') as f:
+                f.write(table_str)
 
-    safe_plot(saved_samples[0], "BEST")
-    safe_plot(saved_samples[-1], "WORST")
-    safe_plot(saved_samples[len(saved_samples)//2], "MEDIAN")
-    safe_plot(saved_samples[(np.abs(arr - mean_v)).argmin()], "MEAN")
+            def safe_plot(sample, tag):
+                try:
+                    plot_manager.plot_signals(
+                        sample[1].unsqueeze(0), 
+                        sample[2].unsqueeze(0), 
+                        f'test_{tag}', 
+                        criterion_name, 
+                        sample[0]
+                    )
+                except Exception:
+                    pass
 
-    if hasattr(plot_manager, 'plot_test_error_distribution'):
-        plot_manager.plot_test_error_distribution(arr, metric_name=criterion_name)
+            safe_plot(saved_samples[0], "BEST")
+            safe_plot(saved_samples[-1], "WORST")
+            safe_plot(saved_samples[len(saved_samples)//2], "MEDIAN")
+            safe_plot(saved_samples[(np.abs(arr - mean_v)).argmin()], "MEAN")
 
-    return mean_v
+            if hasattr(plot_manager, 'plot_test_error_distribution'):
+                plot_manager.plot_test_error_distribution(arr, metric_name=criterion_name)
+
+            return mean_v
