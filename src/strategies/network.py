@@ -265,54 +265,54 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
                 val = metrics_cpu[k].item()
                 saved_samples.append((val, xt_cpu[k], xp_cpu[k]))
 
-            if not saved_samples:
-                print("[WARN] Aucun échantillon de test.")
-                return 0.0
+        if not saved_samples:
+            print("[WARN] Aucun échantillon de test.")
+            return 0.0
 
-            saved_samples.sort(key=lambda x: x[0]) 
-            all_values = [x[0] for x in saved_samples]
-            arr = np.array(all_values)
+        saved_samples.sort(key=lambda x: x[0]) 
+        all_values = [x[0] for x in saved_samples]
+        arr = np.array(all_values)
 
-            mean_v = np.mean(arr)
-            med_v  = np.median(arr)
-            std_v  = np.std(arr)
-            best_v = arr[0]
-            worst_v = arr[-1]
+        mean_v = np.mean(arr)
+        med_v  = np.median(arr)
+        std_v  = np.std(arr)
+        best_v = arr[0]
+        worst_v = arr[-1]
 
-            print(f"[RESULTATS] Mean: {mean_v:.4e} | Median: {med_v:.4e} | Best: {best_v:.4e} | Worst: {worst_v:.4e}")
+        print(f"[RESULTATS] Mean: {mean_v:.4e} | Median: {med_v:.4e} | Best: {best_v:.4e} | Worst: {worst_v:.4e}")
 
-            table_str = (
-                f"\n+-----------------------------------------+\n"
-                f"|        RESULTATS TEST ({criterion_name:<5})        |\n"
-                f"+-----------------------+-----------------+\n"
-                f"| Mean                  | {mean_v:<15.4e} |\n"
-                f"| Median                | {med_v:<15.4e} |\n"
-                f"| Std                   | {std_v:<15.4e} |\n"
-                f"| Min (Best)            | {best_v:<15.4e} |\n"
-                f"| Max (Worst)           | {worst_v:<15.4e} |\n"
-                f"+-----------------------+-----------------+\n"
-            )
-            with open(os.path.join(path_logs, 'test_results_table.txt'), 'w') as f:
-                f.write(table_str)
+        table_str = (
+            f"\n+-----------------------------------------+\n"
+            f"|        RESULTATS TEST ({criterion_name:<5})        |\n"
+            f"+-----------------------+-----------------+\n"
+            f"| Mean                  | {mean_v:<15.4e} |\n"
+            f"| Median                | {med_v:<15.4e} |\n"
+            f"| Std                   | {std_v:<15.4e} |\n"
+            f"| Min (Best)            | {best_v:<15.4e} |\n"
+            f"| Max (Worst)           | {worst_v:<15.4e} |\n"
+            f"+-----------------------+-----------------+\n"
+        )
+        with open(os.path.join(path_logs, 'test_results_table.txt'), 'w') as f:
+            f.write(table_str)
 
-            def safe_plot(sample, tag):
-                try:
-                    plot_manager.plot_signals(
-                        sample[1].unsqueeze(0), 
-                        sample[2].unsqueeze(0), 
-                        f'test_{tag}', 
-                        criterion_name, 
-                        sample[0]
-                    )
-                except Exception:
-                    pass
+        def safe_plot(sample, tag):
+            try:
+                plot_manager.plot_signals(
+                    sample[1].unsqueeze(0), 
+                    sample[2].unsqueeze(0), 
+                    f'test_{tag}', 
+                    criterion_name, 
+                    sample[0]
+                )
+            except Exception:
+                pass
 
-            safe_plot(saved_samples[0], "BEST")
-            safe_plot(saved_samples[-1], "WORST")
-            safe_plot(saved_samples[len(saved_samples)//2], "MEDIAN")
-            safe_plot(saved_samples[(np.abs(arr - mean_v)).argmin()], "MEAN")
+        safe_plot(saved_samples[0], "BEST")
+        safe_plot(saved_samples[-1], "WORST")
+        safe_plot(saved_samples[len(saved_samples)//2], "MEDIAN")
+        safe_plot(saved_samples[(np.abs(arr - mean_v)).argmin()], "MEAN")
 
-            if hasattr(plot_manager, 'plot_test_error_distribution'):
-                plot_manager.plot_test_error_distribution(arr, metric_name=criterion_name)
+        if hasattr(plot_manager, 'plot_test_error_distribution'):
+            plot_manager.plot_test_error_distribution(arr, metric_name=criterion_name)
 
-            return mean_v
+        return mean_v

@@ -113,13 +113,20 @@ def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
         return x
 
     elif model_name == 'hq':
-        Hmat, Ht_y, Ht_H = static
+        # Maintenant static contient uniquement 2 éléments : Hmat et Ht_H
+        Hmat, Ht_H = static
+        
+        # Calcul dynamique de Ht_y nécessaire pour le HQ
+        Ht_y = torch.matmul(y, Hmat).contiguous()
+        
         gamma = float(hp['gamma'])
         lmbd_cvx = float(hp['lmbd_cvx'])
         lmbd_ncvx = float(hp['lmbd_ncvx'])
+        
         x = x0
         for _ in range(max_iter):
-            x = algo.iter_HQ(x, y, Hmat, Ht_y, Ht_H, gamma, lmbd_cvx, lmbd_ncvx)
+            # Passage des arguments corrigés
+            x = algo.iter_HQ(x, y, Hmat, Ht_H, gamma, lmbd_cvx, lmbd_ncvx)
         return x
 
 # =============================================================================

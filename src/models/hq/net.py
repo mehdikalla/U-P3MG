@@ -7,45 +7,41 @@ class HQ_layer(nn.Module):
         super().__init__()
         self.hq_algo = HQ_algo()
         
-        # Projection linéaire (Arch2 de Mouna Gharbi) : 
-        # On projette le résidu (de dimension in_features=100) vers un scalaire
         self.fc_cvx = nn.Linear(in_features, 1, bias=True).double()
         self.fc_ncvx = nn.Linear(in_features, 1, bias=True).double()
         
-        nn.init.uniform_(self.fc_cvx.weight, a=0.001, b=0.002)
-        nn.init.uniform_(self.fc_ncvx.weight, a=0.001, b=0.002)
+        nn.init.uniform_(self.fc_cvx.weight, a=0.01, b=0.02)
+        nn.init.constant_(self.fc_cvx.bias, 0.1) 
         
-        # Gamma est un scalaire apprenable initialisé à 1.0 (Optimal MM)
-        self.gamma = nn.Parameter(tc.tensor([1.0], dtype=tc.float64), requires_grad=True)
-        self.relu = nn.ReLU()
+        nn.init.uniform_(self.fc_ncvx.weight, a=0.01, b=0.02)
+        nn.init.constant_(self.fc_ncvx.bias, 0.1)
+        
+        self.gamma = nn.Parameter(tc.tensor([0.5], dtype=tc.float64), requires_grad=True)
+        self.softplus = nn.Softplus()
 
     def forward(self, static, x, y, gamma_override=None, lmbd_cvx_override=None, lmbd_ncvx_override=None):
-        Hmat, Ht_y, Ht_H = static
+        # Ht_y a été supprimé des variables statiques
+        Hmat, Ht_H = static
         
-        # Calcul du résidu au carré : (Hx - y)^2
-        Hx = tc.matmul(x, Hmat.t())
-        res = (Hx - y) ** 2
+        Hx = tc.matmul(x, Hmat.t().contiguous())
+        res = ((Hx - y) ** 2).contiguous()
         
-        # 1. Gamma : Pas de descente MM
         if gamma_override is not None:
             gamma_val = tc.tensor(gamma_override, device=x.device, dtype=tc.float64)
         else:
-            gamma_val = self.relu(self.gamma)
+            gamma_val = self.softplus(self.gamma)
             
-        # 2. Lambda CVX : Prediction dynamique
         if lmbd_cvx_override is not None:
             lmbd_cvx = tc.tensor(lmbd_cvx_override, device=x.device, dtype=tc.float64)
         else:
-            # Clamp pour éviter l'explosion numérique
-            lmbd_cvx = tc.clamp(self.relu(self.fc_cvx(res)), min=1e-5, max=1e2)
+            lmbd_cvx = self.softplus(self.fc_cvx(res))
             
-        # 3. Lambda NCVX : Prediction dynamique
         if lmbd_ncvx_override is not None:
             lmbd_ncvx = tc.tensor(lmbd_ncvx_override, device=x.device, dtype=tc.float64)
         else:
-            lmbd_ncvx = tc.clamp(self.relu(self.fc_ncvx(res)), min=1e-5, max=1e2)
+            lmbd_ncvx = self.softplus(self.fc_ncvx(res))
         
-        x_new = self.hq_algo.iter_HQ(x, y, Hmat, Ht_y, Ht_H, gamma_val, lmbd_cvx, lmbd_ncvx)
+        x_new = self.hq_algo.iter_HQ(x, y, Hmat, Ht_H, gamma_val, lmbd_cvx, lmbd_ncvx)
         return x_new, (lmbd_cvx, lmbd_ncvx, gamma_val)
 
 class HQ_model(nn.Module):

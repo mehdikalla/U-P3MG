@@ -4,7 +4,7 @@
 
 # --- 1. Paramètres généraux et stratégie ---
 model: "hq"               # Choix de l'architecture : 'p3mg', 'ista', 'hq', 'pmms', 'pd'
-strategy: "unrolling"       # Stratégie de résolution : 'unrolling' ou 'random_search'
+strategy: "random_search"       # Stratégie de résolution : 'unrolling' ou 'random_search'
 seed: 42                    # Graine aléatoire pour la reproductibilité
 
 # --- 2. Chemins et données ---
