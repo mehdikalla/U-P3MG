@@ -33,7 +33,7 @@ Each time you complete a task, please check it off the list below, putting an "x
 Once we have completed the above tasks, we can consider fully deep learning approaches and compare them with the U-P3MG model.
 
 The following are some of the deep learning approaches token from the U-HQ paper that we can implement and compare with the U-P3MG model:
-- [ ] Implement FCU-Net and evaluate its performance on the easiest dataset.
+- [ ] Implement FCNet and evaluate its performance on the easiest dataset.
 - [ ] Implement ResUNet and evaluate its performance on the easiest dataset.
 
 ### **2. Evaluating Models on Different Datasets** should be done by mid July.
