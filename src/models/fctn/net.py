@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 
-# Importation du bloc Transformer précédemment défini
 from src.models.Transformer_block import Transformer_Block
 
 class FCTN_model(nn.Module):

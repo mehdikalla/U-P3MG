@@ -26,6 +26,8 @@ Each time you complete a task, please check it off the list below, putting an "x
 - [x] Implement the HQ traditional algorithm and evaluate its performance on the easiest dataset.
 - [x] Implement the ISTA traditional algorithm and evaluate its performance on the easiest dataset.
 - [x] Implement the PMMS traditional algorithm and evaluate its performance on the easiest dataset.
+- [ ] Implement the Primal-Dual traditional algorithm and evaluate its performance on the easiest dataset.
+- [ ] Implement the U-PD model and evaluate its performance on the easiest dataset.
 - [x] Implement the U-HQ model and evaluate its performance on the easiest dataset.
 - [x] Implement the U-ISTA model and evaluate its performance on the easiest dataset.
 - [x] Implement the U-P3MG model and evaluate its performance on all datasets.
@@ -33,14 +35,17 @@ Each time you complete a task, please check it off the list below, putting an "x
 Once we have completed the above tasks, we can consider fully deep learning approaches and compare them with the U-P3MG model.
 
 The following are some of the deep learning approaches token from the U-HQ paper that we can implement and compare with the U-P3MG model:
-- [ ] Implement FCNet and evaluate its performance on the easiest dataset.
+
+- [ ] Implement an autoencoder and evaluate its performance on the easiest dataset.
+- [ ] Implement a transformer model and evaluate its performance on the easiest dataset.
+- [ ] Implement a FC U-Net model and evaluate it's performance on the easiest dataset.
 - [ ] Implement ResUNet and evaluate its performance on the easiest dataset.
 
 ### **2. Evaluating Models on Different Datasets** should be done by mid July.
 Once the evaluation is done on the easiest dataset, we can move on to the more challenging datasets and evaluate the performance of all models on those datasets as well.
 
-- [ ] Dataset 2: two gaussians and by diversification of the noise level.
-- [ ] Dataset 3: three or more gaussians and by diversification of the noise level.
+- [ ] Dataset 2: two gaussians and by diversification of the skew.
+- [ ] Dataset 3: three or more gaussians and by diversification of the skew.
 
 We should have three levels of noise for each dataset: low, medium, and high. This will allow us to evaluate the robustness of the models under different noise conditions.
 

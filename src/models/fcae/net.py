@@ -1,21 +1,174 @@
 import torch
 import torch.nn as nn
 
-from src.models.FC_block import FC_block
+
+class DenseBlock(nn.Module):
+    """
+    Bloc dense (Fully Connected) avec activation ReLU, normalisation par batch
+    et dropout optionnels. Sert d'unite de base pour l'encodeur et le
+    decodeur du FCAE.
+    """
+
+    def __init__(
+        self,
+        in_dim: int,
+        out_dim: int,
+        use_batchnorm: bool = True,
+        dropout: float = 0.0,
+    ) -> None:
+        super().__init__()
+        layers = [nn.Linear(in_dim, out_dim)]
+        if use_batchnorm:
+            layers.append(nn.BatchNorm1d(out_dim))
+        layers.append(nn.ReLU(inplace=True))
+        if dropout > 0.0:
+            layers.append(nn.Dropout(dropout))
+        self.body = nn.Sequential(*layers)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.body(x)
+
+
+class Encoder(nn.Module):
+    """
+    Encodeur Fully Connected : compresse l'observation bruitee vers un
+    espace latent de dimension reduite (goulot d'etranglement).
+    """
+
+    def __init__(
+        self,
+        in_dim: int,
+        hidden_dims: list,
+        latent_dim: int,
+        use_batchnorm: bool = True,
+        dropout: float = 0.0,
+    ) -> None:
+        super().__init__()
+        dims = [in_dim] + list(hidden_dims)
+        blocks = [
+            DenseBlock(dims[i], dims[i + 1], use_batchnorm, dropout)
+            for i in range(len(dims) - 1)
+        ]
+        self.hidden = nn.Sequential(*blocks)
+        # Projection finale vers l'espace latent sans activation, afin de ne
+        # pas contraindre artificiellement le signe/l'amplitude du code latent.
+        self.to_latent = nn.Linear(dims[-1], latent_dim)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        h = self.hidden(x)
+        return self.to_latent(h)
+
+
+class Decoder(nn.Module):
+    """
+    Decodeur Fully Connected : reconstruit le signal a partir du code
+    latent produit par l'encodeur.
+    """
+
+    def __init__(
+        self,
+        latent_dim: int,
+        hidden_dims: list,
+        out_dim: int,
+        use_batchnorm: bool = True,
+        dropout: float = 0.0,
+    ) -> None:
+        super().__init__()
+        dims = [latent_dim] + list(hidden_dims)
+        blocks = [
+            DenseBlock(dims[i], dims[i + 1], use_batchnorm, dropout)
+            for i in range(len(dims) - 1)
+        ]
+        self.hidden = nn.Sequential(*blocks)
+        # Projection finale vers la dimension du signal, sans activation ni
+        # normalisation, pour permettre une reconstruction non bornee.
+        self.to_output = nn.Linear(dims[-1], out_dim)
+
+    def forward(self, z: torch.Tensor) -> torch.Tensor:
+        h = self.hidden(z)
+        return self.to_output(h)
+
 
 class FCAE_model(nn.Module):
     """
-    Autoencodeur Fully Connected pour la reconstruction de signaux.
+    Autoencodeur Fully Connected (FCAE) pour la reconstruction de signaux.
+
+    Architecture encodeur-decodeur symetrique avec un goulot d'etranglement
+    (espace latent) explicite : l'encodeur compresse l'observation bruitee
+    `y` vers un code latent de dimension reduite, et le decodeur reconstruit
+    le signal `x` de dimension `N_dim` a partir de ce code. La normalisation
+    par batch et le dropout sont utilises pour stabiliser l'entrainement et
+    limiter le surapprentissage.
+
+    Args:
+        M_dim: Dimension de l'observation (entree).
+        N_dim: Dimension du signal reconstruit (sortie).
+        latent_dim: Dimension de l'espace latent (goulot d'etranglement).
+        hidden_dims: Largeurs des couches cachees de l'encodeur, dans l'ordre
+            entree -> latent. Le decodeur utilise les largeurs symetriques.
+        use_batchnorm: Active la normalisation par batch dans les blocs denses.
+        dropout: Taux de dropout applique apres chaque bloc dense (0.0 pour
+            desactiver).
     """
-    def __init__(self, M_dim, N_dim):
+
+    def __init__(
+        self,
+        M_dim: int,
+        N_dim: int,
+        latent_dim: int = 12,
+        hidden_dims: list = None,
+        use_batchnorm: bool = True,
+        dropout: float = 0.0,
+    ) -> None:
         super().__init__()
-        
-        self.layers = FC_block([M_dim, 50, 25, 12, 12, 25, 50, N_dim])
-    
-    def forward(self, static, dynamic, x0, y):
+
+        if hidden_dims is None:
+            hidden_dims = [50, 25]
+
+        self.M_dim = M_dim
+        self.N_dim = N_dim
+        self.latent_dim = latent_dim
+
+        self.encoder = Encoder(
+            in_dim=M_dim,
+            hidden_dims=hidden_dims,
+            latent_dim=latent_dim,
+            use_batchnorm=use_batchnorm,
+            dropout=dropout,
+        )
+        self.decoder = Decoder(
+            latent_dim=latent_dim,
+            hidden_dims=list(reversed(hidden_dims)),
+            out_dim=N_dim,
+            use_batchnorm=use_batchnorm,
+            dropout=dropout,
+        )
+
+    def encode(self, y: torch.Tensor) -> torch.Tensor:
+        """Projette l'observation `y` dans l'espace latent."""
+        return self.encoder(y)
+
+    def decode(self, z: torch.Tensor) -> torch.Tensor:
+        """Reconstruit le signal a partir du code latent `z`."""
+        return self.decoder(z)
+
+    def forward(self, static, dynamic, x0: torch.Tensor, y: torch.Tensor):
         """
-        Passe avant du modèle FCAE.
+        Passe avant du modele FCAE.
+
+        Args:
+            static: Variables statiques (non utilisees, presentes pour
+                compatibilite avec l'interface commune des modeles du projet).
+            dynamic: Variables dynamiques (non utilisees, idem).
+            x0: Signal initial. Non utilise directement, conserve pour
+                compatibilite.
+            y: Observation bruitee. Shape: (batch_size, M_dim).
+
+        Returns:
+            Tuple (x_pred, None, None) ou x_pred est le signal reconstruit
+            de shape (batch_size, N_dim).
         """
-        x_pred = self.layers(y)
-        
+        z = self.encode(y)
+        x_pred = self.decode(z)
+
         return x_pred, None, None
