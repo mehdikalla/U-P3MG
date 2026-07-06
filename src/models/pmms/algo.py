@@ -6,7 +6,7 @@ class PMMS_algo(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def init_PMMS(self, x0, y, sigma=0.01, beta=1.0, eta=0.01):
+    def init_PMMS(self, x0, y, sigma=1e-5, beta=1e-5, eta=1e-2):
         """
         Initialisation des variables statiques et dynamiques.
         """
@@ -15,7 +15,7 @@ class PMMS_algo(nn.Module):
         T, Hmat = dosy_mat(
             int(N), int(M), 0, 1.5, 1, 1000, dtype=x0.dtype, device=x0.device
         )
-        
+
         Cg2 = 9.0 / (N * 8 * eta**2)
         
         countj = tc.ones((P, 1), dtype=x0.dtype, device=x0.device)

@@ -1,12 +1,93 @@
 import os
+import re
 import argparse
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
 
-def generate_dosy_dataset(num_samples, N=800, M=100, noise_std=0.01, randomize_peaks=True, seed=42):
+
+def get_next_generation_dir(base_dir):
+    """
+    Détermine le prochain dossier de génération 'data_i' à créer dans base_dir.
+
+    Parcourt les sous-dossiers existants nommés 'data_<entier>' et retourne
+    le chemin du dossier suivant (index maximal + 1), créé s'il n'existe pas.
+    """
+    os.makedirs(base_dir, exist_ok=True)
+    pattern = re.compile(r"^data_(\d+)$")
+    existing_indices = []
+    for entry in os.listdir(base_dir):
+        match = pattern.match(entry)
+        if match and os.path.isdir(os.path.join(base_dir, entry)):
+            existing_indices.append(int(match.group(1)))
+
+    next_index = max(existing_indices, default=-1) + 1
+    generation_dir = os.path.join(base_dir, f"data_{next_index}")
+    os.makedirs(generation_dir, exist_ok=True)
+    return generation_dir
+
+
+def _generalized_gaussian_peak(n, pos, width, beta, skew):
+    """
+    Calcule un pic gaussien généralisé, éventuellement asymétrique.
+
+    Le paramètre `beta` (forme) généralise la gaussienne classique
+    (beta=2 correspond à une gaussienne standard). Le paramètre `skew`
+    introduit une asymétrie en utilisant une largeur différente de
+    part et d'autre de la position du pic : une valeur positive
+    étire le côté droit, une valeur négative étire le côté gauche.
+
+    Args:
+        n: Vecteur des indices d'échantillonnage.
+        pos: Position du pic.
+        width: Largeur de base du pic.
+        beta: Paramètre de forme de la gaussienne généralisée.
+        skew: Paramètre d'asymétrie, dans (-1, 1).
+
+    Returns:
+        Vecteur numpy représentant le pic généré.
+    """
+    diff = n - pos
+    width_left = width * (1.0 + skew)
+    width_right = width * (1.0 - skew)
+    width_left = max(width_left, 1e-6)
+    width_right = max(width_right, 1e-6)
+    w = np.where(diff < 0, width_left, width_right)
+    return np.exp(-0.5 * (np.abs(diff) / w) ** beta)
+
+
+def generate_dosy_dataset(
+    num_samples,
+    N=800,
+    M=100,
+    noise_std=0.01,
+    randomize_peaks=True,
+    seed=42,
+    skew=False,
+    number=2,
+    beta=2.0,
+    skew_range=(-0.3, 0.3),
+):
     """
     Génère un dataset de signaux RMN DOSY inspiré du code MATLAB.
+
+    Args:
+        num_samples: Nombre d'échantillons à générer.
+        N: Dimension du signal xtrue.
+        M: Dimension de l'observation y.
+        noise_std: Écart-type du bruit gaussien additif.
+        randomize_peaks: Si True, tire aléatoirement position/largeur/amplitude des pics.
+        seed: Graine aléatoire pour la reproductibilité.
+        skew: Si True, utilise une gaussienne généralisée asymétrique pour
+            générer chaque pic (troisième paramètre de forme/asymétrie).
+            Si False, un pic gaussien standard (symétrique) est utilisé.
+        number: Nombre de gaussiennes fondamentales sommées pour former
+            chaque signal xtrue (défaut 2).
+        beta: Paramètre de forme de la gaussienne généralisée, utilisé
+            uniquement si `skew` est True.
+        skew_range: Intervalle (min, max) dans lequel le paramètre
+            d'asymétrie de chaque pic est tiré aléatoirement lorsque
+            `skew` est True et `randomize_peaks` est True.
     """
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -28,31 +109,43 @@ def generate_dosy_dataset(num_samples, N=800, M=100, noise_std=0.01, randomize_p
     # 2. Génération des signaux (xtrue) et observations (y)
     X_true_list = []
     Y_list = []
-    
+
+    # Positions par défaut (mode non-randomisé), réparties sur [0.2, 0.6] * N
+    default_positions = np.linspace(0.2, 0.6, number) * N
+
     for _ in range(num_samples):
-        if randomize_peaks:
-            pos1 = np.random.uniform(0.4, 0.6) * N
-            pos2 = np.random.uniform(0.1, 0.3) * N
-            w1   = np.random.uniform(8, 12)
-            w2   = np.random.uniform(3, 7)
-            amp1 = np.random.uniform(0.5, 0.9)
-        else:
-            pos1 = 0.5 * N
-            pos2 = 0.2 * N
-            w1   = 10.0
-            w2   = 5.0
-            amp1 = 0.7
-            
-        x1 = amp1 * np.exp(-0.5 * (((n - pos1) / w1) ** 2))
-        x2 = 1.0 * np.exp(-0.5 * (((n - pos2) / w2) ** 2))
-        
-        xtrue = (x1 + x2) / np.sum(x1 + x2)
-        
+        peaks = []
+        for k in range(number):
+            if randomize_peaks:
+                # Répartition des pics sur des segments distincts de l'axe N
+                # afin d'éviter le chevauchement systématique.
+                segment_start = k / number
+                segment_end = (k + 1) / number
+                pos_k = np.random.uniform(segment_start + 0.05, segment_end - 0.05) * N
+                w_k = np.random.uniform(3, 12)
+                amp_k = np.random.uniform(0.5, 1.0)
+                skew_k = np.random.uniform(skew_range[0], skew_range[1]) if skew else 0.0
+            else:
+                pos_k = default_positions[k]
+                w_k = 10.0 if k == 0 else 5.0
+                amp_k = 0.7 if k == 0 else 1.0
+                skew_k = 0.0
+
+            if skew:
+                peak = amp_k * _generalized_gaussian_peak(n, pos_k, w_k, beta, skew_k)
+            else:
+                peak = amp_k * np.exp(-0.5 * (((n - pos_k) / w_k) ** 2))
+
+            peaks.append(peak)
+
+        xtrue_raw = np.sum(peaks, axis=0)
+        xtrue = xtrue_raw / np.sum(xtrue_raw)
+
         xblured = Hmat @ xtrue
-        
+
         noise = noise_std * np.random.randn(M)
         y = xblured + noise
-        
+
         X_true_list.append(xtrue)
         Y_list.append(y)
         
@@ -61,6 +154,7 @@ def generate_dosy_dataset(num_samples, N=800, M=100, noise_std=0.01, randomize_p
     Hmat_tensor = torch.tensor(Hmat, dtype=torch.float64)
     
     return X_true_tensor, Y_tensor, Hmat_tensor
+
 
 def verify_and_plot_dataset(dataset_dir):
     """
@@ -117,19 +211,32 @@ if __name__ == "__main__":
     parser.add_argument("--out_dir", type=str, default="./Dataset", help="Dossier de sauvegarde")
     parser.add_argument("--noise", type=float, default=0.01, help="Écart-type du bruit gaussien")
     parser.add_argument("--total_samples", type=int, default=1000, help="Nombre total d'échantillons à générer")
+    parser.add_argument("--skew", action="store_true", default=False,
+                         help="Utilise une gaussienne généralisée asymétrique pour générer xtrue")
+    parser.add_argument("--number", type=int, default=2,
+                         help="Nombre de gaussiennes fondamentales sommées pour générer chaque signal")
+    parser.add_argument("--beta", type=float, default=2.0,
+                         help="Paramètre de forme de la gaussienne généralisée (utilisé si --skew)")
     args = parser.parse_args()
 
-    os.makedirs(args.out_dir, exist_ok=True)
+
+    generation_dir = get_next_generation_dir(args.out_dir)
+    print(f"[INFO] Dossier de génération : {generation_dir}")
 
     print(f"[INFO] Génération d'un dataset de {args.total_samples} échantillons (Bruit: {args.noise})...")
+
 
     # 1. Génération du dataset complet
     X_all, Y_all, Hmat = generate_dosy_dataset(
         num_samples=args.total_samples,
         noise_std=args.noise,
         randomize_peaks=True,
-        seed=42
+        seed=42,
+        skew=args.skew,
+        number=args.number,
+        beta=args.beta,
     )
+
 
     # 2. Découpage 80/10/10
     num_train = int(0.8 * args.total_samples)
@@ -149,14 +256,15 @@ if __name__ == "__main__":
     }
 
     for filename, (X, Y) in splits.items():
-        filepath = os.path.join(args.out_dir, filename)
+        filepath = os.path.join(generation_dir, filename)
         torch.save({
             'xtrue': X,
             'yblur': Y,
             'Hmat': Hmat
         }, filepath)
         
-    print("[SUCCÈS] Sauvegarde terminée.")
+    print(f"[SUCCÈS] Sauvegarde terminée dans {generation_dir}.")
 
     # 4. Vérification et Plot final
-    verify_and_plot_dataset(args.out_dir)
+    verify_and_plot_dataset(generation_dir)
+

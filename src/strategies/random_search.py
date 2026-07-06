@@ -46,9 +46,9 @@ def get_algo_and_static(args, N_dim, M_dim, device):
     elif model_name == 'pmms':
         from src.models.pmms.algo import PMMS_algo
         algo = PMMS_algo().to(device).double()
-        eta = getattr(args, 'eta', 0.01)
-        sigma = getattr(args, 'sigma', 0.01)
-        beta = getattr(args, 'beta', 1.0)
+        eta = getattr(args, 'eta', 1e-2)
+        sigma = getattr(args, 'sigma', 1e-5)
+        beta = getattr(args, 'beta', 1e-5)
         static = (eta, sigma, beta)
         return algo, static
         
@@ -204,6 +204,31 @@ def train(loader, args, paths):
 # =============================================================================
 # TEST (Application & Reporting Complet)
 # =============================================================================
+def find_latest_best_params(model_name, strategy, current_base_dir=None):
+    """
+    Recherche le fichier 'best_params.json' le plus récent pour un modèle et
+    une stratégie donnés dans 'runs/<model>/<strategy>/*', en excluant le
+    dossier du run en cours.
+    """
+    strategy_dir = os.path.join("runs", model_name, strategy)
+    if not os.path.isdir(strategy_dir):
+        return None
+
+    run_dirs = sorted(
+        (d for d in os.listdir(strategy_dir) if os.path.isdir(os.path.join(strategy_dir, d))),
+        reverse=True
+    )
+
+    for run_name in run_dirs:
+        run_path = os.path.join(strategy_dir, run_name)
+        if current_base_dir and os.path.abspath(run_path) == os.path.abspath(current_base_dir):
+            continue
+        candidate = os.path.join(run_path, 'checkpoints', 'best_params.json')
+        if os.path.exists(candidate):
+            return candidate
+
+    return None
+
 def test(loader, args, paths):
     device = args.device
     criterion_name = args.criterion
@@ -211,12 +236,25 @@ def test(loader, args, paths):
     model_name = args.model.strip().lower()
     
     print(f"--- [RANDOM SEARCH] Test Final {model_name.upper()} ---")
-    
+
+    checkpoint_override = getattr(args, 'checkpoint', None)
+    if checkpoint_override:
+        params_path = checkpoint_override
+    elif args.mode == 'test':
+        params_path = find_latest_best_params(model_name, args.strategy, current_base_dir=paths[0])
+        if params_path:
+            print(f"[INFO] Aucun --checkpoint fourni. Utilisation des paramètres les plus récents : {params_path}")
+        else:
+            params_path = os.path.join(path_checkpoints, 'best_params.json')
+    else:
+        params_path = os.path.join(path_checkpoints, 'best_params.json')
+
     try:
-        with open(os.path.join(path_checkpoints, 'best_params.json'), 'r') as f:
+        with open(params_path, 'r') as f:
             best_params = json.load(f)
-        print(f"[INFO] Paramètres chargés : {best_params}")
+        print(f"[INFO] Paramètres chargés depuis {params_path} : {best_params}")
     except:
+
         # Fallback explicite
         if model_name == 'hq':
             best_params = {'lmbd_cvx': 1.0, 'lmbd_ncvx': 1.0, 'gamma': 1.0}

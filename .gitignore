@@ -14,3 +14,5 @@ src/strategies/__pycache__
 *.slurm
 __pycache__/*   
 *.py[cod]
+.clinerules
+/Dataset/data_0

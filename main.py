@@ -11,7 +11,9 @@ from torch.utils.data import DataLoader
 from src.models import NET_ARCHITECTURES
 from src.strategies import network
 from src.strategies import random_search
+from src.strategies import compare
 from Dataset.module import MyDataset
+
 
 def set_seed(seed):
     """Fixe toutes les graines aléatoires pour garantir la reproductibilité."""
@@ -28,9 +30,13 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Framework de Reconstruction")
 
     parser.add_argument('--config', type=str, default=None, help="Chemin vers le fichier YAML de configuration")
-    parser.add_argument('--model', type=str, default='p3mg', choices=['p3mg', 'ista', 'hq', 'pmms', 'pd'])
+    parser.add_argument('--model', type=str, default='p3mg', choices=['p3mg', 'ista', 'hq', 'pmms', 'pd', 'fcae', 'fctn', 'fcun'])
+    parser.add_argument('--dataset_dir', type=str, default='./Dataset', help="Dossier racine contenant les générations de datasets")
+    parser.add_argument('--data_folder', type=str, default='data_1', help="Sous-dossier de génération à utiliser (ex: data_0, data_1, ...)")
+
+
     parser.add_argument('--strategy', type=str, default='unrolling', choices=['unrolling', 'random_search'])
-    parser.add_argument('--mode', type=str, default='full', choices=['train', 'test', 'full'])
+    parser.add_argument('--mode', type=str, default='full', choices=['train', 'test', 'full','compare'])
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu')
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--batch_size', type=int, default=4)
@@ -45,7 +51,7 @@ def parse_args():
     parser.add_argument("--alpha", type=float, default=1e-5)
     parser.add_argument("--beta",  type=float, default=1e-5)
     parser.add_argument("--eta",   type=float, default=1e-2)
-    parser.add_argument("--sigma", type=float, default=0.01)
+    parser.add_argument("--sigma", type=float, default=1e-5)
     parser.add_argument("--nu", type=float, default=0.1)
     parser.add_argument("--delta_cvx", type=float, default=0.01)
     parser.add_argument("--delta_ncvx", type=float, default=0.01)
@@ -78,7 +84,11 @@ def parse_args():
 def setup_paths(args):
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     run_name = f"{timestamp}_{args.mode}"
-    base_dir = os.path.join("runs", args.model.strip().lower(), args.strategy, run_name)
+    if args.mode == 'compare':
+        base_dir = os.path.join("runs", "compare", run_name)
+    else:
+        base_dir = os.path.join("runs", args.model.strip().lower(), args.strategy, run_name)
+
     
     paths = (
         base_dir,                             
@@ -90,14 +100,57 @@ def setup_paths(args):
         os.makedirs(p, exist_ok=True)
     return paths
 
-def get_dataloaders(batch_size):
-    base_path = "Dataset"
+def find_latest_checkpoint(model_name, strategy, current_base_dir=None):
+    """
+    Recherche le checkpoint 'best_model.pt' le plus récent pour un modèle et
+    une stratégie donnés, en parcourant les dossiers 'runs/<model>/<strategy>/*'
+    triés par nom (les timestamps sont ordonnés lexicographiquement).
+
+    Le dossier 'current_base_dir' (run en cours) est exclu de la recherche
+    puisqu'il vient d'être créé et ne contient encore aucun poids.
+    """
+    strategy_dir = os.path.join("runs", model_name, strategy)
+    if not os.path.isdir(strategy_dir):
+        return None
+
+    run_dirs = sorted(
+        (d for d in os.listdir(strategy_dir) if os.path.isdir(os.path.join(strategy_dir, d))),
+        reverse=True
+    )
+
+    for run_name in run_dirs:
+        run_path = os.path.join(strategy_dir, run_name)
+        if current_base_dir and os.path.abspath(run_path) == os.path.abspath(current_base_dir):
+            continue
+        candidate = os.path.join(run_path, 'checkpoints', 'best_model.pt')
+        if os.path.exists(candidate):
+            return candidate
+
+    return None
+
+def get_dataloaders(batch_size, dataset_dir="./Dataset", data_folder="data_1"):
+
+    """
+    Charge les splits train/val/test depuis dataset_dir/data_folder.
+
+    Retombe sur dataset_dir directement (rétrocompatibilité) si le
+    sous-dossier de génération n'existe pas.
+    """
+    base_path = os.path.join(dataset_dir, data_folder)
+    if not os.path.isdir(base_path):
+        print(f"[AVERTISSEMENT] Dossier de génération '{base_path}' introuvable, "
+              f"utilisation de '{dataset_dir}' directement.")
+        base_path = dataset_dir
+
     train_path = os.path.join(base_path, "train.pt")
     val_path   = os.path.join(base_path, "val.pt")
     test_path  = os.path.join(base_path, "test.pt")
     
     if not os.path.exists(train_path):
         raise FileNotFoundError(f"Impossible de trouver {train_path}.")
+
+    print(f"[INFO] Chargement des données depuis : {base_path}")
+
 
     print("[INFO] Instanciation des MyDataset...")
     train_ds = MyDataset(train_path, initial_x0=None, return_name=False)
@@ -123,12 +176,21 @@ def main():
 
     print(f"=== Lancement : {args.model.upper()} | Stratégie : {args.strategy.upper()} | Mode : {args.mode.upper()} ===")
     print("--- Préparation des DataLoaders ---")
-    train_loader, val_loader, test_loader = get_dataloaders(args.batch_size)
+    train_loader, val_loader, test_loader = get_dataloaders(
+        args.batch_size, dataset_dir=args.dataset_dir, data_folder=args.data_folder
+    )
+
     
     paths = setup_paths(args)
     print(f"[INFO] Résultats sauvegardés dans : {paths[0]}")
 
+    if args.mode == 'compare':
+        compare.run(test_loader.dataset, args, paths)
+        print("\n=== Exécution Terminée ===")
+        return
+
     if args.strategy == 'unrolling':
+
         model_key = args.model.strip().lower()
         if model_key not in NET_ARCHITECTURES:
             raise ValueError(f"Architecture '{model_key}' introuvable.")
@@ -137,8 +199,14 @@ def main():
         
         if model_key in ['p3mg', 'hq']:
             model = ModelClass(num_layers=args.num_layers, num_pd_layers=args.num_pd_layers)
+        elif model_key in ['fcae', 'fctn', 'fcun']:
+            sample_batch = next(iter(train_loader))
+            xt_s, y_s = sample_batch[0], sample_batch[1]
+            N_dim, M_dim = xt_s.shape[1], y_s.shape[1]
+            model = ModelClass(N_dim=N_dim, M_dim=M_dim)
         else:
             model = ModelClass(num_layers=args.num_layers)
+
             
         model = model.to(args.device).double()
         print(f"[INFO] Modèle {model_key.upper()} instancié.")
@@ -147,8 +215,21 @@ def main():
             network.train(model, train_loader, val_loader, args, paths)
         
         if args.mode in ['test', 'full']:
-            ckpt_to_load = args.checkpoint if (args.mode == 'test' and args.checkpoint) else os.path.join(paths[1], 'best_model.pt')
+            if args.checkpoint:
+                ckpt_to_load = args.checkpoint
+            elif args.mode == 'test':
+                # Mode test seul : le dossier de run courant vient d'etre cree et
+                # ne contient donc aucun poids. On recherche le run le plus recent.
+                ckpt_to_load = find_latest_checkpoint(model_key, args.strategy, current_base_dir=paths[0])
+                if ckpt_to_load:
+                    print(f"[INFO] Aucun --checkpoint fourni. Utilisation du poids le plus récent : {ckpt_to_load}")
+                else:
+                    print("[AVERTISSEMENT] Aucun checkpoint existant trouvé dans 'runs/'.")
+                    ckpt_to_load = os.path.join(paths[1], 'best_model.pt')
+            else:
+                ckpt_to_load = os.path.join(paths[1], 'best_model.pt')
             network.test(model, test_loader, args, paths, checkpoint_path=ckpt_to_load)
+
 
     elif args.strategy == 'random_search':
         if args.mode in ['train', 'full']:

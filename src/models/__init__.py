@@ -22,6 +22,15 @@ from src.models.pd.algo import PD_Standalone_algo
 from src.models.pmms.net import PMMS_model
 from src.models.pmms.algo import PMMS_algo
 
+# --- Modèle 6 : FCAE (Fully Connected Autoencoder) ---
+from src.models.fcae.net import FCAE_model
+
+# --- Modèle 7 : FCTN (Fully Connected Transformer Network) ---
+from src.models.fctn.net import FCTN_model
+
+# --- Modèle 8 : FCUN (Fully Connected U-Net) ---
+from src.models.fcun.net import FCUN_model
+
 # -----------------------------------------------------------------------------
 # Registres (Dictionnaires)
 # C'est ce que le main.py va utiliser pour sélectionner le modèle
@@ -34,6 +43,9 @@ NET_ARCHITECTURES = {
     'hq': HQ_model,
     'pd': PD_Standalone_model,
     'pmms': PMMS_model,
+    'fcae': FCAE_model,
+    'fctn': FCTN_model,
+    'fcun': FCUN_model,
 }
 
 ALGORITHMS = {
@@ -43,3 +55,8 @@ ALGORITHMS = {
     'pd': PD_Standalone_algo,
     'pmms': PMMS_algo,
 }
+
+# Modèles purement "deep learning" ne reposant sur aucun algorithme itératif
+# statique (pas de dictionnaire `static`/`dynamic` physique à initialiser).
+FULLY_LEARNED_MODELS = {'fcae', 'fctn', 'fcun'}
+

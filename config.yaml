@@ -9,7 +9,9 @@ seed: 42                    # Graine aléatoire pour la reproductibilité
 
 # --- 2. Chemins et données ---
 dataset_dir: "./Dataset"
+data_folder: "data_1"       # Sous-dossier de génération à utiliser (ex: data_0, data_1, ...)
 train: "train.pt"
+
 val: "val.pt"
 test: "test.pt"
 save_dir: "./Results"
@@ -36,7 +38,7 @@ alpha: 1.0e-05
 beta: 1.0e-05
 eta: 0.01
 # Spécifiques à PMMS
-sigma: 0.01                # Paramètre de lissage SOOT
+sigma: 1.0e-05              # Paramètre de lissage SOOT (doit être égal à alpha, cf. runPMMSalgorithm.m)
 nu: 0.1                    # Poids de régularisation ~lambda
 # Spécifiques à HQ
 delta_cvx: 0.01            # Paramètre de lissage pour la pénalité convexe
