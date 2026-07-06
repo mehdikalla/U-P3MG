@@ -77,7 +77,7 @@ def train(model, train_loader, val_loader, args, paths):
     path_save, path_checkpoints, path_plots, path_logs = paths
     save_config(path_logs, args)
     
-    print(f"--- [TRAIN] Démarrage : {args.epochs} epochs | Loss: {criterion_name} ---")
+    print(f"--- [TRAIN] {model_name.upper()} (UNROLLING) | Epochs: {args.epochs} | Loss: {criterion_name} ---")
 
     # Sécurisation de l'optimiseur (uniquement les variables avec requires_grad)
     tau_params = [p for n, p in model.named_parameters() if 'tau_k' in n and p.requires_grad]
@@ -196,7 +196,7 @@ def train(model, train_loader, val_loader, args, paths):
             except Exception:
                 pass 
 
-    print(f"--- Entrainement terminé en {(time.time()-start_time)/60:.2f} min ---")
+    print(f"--- [TRAIN] Terminé en {(time.time()-start_time)/60:.2f} min ---")
 
 # =============================================================================
 # 2. FONCTION DE TEST (Dynamique)
@@ -207,7 +207,7 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
     path_checkpoints, path_plots, path_logs = paths[1], paths[2], paths[3]
     model_name = args.model.strip().lower()
     
-    print(f"--- [TEST] Démarrage sur {len(test_loader.dataset)} échantillons | Metric: {criterion_name} ---")
+    print(f"--- [TEST] {model_name.upper()} (UNROLLING) | Metric: {criterion_name} | Samples: {len(test_loader.dataset)} ---")
 
     if checkpoint_path is None:
         checkpoint_path = os.path.join(path_checkpoints, 'best_model.pt')
@@ -279,7 +279,7 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
         best_v = arr[0]
         worst_v = arr[-1]
 
-        print(f"[RESULTATS] Mean: {mean_v:.4e} | Median: {med_v:.4e} | Best: {best_v:.4e} | Worst: {worst_v:.4e}")
+        print(f"[RESULT] Mean {criterion_name}: {mean_v:.4e} | Median: {med_v:.4e} | Std: {std_v:.4e} | Best: {best_v:.4e} | Worst: {worst_v:.4e}")
 
         table_str = (
             f"\n+-----------------------------------------+\n"

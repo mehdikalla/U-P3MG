@@ -138,7 +138,7 @@ def train(loader, args, paths):
     path_checkpoints, _, path_logs = paths[1], paths[2], paths[3]
     model_name = args.model.strip().lower()
     
-    print(f"--- [RANDOM SEARCH] Calibration {model_name.upper()} ---")
+    print(f"--- [TRAIN] {model_name.upper()} (RANDOM_SEARCH) | Samples: {args.n_samples} | Loss: {args.criterion} ---")
 
     full_data = list(loader)
     subset_size = max(1, int(len(full_data) * 0.10))
@@ -197,9 +197,10 @@ def train(loader, args, paths):
             hp_str = " ".join([f"{k}={v:.4e}" if 'lmbd' in k or 'nu' in k else f"{k}={v:.4f}" for k, v in hp.items()])
             print(f"   [{i+1}/{args.n_samples}] New Best! {hp_str} | Loss={best_loss:.4e}")
 
-    print(f"[RESULT] Best Params: {best_params} (Time: {time.time()-start:.1f}s)")
+    print(f"[RESULT] Best Params: {best_params}")
     with open(os.path.join(path_checkpoints, 'best_params.json'), 'w') as f:
         json.dump(best_params, f, indent=4)
+    print(f"--- [TRAIN] Terminé en {(time.time()-start)/60:.2f} min ---")
 
 # =============================================================================
 # TEST (Application & Reporting Complet)
@@ -235,7 +236,7 @@ def test(loader, args, paths):
     path_checkpoints, path_plots, path_logs = paths[1], paths[2], paths[3]
     model_name = args.model.strip().lower()
     
-    print(f"--- [RANDOM SEARCH] Test Final {model_name.upper()} ---")
+    print(f"--- [TEST] {model_name.upper()} (RANDOM_SEARCH) | Metric: {criterion_name} | Samples: {len(loader.dataset)} ---")
 
     checkpoint_override = getattr(args, 'checkpoint', None)
     if checkpoint_override:
@@ -314,20 +315,20 @@ def test(loader, args, paths):
     min_v = np.min(arr)
     max_v = np.max(arr)
 
-    print(f"[RESULT] Mean {criterion_name}: {mean_v:.4e} | Std: {std_v:.4e}")
-    
+    print(f"[RESULT] Mean {criterion_name}: {mean_v:.4e} | Median: {med_v:.4e} | Std: {std_v:.4e} | Best: {min_v:.4e} | Worst: {max_v:.4e}")
+
     table_str = (
         f"\n+-----------------------------------------+\n"
-        f"|  RESULTATS RANDOM SEARCH ({criterion_name:<5})  |\n"
+        f"|        RESULTATS TEST ({criterion_name:<5})        |\n"
         f"+-----------------------+-----------------+\n"
-        f"| Moyenne               | {mean_v:<15.4e} |\n"
-        f"| Mediane               | {med_v:<15.4e} |\n"
-        f"| Ecart-type            | {std_v:<15.4e} |\n"
+        f"| Mean                  | {mean_v:<15.4e} |\n"
+        f"| Median                | {med_v:<15.4e} |\n"
+        f"| Std                   | {std_v:<15.4e} |\n"
         f"| Min (Best)            | {min_v:<15.4e} |\n"
         f"| Max (Worst)           | {max_v:<15.4e} |\n"
         f"+-----------------------+-----------------+\n"
     )
-    with open(os.path.join(path_logs, 'rs_results_table.txt'), 'w') as f:
+    with open(os.path.join(path_logs, 'test_results_table.txt'), 'w') as f:
         f.write(table_str)
 
     pm = PlottingManager(
@@ -344,7 +345,7 @@ def test(loader, args, paths):
     )
     
     if hasattr(pm, 'plot_statistical_samples'):
-        pm.plot_statistical_samples(saved_samples, criterion_name, prefix="RS_test_")
+        pm.plot_statistical_samples(saved_samples, criterion_name, prefix="test_")
     if hasattr(pm, 'plot_test_error_distribution'):
         pm.plot_test_error_distribution(arr, metric_name=criterion_name)
     
