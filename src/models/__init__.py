@@ -31,6 +31,10 @@ from src.models.fctn.net import FCTN_model
 # --- Modèle 8 : FCUN (Fully Connected U-Net) ---
 from src.models.fcun.net import FCUN_model
 
+# --- Modèle 9 : ResU (Residual U-Net convolutif) ---
+from src.models.resu.net import ResU_model
+
+
 # -----------------------------------------------------------------------------
 # Registres (Dictionnaires)
 # C'est ce que le main.py va utiliser pour sélectionner le modèle
@@ -46,7 +50,9 @@ NET_ARCHITECTURES = {
     'fcae': FCAE_model,
     'fctn': FCTN_model,
     'fcun': FCUN_model,
+    'resu': ResU_model,
 }
+
 
 ALGORITHMS = {
     'p3mg': P3MG_algo,
@@ -58,5 +64,6 @@ ALGORITHMS = {
 
 # Modèles purement "deep learning" ne reposant sur aucun algorithme itératif
 # statique (pas de dictionnaire `static`/`dynamic` physique à initialiser).
-FULLY_LEARNED_MODELS = {'fcae', 'fctn', 'fcun'}
+FULLY_LEARNED_MODELS = {'fcae', 'fctn', 'fcun', 'resu'}
+
 

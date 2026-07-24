@@ -205,15 +205,20 @@ def train(loader, args, paths):
 # =============================================================================
 # TEST (Application & Reporting Complet)
 # =============================================================================
-def find_latest_best_params(model_name, strategy, current_base_dir=None):
+def find_latest_best_params(model_name, strategy, data_folder=None, current_base_dir=None):
     """
-    Recherche le fichier 'best_params.json' le plus récent pour un modèle et
-    une stratégie donnés dans 'runs/<model>/<strategy>/*', en excluant le
-    dossier du run en cours.
+    Recherche le fichier 'best_params.json' le plus récent pour un modèle,
+    une stratégie et un dossier de donnees donnés dans
+    'runs/<model>/<strategy>/<data_folder>/*', en excluant le dossier du run
+    en cours.
     """
-    strategy_dir = os.path.join("runs", model_name, strategy)
+    if data_folder:
+        strategy_dir = os.path.join("runs", model_name, strategy, data_folder.strip().lower())
+    else:
+        strategy_dir = os.path.join("runs", model_name, strategy)
     if not os.path.isdir(strategy_dir):
         return None
+
 
     run_dirs = sorted(
         (d for d in os.listdir(strategy_dir) if os.path.isdir(os.path.join(strategy_dir, d))),
@@ -242,7 +247,8 @@ def test(loader, args, paths):
     if checkpoint_override:
         params_path = checkpoint_override
     elif args.mode == 'test':
-        params_path = find_latest_best_params(model_name, args.strategy, current_base_dir=paths[0])
+        params_path = find_latest_best_params(model_name, args.strategy, data_folder=getattr(args, 'data_folder', None), current_base_dir=paths[0])
+
         if params_path:
             print(f"[INFO] Aucun --checkpoint fourni. Utilisation des paramètres les plus récents : {params_path}")
         else:

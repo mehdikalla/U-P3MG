@@ -25,10 +25,15 @@ UNROLLING_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms']
 RANDOM_SEARCH_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms']
 
 
-def _list_run_dirs(model_name, strategy):
+def _list_run_dirs(model_name, strategy, data_folder):
     """Retourne (liste des dossiers de run tries du plus recent au plus ancien,
-    chemin du dossier de strategie) ou (None, None) si absent."""
-    strategy_dir = os.path.join("runs", model_name, strategy)
+    chemin du dossier de strategie) ou (None, None) si absent.
+
+    Le dossier est cherche sous 'runs/<model>/<strategy>/<data_folder>' afin
+    de garantir que la comparaison ne porte que sur des runs entraines/
+    calibres sur le meme jeu de donnees.
+    """
+    strategy_dir = os.path.join("runs", model_name, strategy, data_folder.strip().lower())
     if not os.path.isdir(strategy_dir):
         return None, None
     run_dirs = sorted(
@@ -38,9 +43,9 @@ def _list_run_dirs(model_name, strategy):
     return run_dirs, strategy_dir
 
 
-def find_latest_checkpoint(model_name, strategy):
-    """Cherche le dernier 'best_model.pt' disponible pour (model_name, strategy)."""
-    run_dirs, strategy_dir = _list_run_dirs(model_name, strategy)
+def find_latest_checkpoint(model_name, strategy, data_folder):
+    """Cherche le dernier 'best_model.pt' disponible pour (model_name, strategy, data_folder)."""
+    run_dirs, strategy_dir = _list_run_dirs(model_name, strategy, data_folder)
     if not run_dirs:
         return None
     for run_name in run_dirs:
@@ -50,9 +55,9 @@ def find_latest_checkpoint(model_name, strategy):
     return None
 
 
-def find_latest_best_params(model_name, strategy):
-    """Cherche le dernier 'best_params.json' disponible pour (model_name, strategy)."""
-    run_dirs, strategy_dir = _list_run_dirs(model_name, strategy)
+def find_latest_best_params(model_name, strategy, data_folder):
+    """Cherche le dernier 'best_params.json' disponible pour (model_name, strategy, data_folder)."""
+    run_dirs, strategy_dir = _list_run_dirs(model_name, strategy, data_folder)
     if not run_dirs:
         return None
     for run_name in run_dirs:
@@ -60,6 +65,7 @@ def find_latest_best_params(model_name, strategy):
         if os.path.exists(candidate):
             return candidate
     return None
+
 
 
 def _build_unrolled_model(model_name, args):
@@ -94,9 +100,11 @@ def run(dataset, args, paths):
     """
     device = args.device
     criterion_name = getattr(args, 'criterion', 'MSE')
+    data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     _, _, path_plots, path_logs = paths
 
     if len(dataset) == 0:
+
         print("[COMPARE] Jeu de donnees vide, impossible de tirer un signal.")
         return
 
@@ -109,15 +117,17 @@ def run(dataset, args, paths):
     N_dim, M_dim = xt.shape[1], y.shape[1]
     x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
 
-    print(f"--- [COMPARE] Signal test index={idx} | N={N_dim} M={M_dim} ---")
+    print(f"--- [COMPARE] Signal test index={idx} | N={N_dim} M={M_dim} | Data: {data_folder} ---")
+
 
     results = {}  # cle -> (xh_numpy, loss)
     original_model_arg = getattr(args, 'model', None)
 
     # --- Strategie 'unrolling' ---
     for model_name in UNROLLING_MODELS:
-        ckpt_path = find_latest_checkpoint(model_name, 'unrolling')
+        ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
         if ckpt_path is None:
+
             print(f"[COMPARE][unrolling][{model_name}] Aucun checkpoint trouve, ignore.")
             continue
         try:
@@ -143,8 +153,9 @@ def run(dataset, args, paths):
 
     # --- Strategie 'random_search' ---
     for model_name in RANDOM_SEARCH_MODELS:
-        params_path = find_latest_best_params(model_name, 'random_search')
+        params_path = find_latest_best_params(model_name, 'random_search', data_folder)
         if params_path is None:
+
             print(f"[COMPARE][random_search][{model_name}] Aucun best_params.json trouve, ignore.")
             continue
         try:
@@ -173,18 +184,20 @@ def run(dataset, args, paths):
         return
 
 
-    _plot_comparison(xt.squeeze(0).cpu().numpy(), results, idx, criterion_name, path_plots)
-    _save_report(results, idx, criterion_name, path_logs)
+    _plot_comparison(xt.squeeze(0).cpu().numpy(), results, idx, criterion_name, path_plots, data_folder)
+    _save_report(results, idx, criterion_name, path_logs, data_folder)
 
 
-def _plot_comparison(xt_np, results, idx, criterion_name, path_plots):
+
+def _plot_comparison(xt_np, results, idx, criterion_name, path_plots, data_folder):
     """Trace le signal vrai et toutes les restaurations, plus un histogramme des pertes."""
     fig, (ax_sig, ax_loss) = plt.subplots(2, 1, figsize=(12, 9))
 
     ax_sig.plot(xt_np, label='Signal vrai', color='black', linewidth=2)
     for key, (xh_np, loss) in results.items():
         ax_sig.plot(xh_np, '--', label=f"{key} ({criterion_name}={loss:.3e})")
-    ax_sig.set_title(f"Comparaison des restaurations - Signal test #{idx}")
+    ax_sig.set_title(f"Comparaison des restaurations - Signal test #{idx} ({data_folder})")
+
     ax_sig.legend(fontsize=8)
     ax_sig.grid(True)
 
@@ -204,9 +217,10 @@ def _plot_comparison(xt_np, results, idx, criterion_name, path_plots):
     print(f"[COMPARE] Graphique sauvegarde : {out_path}")
 
 
-def _save_report(results, idx, criterion_name, path_logs):
+def _save_report(results, idx, criterion_name, path_logs, data_folder):
     """Sauvegarde un rapport texte et JSON des pertes obtenues."""
-    lines = [f"=== Comparaison - Signal test index {idx} ({criterion_name}) ===\n"]
+    lines = [f"=== Comparaison - Signal test index {idx} ({criterion_name}) | Data: {data_folder} ===\n"]
+
     for key, (_, loss) in sorted(results.items(), key=lambda kv: kv[1][1]):
         lines.append(f"{key:<30s} : {loss:.6e}\n")
 

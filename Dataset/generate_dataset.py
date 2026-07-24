@@ -66,7 +66,7 @@ def generate_dosy_dataset(
     skew=False,
     number=2,
     beta=2.0,
-    skew_range=(-0.3, 0.3),
+    skew_range=(-1, 1),
 ):
     """
     Génère un dataset de signaux RMN DOSY inspiré du code MATLAB.
@@ -110,38 +110,87 @@ def generate_dosy_dataset(
     X_true_list = []
     Y_list = []
 
-    # Positions par défaut (mode non-randomisé), réparties sur [0.2, 0.6] * N
-    default_positions = np.linspace(0.2, 0.6, number) * N
+    # Zone centrale autour de laquelle les pics sont répartis. La demi-largeur
+    # de la zone (spread) est élargie proportionnellement au nombre de pics
+    # afin de conserver un espacement suffisant même lorsque `number` augmente,
+    # évitant ainsi que l'algorithme ne soit contraint de compresser les
+    # positions (et donc de faire se chevaucher les pics visuellement).
+    center = 0.35
+    spread = min(0.45, 0.15 + 0.1 * max(0, number - 1))
+    # Facteur de séparation minimale entre pics adjacents, exprimé en
+    # multiples de la somme de leurs écarts-types (règle heuristique
+    # garantissant un chevauchement négligeable entre gaussiennes voisines).
+    # Augmenté de 5.0 à 9.0 pour imposer une distance minimale nettement
+    # plus grande entre pics consécutifs.
+    separation_factor = 9.0
+
+
 
     for _ in range(num_samples):
-        peaks = []
-        for k in range(number):
+        xtrue_raw = np.zeros(N)
+
+        amplitudes = (
+            np.random.uniform(0.5, 1.0, size=number) if randomize_peaks
+            else np.full(number, 1.0)
+        )
+        shapes = (
+            np.random.uniform(1.5, 2.5, size=number) if randomize_peaks
+            else np.full(number, beta if skew else 2.0)
+        )
+        skews = (
+            np.random.uniform(skew_range[0], skew_range[1], size=number)
+            if (skew and randomize_peaks)
+            else np.zeros(number)
+        )
+
+        if randomize_peaks:
+            sigmas = np.random.uniform(3, 8, size=number)
+        else:
+            sigmas = np.full(number, 5.0)
+
+        if number == 1:
+            positions = np.array([center])
+        else:
+            # Écarts minimaux (normalisés) requis entre pics consécutifs
+            # pour éviter tout chevauchement significatif.
+            gaps_min = separation_factor * (sigmas[:-1] + sigmas[1:]) / N
+            total_min = gaps_min.sum()
+            available = 2 * spread
+
+            # Si l'espace disponible est insuffisant pour respecter les
+            # écarts minimaux, on agrandit la zone disponible (available)
+            # plutôt que de compresser les écarts minimaux requis. Cela
+            # garantit que la distance minimale entre pics n'est JAMAIS
+            # réduite, quitte à élargir la plage de positions possibles.
+            if total_min > available * 0.95:
+                available = total_min / 0.95
+
+            remaining = available - total_min
+
             if randomize_peaks:
-                # Répartition des pics sur des segments distincts de l'axe N
-                # afin d'éviter le chevauchement systématique.
-                segment_start = k / number
-                segment_end = (k + 1) / number
-                pos_k = np.random.uniform(segment_start + 0.05, segment_end - 0.05) * N
-                w_k = np.random.uniform(3, 12)
-                amp_k = np.random.uniform(0.5, 1.0)
-                skew_k = np.random.uniform(skew_range[0], skew_range[1]) if skew else 0.0
+                extra_gaps = np.random.dirichlet(np.ones(number + 1)) * remaining
             else:
-                pos_k = default_positions[k]
-                w_k = 10.0 if k == 0 else 5.0
-                amp_k = 0.7 if k == 0 else 1.0
-                skew_k = 0.0
+                extra_gaps = np.full(number + 1, remaining / (number + 1))
 
+            positions = np.empty(number)
+            pos = (center - spread) + extra_gaps[0]
+            positions[0] = pos
+            for i in range(1, number):
+                pos += gaps_min[i - 1] + extra_gaps[i]
+                positions[i] = pos
+
+
+        for pos, sigma, amp, shape, sk in zip(positions, sigmas, amplitudes, shapes, skews):
             if skew:
-                peak = amp_k * _generalized_gaussian_peak(n, pos_k, w_k, beta, skew_k)
+                xtrue_raw += amp * _generalized_gaussian_peak(n, pos * N, sigma, shape, sk)
             else:
-                peak = amp_k * np.exp(-0.5 * (((n - pos_k) / w_k) ** 2))
+                xtrue_raw += amp * np.exp(-0.5 * np.abs((n - pos * N) / sigma) ** shape)
 
-            peaks.append(peak)
-
-        xtrue_raw = np.sum(peaks, axis=0)
         xtrue = xtrue_raw / np.sum(xtrue_raw)
 
+
         xblured = Hmat @ xtrue
+
 
         noise = noise_std * np.random.randn(M)
         y = xblured + noise
@@ -250,6 +299,7 @@ if __name__ == "__main__":
 
     # 3. Sauvegarde
     splits = {
+        "dataset.pt": (X_all, Y_all),
         "train.pt": (X_train, Y_train),
         "val.pt":   (X_val, Y_val),
         "test.pt":  (X_test, Y_test)
@@ -264,6 +314,7 @@ if __name__ == "__main__":
         }, filepath)
         
     print(f"[SUCCÈS] Sauvegarde terminée dans {generation_dir}.")
+
 
     # 4. Vérification et Plot final
     verify_and_plot_dataset(generation_dir)

@@ -30,7 +30,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Framework de Reconstruction")
 
     parser.add_argument('--config', type=str, default=None, help="Chemin vers le fichier YAML de configuration")
-    parser.add_argument('--model', type=str, default='p3mg', choices=['p3mg', 'ista', 'hq', 'pmms', 'pd', 'fcae', 'fctn', 'fcun'])
+    parser.add_argument('--model', type=str, default='p3mg', choices=['p3mg', 'ista', 'hq', 'pmms', 'pd', 'fcae', 'fctn', 'fcun', 'resu'])
+
     parser.add_argument('--dataset_dir', type=str, default='./Dataset', help="Dossier racine contenant les générations de datasets")
     parser.add_argument('--data_folder', type=str, default='data_1', help="Sous-dossier de génération à utiliser (ex: data_0, data_1, ...)")
 
@@ -84,13 +85,15 @@ def parse_args():
 def setup_paths(args):
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     run_name = f"{timestamp}_{args.mode}"
+    data_folder = args.data_folder.strip().lower()
     if args.mode == 'compare':
-        base_dir = os.path.join("runs", "compare", run_name)
+        base_dir = os.path.join("runs", "compare", data_folder, run_name)
     else:
-        base_dir = os.path.join("runs", args.model.strip().lower(), args.strategy, run_name)
+        base_dir = os.path.join("runs", args.model.strip().lower(), args.strategy, data_folder, run_name)
 
     
     paths = (
+
         base_dir,                             
         os.path.join(base_dir, 'checkpoints'),
         os.path.join(base_dir, 'plots'),       
@@ -100,18 +103,23 @@ def setup_paths(args):
         os.makedirs(p, exist_ok=True)
     return paths
 
-def find_latest_checkpoint(model_name, strategy, current_base_dir=None):
+def find_latest_checkpoint(model_name, strategy, data_folder=None, current_base_dir=None):
     """
-    Recherche le checkpoint 'best_model.pt' le plus récent pour un modèle et
-    une stratégie donnés, en parcourant les dossiers 'runs/<model>/<strategy>/*'
-    triés par nom (les timestamps sont ordonnés lexicographiquement).
+    Recherche le checkpoint 'best_model.pt' le plus récent pour un modèle,
+    une stratégie et un dossier de données donnés, en parcourant les dossiers
+    'runs/<model>/<strategy>/<data_folder>/*' triés par nom (les timestamps
+    sont ordonnés lexicographiquement).
 
     Le dossier 'current_base_dir' (run en cours) est exclu de la recherche
     puisqu'il vient d'être créé et ne contient encore aucun poids.
     """
-    strategy_dir = os.path.join("runs", model_name, strategy)
+    if data_folder:
+        strategy_dir = os.path.join("runs", model_name, strategy, data_folder.strip().lower())
+    else:
+        strategy_dir = os.path.join("runs", model_name, strategy)
     if not os.path.isdir(strategy_dir):
         return None
+
 
     run_dirs = sorted(
         (d for d in os.listdir(strategy_dir) if os.path.isdir(os.path.join(strategy_dir, d))),
@@ -199,7 +207,8 @@ def main():
         
         if model_key in ['p3mg', 'hq']:
             model = ModelClass(num_layers=args.num_layers, num_pd_layers=args.num_pd_layers)
-        elif model_key in ['fcae', 'fctn', 'fcun']:
+        elif model_key in ['fcae', 'fctn', 'fcun', 'resu']:
+
             sample_batch = next(iter(train_loader))
             xt_s, y_s = sample_batch[0], sample_batch[1]
             N_dim, M_dim = xt_s.shape[1], y_s.shape[1]
@@ -220,7 +229,8 @@ def main():
             elif args.mode == 'test':
                 # Mode test seul : le dossier de run courant vient d'etre cree et
                 # ne contient donc aucun poids. On recherche le run le plus recent.
-                ckpt_to_load = find_latest_checkpoint(model_key, args.strategy, current_base_dir=paths[0])
+                ckpt_to_load = find_latest_checkpoint(model_key, args.strategy, data_folder=args.data_folder, current_base_dir=paths[0])
+
                 if ckpt_to_load:
                     print(f"[INFO] Aucun --checkpoint fourni. Utilisation du poids le plus récent : {ckpt_to_load}")
                 else:

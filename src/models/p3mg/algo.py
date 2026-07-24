@@ -14,7 +14,6 @@ class P3MG_algo(nn.Module):
     # init_P3MG 
     # -------------------------
     def init_P3MG(self, static_input, x0, y):
-        # ... (Logique inchangée pour initialiser les paramètres statiques Hmat, Vprec, etc.) ...
         P, N, M = x0.size(0), x0.size(1), y.size(1)
         alpha, beta, eta = static_input
 
