@@ -11,12 +11,14 @@ def S2(x):
 # P3MG model layers
 # --------------------
 class layer_0(nn.Module):
-    def __init__(self, num_pd_layers: int):
+    def __init__(self, num_pd_layers: int, mlp_hidden: list = None):
         super().__init__()
         self.p3mg_algo = P3MG_algo(num_pd_layers)
-        
-        # 1. Lambda (Dynamique)
-        self.f_act = FC_block([100, 50, 25, 12, 1])
+
+        # 1. Lambda (Dynamique) - hidden layers du MLP configurables (ablation c)
+        hidden = mlp_hidden if mlp_hidden else [50, 25, 12]
+        self.f_act = FC_block([100, *hidden, 1])
+
         # 2. Tau (Explicite - Vecteur de M valeurs)
         self.tau_k = nn.Parameter(tc.empty(num_pd_layers).double().fill_(0.5), requires_grad=True) 
 
@@ -44,10 +46,12 @@ class layer_0(nn.Module):
 
 
 class layer_k(nn.Module):
-    def __init__(self, num_pd_layers: int):
+    def __init__(self, num_pd_layers: int, mlp_hidden: list = None):
         super().__init__()
         self.p3mg_algo = P3MG_algo(num_pd_layers)
-        self.f_act = FC_block([100, 50, 25, 12, 1])
+        hidden = mlp_hidden if mlp_hidden else [50, 25, 12]
+        self.f_act = FC_block([100, *hidden, 1])
+
         self.tau_k = nn.Parameter(tc.empty(num_pd_layers).double().fill_(0.5), requires_grad=True)
 
     def forward(self, static, dynamic, x, y, lmbd_override=None, tau_override=None):
@@ -74,15 +78,17 @@ class layer_k(nn.Module):
 # P3MG model container
 # --------------------
 class P3MG_model(nn.Module):
-    def __init__(self, num_layers, num_pd_layers):
+    def __init__(self, num_layers, num_pd_layers, mlp_hidden: list = None):
         super().__init__()
         self.Layers = nn.ModuleList()
         self.num_layers = num_layers
         self.num_pd_layers = num_pd_layers
-        
+        self.mlp_hidden = mlp_hidden
+
         for i in range(num_layers):
-            if i == 0: self.Layers.append(layer_0(num_pd_layers))
-            else: self.Layers.append(layer_k(num_pd_layers))
+            if i == 0: self.Layers.append(layer_0(num_pd_layers, mlp_hidden))
+            else: self.Layers.append(layer_k(num_pd_layers, mlp_hidden))
+
 
     def forward(self, static, dynamic, x0, y, x_true=None, lmbd_override=None, tau_override=None):
         x, dyn = x0, dynamic

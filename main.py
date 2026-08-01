@@ -46,6 +46,9 @@ def parse_args():
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--num_layers', type=int, default=25)
     parser.add_argument('--num_pd_layers', type=int, default=10)
+    parser.add_argument('--mlp_hidden', type=str, default=None,
+                         help="Tailles des couches cachees du MLP interne P3MG (lambda), ex: '50,25,12'")
+
     parser.add_argument('--checkpoint', type=str, default=None)
     parser.add_argument('--n_samples', type=int, default=50)
     parser.add_argument('--algo_iters', type=int, default=200)
@@ -205,8 +208,14 @@ def main():
         
         ModelClass = NET_ARCHITECTURES[model_key]
         
-        if model_key in ['p3mg', 'hq']:
+        if model_key == 'p3mg':
+            mlp_hidden = None
+            if args.mlp_hidden:
+                mlp_hidden = [int(v.strip()) for v in str(args.mlp_hidden).split(',') if v.strip()]
+            model = ModelClass(num_layers=args.num_layers, num_pd_layers=args.num_pd_layers, mlp_hidden=mlp_hidden)
+        elif model_key == 'hq':
             model = ModelClass(num_layers=args.num_layers, num_pd_layers=args.num_pd_layers)
+
         elif model_key in ['fcae', 'fctn', 'fcun', 'resu']:
 
             sample_batch = next(iter(train_loader))

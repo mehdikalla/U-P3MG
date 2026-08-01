@@ -69,12 +69,23 @@ conda activate U-P3MG
 ### **C. Dataset**
 
 #### **1. Simulated Data**
-To simulate a dataset, execute the following command: 
+To simulate a dataset, execute the following command to generate a dataset with skew with two gaussians: 
 
 ```bash
-python generate_dataset.py --noise 0.01
+scripts/generate_dataset.sh --skew --number 2 
 ```
 
+Alternatively, if you want to generate a set of diversified dataset directly, execute the following script :
+
+```bash
+scripts/generate_dataset_suite.sh
+```
+
+To visualize a dataset, you can run : 
+
+'''bash
+python3 Dataset/visualize_dataset.py --path $PATH OF THE DATASET$
+'''
 ---
 
 ### **D. Training and Evaluation**
