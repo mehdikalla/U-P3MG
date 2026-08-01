@@ -76,8 +76,13 @@ CONFIGS=(
 ENTRY="${CONFIGS[$SLURM_ARRAY_TASK_ID]}"
 IFS=';' read -r STUDY NUM_LAYERS NUM_PD_LAYERS MLP_HIDDEN <<< "$ENTRY"
 
+# Espace de noms dedie a l'ablation, isole de 'data_1' (utilise par
+# run_all.slurm et run_compare.slurm) afin qu'aucun run standard/compare ne
+# soit pollue par les checkpoints d'ablation, et inversement.
+RUN_TAG="ablation_${STUDY}"
+
 echo "--- Job Slurm ID: ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} ---"
-echo "--- Volet: $STUDY | num_layers=$NUM_LAYERS | num_pd_layers=$NUM_PD_LAYERS | mlp_hidden=$MLP_HIDDEN ---"
+echo "--- Volet: $STUDY | num_layers=$NUM_LAYERS | num_pd_layers=$NUM_PD_LAYERS | mlp_hidden=$MLP_HIDDEN | run_tag=$RUN_TAG ---"
 
 # -------------------------------------------------------------
 # 3. Execution
@@ -88,9 +93,13 @@ if [ -n "$MLP_HIDDEN" ]; then
 fi
 
 ./scripts/run.sh --config "$CONFIG" --gpu 0 --mode full \
+    --run_group ablation \
+    --run_tag "$RUN_TAG" \
     --num_layers "$NUM_LAYERS" \
     --num_pd_layers "$NUM_PD_LAYERS" \
     "${EXTRA_ARGS[@]}"
+
+
 
 # -------------------------------------------------------------
 # 4. Consolidation du resultat de ce run dans le CSV du volet
@@ -102,7 +111,9 @@ SUMMARY_CSV="$RESULTS_DIR/summary.csv"
 LOCK_FILE="$RESULTS_DIR/.summary.lock"
 mkdir -p "$RESULTS_DIR"
 
-RUN_DIR=$(find runs/p3mg/unrolling -mindepth 2 -maxdepth 2 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+RUN_DIR=$(find "runs/ablation/p3mg/unrolling/${RUN_TAG}" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+
+
 TABLE_FILE="$RUN_DIR/logs/test_results_table.txt"
 
 if [ -f "$TABLE_FILE" ]; then

@@ -5,6 +5,9 @@
 CONFIG="config.yaml"
 FIXED_NUM_PD_LAYERS=10
 GPU_ID=0
+# Espace de noms isole (ne pollue pas 'data_1' utilise par run_all/compare).
+RUN_TAG="ablation_extern"
+
 
 RESULTS_DIR="Results/ablation/extern"
 SUMMARY_CSV="$RESULTS_DIR/summary.csv"
@@ -14,13 +17,15 @@ echo "num_layers,num_pd_layers,run_dir,mean,median,std,best,worst" > "$SUMMARY_C
 for NUM_LAYERS in $(seq 5 5 60); do
     echo "=== Ablation EXTERN : num_layers=$NUM_LAYERS | num_pd_layers=$FIXED_NUM_PD_LAYERS ==="
 
-    BEFORE_RUNS=$(ls -1 runs/p3mg/unrolling/*/ 2>/dev/null)
-
     ./scripts/run.sh --config "$CONFIG" --gpu $GPU_ID --full \
+        --run_group ablation \
+        --run_tag "$RUN_TAG" \
         --num_layers $NUM_LAYERS \
         --num_pd_layers $FIXED_NUM_PD_LAYERS
 
-    RUN_DIR=$(find runs/p3mg/unrolling -mindepth 2 -maxdepth 2 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+    RUN_DIR=$(find "runs/ablation/p3mg/unrolling/${RUN_TAG}" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+
+
     TABLE_FILE="$RUN_DIR/logs/test_results_table.txt"
 
     if [ -f "$TABLE_FILE" ]; then
