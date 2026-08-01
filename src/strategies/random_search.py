@@ -170,7 +170,11 @@ def train(loader, args, paths):
             hp['lmbd_ncvx'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['gamma'] = random.uniform(float(tau_min), float(tau_max))
         elif model_name == 'pmms':
-            hp['nu'] = 10 ** random.uniform(log_l_min, log_l_max)
+            # La valeur de reference nu=8e-5 est toujours explorée en premier
+            if i == 0:
+                hp['nu'] = 8.0e-5
+            else:
+                hp['nu'] = 10 ** random.uniform(log_l_min, log_l_max)
         elif model_name == 'ista':
             hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
         elif model_name in ['p3mg', 'pd']:
@@ -271,7 +275,7 @@ def test(loader, args, paths):
         if model_name == 'hq':
             best_params = {'lmbd_cvx': 1.0, 'lmbd_ncvx': 1.0, 'gamma': 1.0}
         elif model_name == 'pmms':
-            best_params = {'nu': 0.1}
+            best_params = {'nu': 8.0e-5}
         elif model_name == 'ista':
             best_params = {'lmbd': 1.0}
         else:
