@@ -41,4 +41,13 @@ for NUM_PD_LAYERS in $(seq 5 5 60); do
     echo "$FIXED_NUM_LAYERS,$NUM_PD_LAYERS,$RUN_DIR,$MEAN,$MEDIAN,$STD,$BEST,$WORST" >> "$SUMMARY_CSV"
 done
 
+python scripts/plot_ablation.py \
+    --csv "$SUMMARY_CSV" \
+    --x num_pd_layers \
+    --xlabel "Nombre de couches internes (num_pd_layers)" \
+    --title "Ablation - Loss vs. nombre de couches internes" \
+    --output "$RESULTS_DIR/loss_vs_layers.png" \
+    --metric "Loss" || echo "[WARN] Generation du graphe d'ablation echouee."
+
 echo "=== Ablation INTERN terminee. Resultats consolides : $SUMMARY_CSV ==="
+

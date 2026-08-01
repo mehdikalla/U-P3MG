@@ -135,3 +135,30 @@ fi
 ) 200>"$LOCK_FILE"
 
 echo "--- Tache ${SLURM_ARRAY_TASK_ID} terminee (volet: $STUDY) ---"
+
+# -------------------------------------------------------------
+# 5. Generation du graphe loss vs. layers pour ce volet
+#    (uniquement effectuee par la derniere tache du volet dans le
+#    job array, une fois que toutes les autres taches du meme volet
+#    ont pu ecrire leur ligne dans le CSV)
+# -------------------------------------------------------------
+case "$STUDY" in
+    extern) LAST_TASK_ID=11; X_COL="num_layers"; XLABEL="Nombre de couches externes (num_layers)"; TITLE="Ablation - Loss vs. nombre de couches externes" ;;
+    intern) LAST_TASK_ID=23; X_COL="num_pd_layers"; XLABEL="Nombre de couches internes (num_pd_layers)"; TITLE="Ablation - Loss vs. nombre de couches internes" ;;
+    mlp)    LAST_TASK_ID=28; X_COL="mlp_hidden"; XLABEL="Profondeur du MLP interne"; TITLE="Ablation - Loss vs. profondeur du MLP interne" ;;
+    *) LAST_TASK_ID=-1 ;;
+esac
+
+if [ "${SLURM_ARRAY_TASK_ID}" -eq "${LAST_TASK_ID}" ]; then
+    # Attente courte pour laisser les taches concurrentes finaliser leur ecriture CSV
+    sleep 30
+    python scripts/plot_ablation.py \
+        --csv "$SUMMARY_CSV" \
+        --x "$X_COL" \
+        --xlabel "$XLABEL" \
+        --title "$TITLE" \
+        --output "$RESULTS_DIR/loss_vs_layers.png" \
+        --metric "Loss" || echo "[WARN] Generation du graphe d'ablation echouee pour le volet $STUDY."
+
+fi
+

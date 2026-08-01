@@ -53,4 +53,15 @@ for MLP_HIDDEN in "${MLP_CONFIGS[@]}"; do
     echo "\"$MLP_HIDDEN\",$FIXED_NUM_LAYERS,$FIXED_NUM_PD_LAYERS,$RUN_DIR,$MEAN,$MEDIAN,$STD,$BEST,$WORST" >> "$SUMMARY_CSV"
 done
 
+python scripts/plot_ablation.py \
+    --csv "$SUMMARY_CSV" \
+    --x mlp_hidden \
+    --xlabel "Profondeur du MLP interne" \
+    --title "Ablation - Loss vs. profondeur du MLP interne" \
+    --output "$RESULTS_DIR/loss_vs_layers.png" \
+    --metric "Loss" || echo "[WARN] Generation du graphe d'ablation echouee."
+
 echo "=== Ablation MLP terminee. Resultats consolides : $SUMMARY_CSV ==="
+
+
+
