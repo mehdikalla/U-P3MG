@@ -11,8 +11,11 @@ src/pd/__pycache__
 src/pmms/__pycache__
 src/strategies/__pycache__
 
+*/__pycache__/
 __pycache__/*   
 *.py[cod]
 .clinerules
 /Dataset/data_0
+/Dataset/data_1
+/Dataset/data_2
 .vscode
