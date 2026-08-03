@@ -29,6 +29,8 @@ for MLP_HIDDEN in "${MLP_CONFIGS[@]}"; do
     echo "=== Ablation MLP : mlp_hidden=$MLP_HIDDEN | num_layers=$FIXED_NUM_LAYERS | num_pd_layers=$FIXED_NUM_PD_LAYERS ==="
 
     ./scripts/run.sh --config "$CONFIG" --gpu $GPU_ID --full \
+        --model p3mg \
+        --strategy unrolling \
         --run_group ablation \
         --run_tag "$RUN_TAG" \
         --num_layers $FIXED_NUM_LAYERS \

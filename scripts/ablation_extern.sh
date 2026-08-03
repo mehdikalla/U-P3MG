@@ -18,6 +18,8 @@ for NUM_LAYERS in $(seq 5 5 60); do
     echo "=== Ablation EXTERN : num_layers=$NUM_LAYERS | num_pd_layers=$FIXED_NUM_PD_LAYERS ==="
 
     ./scripts/run.sh --config "$CONFIG" --gpu $GPU_ID --full \
+        --model p3mg \
+        --strategy unrolling \
         --run_group ablation \
         --run_tag "$RUN_TAG" \
         --num_layers $NUM_LAYERS \

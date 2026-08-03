@@ -93,6 +93,8 @@ if [ -n "$MLP_HIDDEN" ]; then
 fi
 
 ./scripts/run.sh --config "$CONFIG" --gpu 0 --mode full \
+    --model p3mg \
+    --strategy unrolling \
     --run_group ablation \
     --run_tag "$RUN_TAG" \
     --num_layers "$NUM_LAYERS" \
