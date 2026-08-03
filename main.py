@@ -105,7 +105,9 @@ def setup_paths(args):
     if run_group:
         # Racine dediee (ex: 'runs/ablation/...'), totalement separee de
         # 'runs/<model>/<strategy>/...' (runs standard) et 'runs/compare/...'.
-        base_dir = os.path.join("runs", run_group.strip().lower(), args.model.strip().lower(), args.strategy, run_tag, run_name)
+        # Le segment '<strategy>' est omis : une etude d'ablation ne porte
+        # que sur le P3MG en mode unrolling, ce niveau est donc redondant.
+        base_dir = os.path.join("runs", run_group.strip().lower(), args.model.strip().lower(), run_tag, run_name)
     elif args.mode == 'compare':
         base_dir = os.path.join("runs", "compare", run_tag, run_name)
     else:
@@ -137,10 +139,11 @@ def find_latest_checkpoint(model_name, strategy, data_folder=None, current_base_
     puisqu'il vient d'être créé et ne contient encore aucun poids.
     """
     root = os.path.join("runs", run_group.strip().lower()) if run_group else "runs"
+    model_dir = os.path.join(root, model_name) if run_group else os.path.join(root, model_name, strategy)
     if data_folder:
-        strategy_dir = os.path.join(root, model_name, strategy, data_folder.strip().lower())
+        strategy_dir = os.path.join(model_dir, data_folder.strip().lower())
     else:
-        strategy_dir = os.path.join(root, model_name, strategy)
+        strategy_dir = model_dir
 
     if not os.path.isdir(strategy_dir):
         return None

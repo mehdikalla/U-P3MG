@@ -108,12 +108,12 @@ fi
 #    (une ligne par tache, ajout protege par flock pour eviter
 #    les ecritures concurrentes entre taches du job array)
 # -------------------------------------------------------------
-RESULTS_DIR="Results/ablation/$STUDY"
+RESULTS_DIR="runs/ablation/p3mg/${RUN_TAG}"
 SUMMARY_CSV="$RESULTS_DIR/summary.csv"
 LOCK_FILE="$RESULTS_DIR/.summary.lock"
 mkdir -p "$RESULTS_DIR"
 
-RUN_DIR=$(find "runs/ablation/p3mg/unrolling/${RUN_TAG}" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+RUN_DIR=$(find "runs/ablation/p3mg/${RUN_TAG}" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
 
 
 TABLE_FILE="$RUN_DIR/logs/test_results_table.txt"

@@ -20,7 +20,7 @@ MLP_CONFIGS=(
     "100,50,25,12,6"
 )
 
-RESULTS_DIR="Results/ablation/mlp"
+RESULTS_DIR="runs/ablation/p3mg/${RUN_TAG}"
 SUMMARY_CSV="$RESULTS_DIR/summary.csv"
 mkdir -p "$RESULTS_DIR"
 echo "mlp_hidden,num_layers,num_pd_layers,run_dir,mean,median,std,best,worst" > "$SUMMARY_CSV"
@@ -37,7 +37,7 @@ for MLP_HIDDEN in "${MLP_CONFIGS[@]}"; do
         --num_pd_layers $FIXED_NUM_PD_LAYERS \
         --mlp_hidden "$MLP_HIDDEN"
 
-    RUN_DIR=$(find "runs/ablation/p3mg/unrolling/${RUN_TAG}" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+    RUN_DIR=$(find "runs/ablation/p3mg/${RUN_TAG}" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
 
 
     TABLE_FILE="$RUN_DIR/logs/test_results_table.txt"

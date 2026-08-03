@@ -9,7 +9,7 @@ GPU_ID=0
 RUN_TAG="ablation_extern"
 
 
-RESULTS_DIR="Results/ablation/extern"
+RESULTS_DIR="runs/ablation/p3mg/${RUN_TAG}"
 SUMMARY_CSV="$RESULTS_DIR/summary.csv"
 mkdir -p "$RESULTS_DIR"
 echo "num_layers,num_pd_layers,run_dir,mean,median,std,best,worst" > "$SUMMARY_CSV"
@@ -25,7 +25,7 @@ for NUM_LAYERS in $(seq 5 5 60); do
         --num_layers $NUM_LAYERS \
         --num_pd_layers $FIXED_NUM_PD_LAYERS
 
-    RUN_DIR=$(find "runs/ablation/p3mg/unrolling/${RUN_TAG}" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+    RUN_DIR=$(find "runs/ablation/p3mg/${RUN_TAG}" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
 
 
     TABLE_FILE="$RUN_DIR/logs/test_results_table.txt"
