@@ -10,6 +10,12 @@
 # mais le rapport produit contient systematiquement la MSE ET le SNR
 # (moyenne + ecart-type) pour chaque combinaison (modele, strategie).
 #
+# Structure de sortie (une soumission sbatch = un "run_set", identifie par
+# SLURM_JOB_ID, pour pouvoir relancer l'etude sans ecraser les resultats
+# precedents) :
+#   runs/compare/run_set_<id>/<data_folder>/<timestamp>_compare/  -> runs bruts
+#   Results/compare/results_<id>/all_compare_report.csv           -> synthese
+#
 # A la fin, les rapports CSV individuels (un par data_folder) sont
 # consolides en un unique fichier CSV global.
 #
@@ -29,6 +35,8 @@ set -euo pipefail
 module purge
 module load cuda/13.1
 export MPLBACKEND=Agg   # Evite les erreurs liees a l'affichage graphique (X11)
+export PYTHONUNBUFFERED=1   # Force le flush immediat des print() dans les logs Slurm
+
 
 cd /scratch/mkalla/U-P3MG
 eval "$(conda shell.bash hook)"
@@ -44,11 +52,15 @@ CONFIG="config.yaml"
 CRITERION="SNR"
 DATA_FOLDERS=(data_0 data_1 data_2)
 
-RESULTS_DIR="Results/compare"
+# Identifiant de l'iteration courante du script (run_set), base sur le job
+# Slurm afin de garantir l'independance entre deux soumissions successives.
+RUN_SET_TAG="run_set_${SLURM_JOB_ID:-manual}"
+
+RESULTS_DIR="Results/compare/results_${SLURM_JOB_ID:-manual}"
 FINAL_CSV="${RESULTS_DIR}/all_compare_report.csv"
 mkdir -p "${RESULTS_DIR}"
 
-echo "--- Job Slurm ID: ${SLURM_JOB_ID:-N/A} | Mode: compare | Critere: ${CRITERION} ---"
+echo "--- Job Slurm ID: ${SLURM_JOB_ID:-N/A} | Mode: compare | Critere: ${CRITERION} | run_set: ${RUN_SET_TAG} ---"
 
 # -----------------------------------------------------------------------------
 # 2. Execution du mode 'compare' pour chaque jeu de donnees
@@ -63,9 +75,10 @@ for DATA_FOLDER in "${DATA_FOLDERS[@]}"; do
         --gpu 0 \
         --mode compare \
         --data_folder "${DATA_FOLDER}" \
+        --run_tag "${RUN_SET_TAG}/${DATA_FOLDER}" \
         --criterion "${CRITERION}"
 
-    RUN_DIR=$(find "runs/compare/${DATA_FOLDER}" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
+    RUN_DIR=$(find "runs/compare/${RUN_SET_TAG}/${DATA_FOLDER}" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
         | sort -n | tail -1 | cut -d' ' -f2-)
 
     if [ -z "${RUN_DIR}" ]; then
@@ -101,4 +114,5 @@ for CSV_PATH in "${PER_DATASET_CSVS[@]}"; do
 done
 
 echo "--- Rapport de comparaison global consolide : ${FINAL_CSV} ---"
+echo "--- Runs bruts consolides sous : runs/compare/${RUN_SET_TAG}/ ---"
 echo "--- Job de comparaison termine ---"

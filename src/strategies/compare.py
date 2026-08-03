@@ -128,9 +128,11 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
 
         metrics_per_sample = {m: [] for m in REPORT_METRICS}
         static_params = None
+        n_total = len(dataset)
+        progress_step = max(1, n_total // 10)
 
         with torch.no_grad():
-            for idx in range(len(dataset)):
+            for idx in range(n_total):
                 sample = dataset[idx]
                 xt, y = sample[0], sample[1]
                 xt = xt.to(device).double().unsqueeze(0)
@@ -148,7 +150,11 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
                 for m in REPORT_METRICS:
                     metrics_per_sample[m].append(sample_metrics[m])
 
+                if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
+                    print(f"[COMPARE][unrolling][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
+
         return metrics_per_sample, ckpt_path
+
     finally:
         args.model = original_model_arg
 
@@ -172,9 +178,14 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device):
 
         metrics_per_sample = {m: [] for m in REPORT_METRICS}
         algo, static = None, None
+        n_total = len(dataset)
+        progress_step = max(1, n_total // 10)
+
+        print(f"[COMPARE][random_search][{model_name}] Debut evaluation : {n_total} signaux, "
+              f"{args.algo_iters} iterations/signal.")
 
         with torch.no_grad():
-            for idx in range(len(dataset)):
+            for idx in range(n_total):
                 sample = dataset[idx]
                 xt, y = sample[0], sample[1]
                 xt = xt.to(device).double().unsqueeze(0)
@@ -194,7 +205,11 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device):
                 for m in REPORT_METRICS:
                     metrics_per_sample[m].append(sample_metrics[m])
 
+                if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
+                    print(f"[COMPARE][random_search][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
+
         return metrics_per_sample, params_path
+
     finally:
         args.model = original_model_arg
 

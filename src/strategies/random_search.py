@@ -151,6 +151,7 @@ def train(loader, args, paths):
     algo, static = get_algo_and_static(args, N_dim, M_dim, device)
     
     lmbd_min, lmbd_max = args.lmbd_bounds
+    nu_min, nu_max = getattr(args, 'nu_bounds', (1e-6, 1e-3))
     algo_iters = args.algo_iters
     
     l_mid_log = (np.log10(float(lmbd_min)) + np.log10(float(lmbd_max))) / 2
@@ -161,6 +162,7 @@ def train(loader, args, paths):
     start = time.time()
     for i in range(args.n_samples):
         log_l_min, log_l_max = np.log10(float(lmbd_min)), np.log10(float(lmbd_max))
+        log_nu_min, log_nu_max = np.log10(float(nu_min)), np.log10(float(nu_max))
         hp = {}
         
         # Attribution explicite des hyperparamètres selon le modèle
@@ -174,7 +176,8 @@ def train(loader, args, paths):
             if i == 0:
                 hp['nu'] = 8.0e-5
             else:
-                hp['nu'] = 10 ** random.uniform(log_l_min, log_l_max)
+                hp['nu'] = 10 ** random.uniform(log_nu_min, log_nu_max)
+
         elif model_name == 'ista':
             hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
         elif model_name in ['p3mg', 'pd']:

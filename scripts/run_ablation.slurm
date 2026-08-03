@@ -23,6 +23,8 @@ set -euo pipefail
 module purge
 module load cuda/13.1
 export MPLBACKEND=Agg
+export PYTHONUNBUFFERED=1   # Force le flush immediat des print() dans les logs Slurm
+
 
 cd /scratch/mkalla/U-P3MG
 eval "$(conda shell.bash hook)"
@@ -79,7 +81,15 @@ IFS=';' read -r STUDY NUM_LAYERS NUM_PD_LAYERS MLP_HIDDEN <<< "$ENTRY"
 # Espace de noms dedie a l'ablation, isole de 'data_1' (utilise par
 # run_all.slurm et run_compare.slurm) afin qu'aucun run standard/compare ne
 # soit pollue par les checkpoints d'ablation, et inversement.
-RUN_TAG="ablation_${STUDY}"
+#
+# Chaque soumission sbatch (SLURM_ARRAY_JOB_ID) constitue une iteration
+# independante de l'etude ("run_set"). Toutes les taches du meme volet
+# (STUDY) issues d'une meme soumission partagent donc le meme run_set,
+# sans risque de collision entre deux soumissions successives.
+STUDY_TAG="ablation_${STUDY}"
+RUN_SET_TAG="run_set_${SLURM_ARRAY_JOB_ID}"
+RUN_TAG="${STUDY_TAG}/${RUN_SET_TAG}"
+
 
 echo "--- Job Slurm ID: ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} ---"
 echo "--- Volet: $STUDY | num_layers=$NUM_LAYERS | num_pd_layers=$NUM_PD_LAYERS | mlp_hidden=$MLP_HIDDEN | run_tag=$RUN_TAG ---"
@@ -108,12 +118,17 @@ fi
 #    (une ligne par tache, ajout protege par flock pour eviter
 #    les ecritures concurrentes entre taches du job array)
 # -------------------------------------------------------------
-RESULTS_DIR="runs/ablation/p3mg/${RUN_TAG}"
+# 'RUN_TAG' pointe vers le dossier des runs P3MG bruts (run_set_<id>).
+# La synthese (CSV + graphe) est ecrite dans un dossier "results_<id>"
+# distinct, cote a cote avec "run_set_<id>", au sein du meme volet.
+RUN_SET_DIR="runs/ablation/p3mg/${RUN_TAG}"
+RESULTS_DIR="runs/ablation/p3mg/${STUDY_TAG}/results_${SLURM_ARRAY_JOB_ID}"
 SUMMARY_CSV="$RESULTS_DIR/summary.csv"
 LOCK_FILE="$RESULTS_DIR/.summary.lock"
 mkdir -p "$RESULTS_DIR"
 
-RUN_DIR=$(find "runs/ablation/p3mg/${RUN_TAG}" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+RUN_DIR=$(find "$RUN_SET_DIR" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+
 
 
 TABLE_FILE="$RUN_DIR/logs/test_results_table.txt"
