@@ -45,6 +45,9 @@ class FCTN_model(nn.Module):
         # 4. Couche Fully Connected de sortie
         # Projette la dimension latente d_model vers la dimension scalaire finale du signal
         self.fc_out = nn.Linear(d_model, 1)
+        # Activation Softplus finale afin de garantir un signal reconstruit
+        # strictement positif.
+        self.output_activation = nn.Softplus()
 
     def forward(self, static, dynamic, x0: torch.Tensor, y: torch.Tensor):
         """
@@ -66,6 +69,6 @@ class FCTN_model(nn.Module):
 
         encoded = self.transformer(emb)
         
-        x_pred = self.fc_out(encoded).squeeze(-1)
+        x_pred = self.output_activation(self.fc_out(encoded)).squeeze(-1)
         
         return x_pred, None, None

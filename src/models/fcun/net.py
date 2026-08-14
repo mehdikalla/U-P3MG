@@ -14,7 +14,6 @@ class DenseBlock(nn.Module):
         if use_batchnorm:
             layers.append(nn.BatchNorm1d(out_dim))
         layers.append(nn.ReLU(inplace=True))
-        layers.append(nn.Softplus())
         self.body = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -85,7 +84,10 @@ class FCUN_model(nn.Module):
             in_dim = width
 
         # --- Projection finale vers la dimension du signal reconstruit ---
+        # Suivie d'une activation Softplus afin de garantir un signal
+        # reconstruit strictement positif.
         self.fc_out = nn.Linear(decoder_widths[-1], N_dim)
+        self.output_activation = nn.Softplus()
 
     def forward(self, static, dynamic, x0: torch.Tensor, y: torch.Tensor):
         """
@@ -115,6 +117,6 @@ class FCUN_model(nn.Module):
             h = torch.cat([h, skip], dim=-1)
             h = block(h)
 
-        x_pred = self.fc_out(h)
+        x_pred = self.output_activation(self.fc_out(h))
 
         return x_pred, None, None

@@ -23,7 +23,6 @@ class DenseBlock(nn.Module):
         layers.append(nn.ReLU(inplace=True))
         if dropout > 0.0:
             layers.append(nn.Dropout(dropout))
-        layers.append(nn.Softplus())
         self.body = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -81,13 +80,15 @@ class Decoder(nn.Module):
             for i in range(len(dims) - 1)
         ]
         self.hidden = nn.Sequential(*blocks)
-        # Projection finale vers la dimension du signal, sans activation ni
-        # normalisation, pour permettre une reconstruction non bornee.
+        # Projection finale vers la dimension du signal, suivie d'une
+        # activation Softplus afin de garantir un signal reconstruit
+        # strictement positif.
         self.to_output = nn.Linear(dims[-1], out_dim)
+        self.output_activation = nn.Softplus()
 
     def forward(self, z: torch.Tensor) -> torch.Tensor:
         h = self.hidden(z)
-        return self.to_output(h)
+        return self.output_activation(self.to_output(h))
 
 
 class FCAE_model(nn.Module):
