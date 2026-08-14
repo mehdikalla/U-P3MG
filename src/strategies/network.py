@@ -262,7 +262,7 @@ def test(model, test_loader, args, paths, checkpoint_path=None):
                 mean_v = y.sum(1, keepdim=True)/(M_dim*N_dim)
                 x0 = mean_v.repeat(1, N_dim)
 
-            current_static = static_params if model_name == 'p3mg' else None
+            current_static = static_params if model_name in ('p3mg', 'pmms') else None
             xp, _, _ = model(current_static, None, x0, y)
             
             metrics = compute_sample_metric(xp, xt, criterion_name)

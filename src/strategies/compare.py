@@ -143,7 +143,7 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
                     static_params, _ = init_static_params(args, N_dim, M_dim, device)
 
                 x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
-                current_static = static_params if model_name == 'p3mg' else None
+                current_static = static_params if model_name in ('p3mg', 'pmms') else None
                 xp, _, _ = model(current_static, None, x0, y)
 
                 sample_metrics = _compute_all_metrics(xp, xt)
@@ -290,7 +290,7 @@ def run(dataset, args, paths):
             x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
 
             static_params, _ = init_static_params(args, N_dim, M_dim, device)
-            current_static = static_params if model_name == 'p3mg' else None
+            current_static = static_params if model_name in ('p3mg', 'pmms') else None
             with torch.no_grad():
                 xp, _, _ = model(current_static, None, x0, y)
             loss = _compute_all_metrics(xp, xt)[plot_criterion]
