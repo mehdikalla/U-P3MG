@@ -138,7 +138,7 @@ def train(loader, args, paths):
     path_checkpoints, _, path_logs = paths[1], paths[2], paths[3]
     model_name = args.model.strip().lower()
     
-    print(f"--- [TRAIN] {model_name.upper()} (RANDOM_SEARCH) | Samples: {args.n_samples} | Loss: {args.criterion} ---")
+    print(f"--- [TRAIN] {model_name.upper()} (RANDOM_SEARCH) | Trials: {args.n_trials} | Loss: {args.criterion} ---")
 
     full_data = list(loader)
     subset_size = max(1, int(len(full_data) * 0.10))
@@ -160,7 +160,7 @@ def train(loader, args, paths):
     best_params = {}
     
     start = time.time()
-    for i in range(args.n_samples):
+    for i in range(args.n_trials):
         log_l_min, log_l_max = np.log10(float(lmbd_min)), np.log10(float(lmbd_max))
         log_nu_min, log_nu_max = np.log10(float(nu_min)), np.log10(float(nu_max))
         hp = {}
@@ -202,7 +202,7 @@ def train(loader, args, paths):
             best_params = hp.copy()
             
             hp_str = " ".join([f"{k}={v:.4e}" if 'lmbd' in k or 'nu' in k else f"{k}={v:.4f}" for k, v in hp.items()])
-            print(f"   [{i+1}/{args.n_samples}] New Best! {hp_str} | Loss={best_loss:.4e}")
+            print(f"   [{i+1}/{args.n_trials}] New Best! {hp_str} | Loss={best_loss:.4e}")
 
     print(f"[RESULT] Best Params: {best_params}")
     with open(os.path.join(path_checkpoints, 'best_params.json'), 'w') as f:

@@ -62,7 +62,7 @@ def parse_args():
                          help="Tailles des couches cachees du MLP interne P3MG (lambda), ex: '50,25,12'")
 
     parser.add_argument('--checkpoint', type=str, default=None)
-    parser.add_argument('--n_samples', type=int, default=50)
+    parser.add_argument('--n_trials', type=int, default=50)
     parser.add_argument('--algo_iters', type=int, default=200)
     parser.add_argument("--alpha", type=float, default=1e-5)
     parser.add_argument("--beta",  type=float, default=1e-5)

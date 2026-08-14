@@ -45,14 +45,14 @@ delta_cvx: 0.01            # Paramètre de lissage pour la pénalité convexe
 delta_ncvx: 0.01           # Paramètre de lissage pour la pénalité non-convexe
 
 # --- 6. Paramètres algorithmiques (Random Search / Oracle) ---
-n_samples: 10              # Nombre de configurations à tester (calibration)
-algo_iters: 10000            # Nombre d'itérations pour l'algorithme itératif standard
+n_trials: 100           # Nombre de tirages d'hyperparametres a tester (calibration)
+algo_iters: 5000            # Nombre d'itérations pour l'algorithme itératif standard
 lmbd_min: 1.0e-9             # Borne inférieure pour la recherche de Lambda (P3MG, ISTA, HQ)
 lmbd_max: 1.1              # Borne supérieure pour la recherche de Lambda (P3MG, ISTA, HQ)
 tau_min: 0.01              # Borne inférieure pour la recherche de Tau (P3MG, PD)
 tau_max: 2.0               # Borne supérieure pour la recherche de Tau (P3MG, PD)
-nu_min: 1.0e-6              # Borne inférieure pour la recherche de nu (PMMS uniquement)
-nu_max: 1.0e-4              # Borne supérieure pour la recherche de nu (PMMS uniquement)
+nu_min: 1.0e-9              # Borne inférieure pour la recherche de nu (PMMS uniquement)
+nu_max: 1.0e-5              # Borne supérieure pour la recherche de nu (PMMS uniquement)
 
 # --- 7. Sauvegarde et chargement ---
 
