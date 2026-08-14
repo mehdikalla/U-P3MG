@@ -60,7 +60,8 @@ class PMMS_algo(nn.Module):
             
         Ad = tc.stack(Ad_list, dim=1) # (P, L, N)
         B = tc.bmm(D, Ad.transpose(1, 2)) # (P, L, L)
-        
+        B = 0.5 * (B + B.transpose(1, 2))  # Symetrisation pour la stabilite numerique du pinv
+
         # Minimisation dans le sous-espace
         D_gradx = tc.bmm(D, gradx.unsqueeze(2))
         B_pinv = tc.linalg.pinv(B)

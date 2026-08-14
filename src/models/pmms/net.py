@@ -53,8 +53,16 @@ class PMMS_model(nn.Module):
             param.requires_grad = False
 
     def forward(self, static, dynamic, x0, y, x_true=None, nu_override=None):
-        if static is None:
-            static, dynamic = self.algo.init_PMMS(x0, y)
+        # static et dynamic doivent toujours etre initialises ensemble : si l'un
+        # des deux est absent (ex: static fourni par init_static_params mais
+        # dynamic non recalcule par l'appelant), on reinitialise les deux via
+        # les valeurs statiques fournies (sigma/beta/eta) si disponibles.
+        if dynamic is None:
+            if static is not None:
+                _, sigma, beta, eta, _ = static
+                static, dynamic = self.algo.init_PMMS(x0, y, sigma=sigma, beta=beta, eta=eta)
+            else:
+                static, dynamic = self.algo.init_PMMS(x0, y)
 
         x = x0
 
@@ -62,6 +70,6 @@ class PMMS_model(nn.Module):
 
         for layer in self.Layers:
             x, dynamic, nu_k = layer(static, dynamic, x, y, nu_override)
-        dynamic_nu.append(nu_k)
+            dynamic_nu.append(nu_k)
 
         return x, dynamic, dynamic_nu

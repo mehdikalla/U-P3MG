@@ -58,8 +58,17 @@ def init_static_params(args, N_dim, M_dim, device):
         algo_tmp = HQ_algo().to(device).double()
         # Initialisation une seule fois
         static = algo_tmp.init_HQ(dx, dy) 
-        
+
+    elif model_name == 'pmms':
+        from src.models.pmms.algo import PMMS_algo
+        algo_tmp = PMMS_algo().to(device).double()
+        sigma = getattr(args, 'sigma', 1e-5)
+        beta = getattr(args, 'beta', 1e-5)
+        eta = getattr(args, 'eta', 1e-2)
+        static, _ = algo_tmp.init_PMMS(dx, dy, sigma=sigma, beta=beta, eta=eta)
+
     else:
+
         algo_tmp = None
         static = None
         
