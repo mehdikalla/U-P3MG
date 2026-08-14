@@ -52,7 +52,7 @@ lmbd_max: 1.1              # Borne supérieure pour la recherche de Lambda (P3MG
 tau_min: 0.01              # Borne inférieure pour la recherche de Tau (P3MG, PD)
 tau_max: 2.0               # Borne supérieure pour la recherche de Tau (P3MG, PD)
 nu_min: 1.0e-6              # Borne inférieure pour la recherche de nu (PMMS uniquement)
-nu_max: 1.0e-3              # Borne supérieure pour la recherche de nu (PMMS uniquement)
+nu_max: 1.0e-4              # Borne supérieure pour la recherche de nu (PMMS uniquement)
 
 # --- 7. Sauvegarde et chargement ---
 
