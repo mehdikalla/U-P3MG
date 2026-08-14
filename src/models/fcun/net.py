@@ -14,6 +14,7 @@ class DenseBlock(nn.Module):
         if use_batchnorm:
             layers.append(nn.BatchNorm1d(out_dim))
         layers.append(nn.ReLU(inplace=True))
+        layers.append(nn.Softplus())
         self.body = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

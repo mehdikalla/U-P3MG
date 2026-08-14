@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from src.models.ResU_block import BasicConv, ResUNetBlock, ResUNetUpBlock
+from src.models.Transformer_block import Transformer_Block
 
 
 class ResU_model(nn.Module):
@@ -25,6 +26,15 @@ class ResU_model(nn.Module):
         num_convs: Nombre de convolutions residuelles par bloc.
         use_batchnorm: Active la normalisation par batch dans les blocs
             convolutifs.
+        use_transformer: Active un module d'attention (Transformer encoder)
+            applique sur la representation du goulot d'etranglement, afin
+            de capturer des dependances a longue portee complementaires
+            aux convolutions locales.
+        transformer_nhead: Nombre de tetes d'attention du Transformer.
+        transformer_num_layers: Nombre de couches d'encodeur Transformer.
+        transformer_dim_feedforward: Dimension du reseau feedforward interne
+            du Transformer.
+        transformer_dropout: Taux de dropout applique dans le Transformer.
     """
 
     def __init__(
@@ -35,7 +45,13 @@ class ResU_model(nn.Module):
         base_channels: int = 16,
         num_convs: int = 2,
         use_batchnorm: bool = True,
+        use_transformer: bool = True,
+        transformer_nhead: int = 4,
+        transformer_num_layers: int = 2,
+        transformer_dim_feedforward: int = 256,
+        transformer_dropout: float = 0.1,
     ) -> None:
+
         super().__init__()
 
         if num_layers < 1:
@@ -65,7 +81,27 @@ class ResU_model(nn.Module):
         bottleneck_channels = channel_widths[-1] * 2
         self.bottleneck = BasicConv(channel_widths[-1], bottleneck_channels, use_batchnorm)
 
+        # --- Module d'attention (Transformer) sur le goulot d'etranglement ---
+        # Le nombre de tetes doit diviser le nombre de canaux du bottleneck.
+        self.use_transformer = use_transformer
+        if use_transformer:
+            adjusted_nhead = transformer_nhead
+            while adjusted_nhead > 1 and bottleneck_channels % adjusted_nhead != 0:
+                adjusted_nhead -= 1
+            self.transformer = Transformer_Block(
+                d_model=bottleneck_channels,
+                nhead=adjusted_nhead,
+                num_layers=transformer_num_layers,
+                dim_feedforward=transformer_dim_feedforward,
+                dropout=transformer_dropout,
+                batch_first=True,
+                norm_first=True,
+            )
+        else:
+            self.transformer = None
+
         # --- Decodeur ---
+
         self.decoder_blocks = nn.ModuleList()
         in_channels = bottleneck_channels
         for width in reversed(channel_widths):
@@ -77,6 +113,7 @@ class ResU_model(nn.Module):
         # --- Projection finale vers la dimension du signal reconstruit ---
         self.output_proj = nn.Conv1d(channel_widths[0], 1, kernel_size=1)
         self.fc_out = nn.Linear(M_dim, N_dim)
+        self.output_activation = nn.Softplus()
 
     def forward(self, static, dynamic, x0: tc.Tensor, y: tc.Tensor):
         """
@@ -104,10 +141,18 @@ class ResU_model(nn.Module):
 
         h = self.bottleneck(h)
 
+        if self.use_transformer:
+            # (batch, channels, length) -> (batch, length, channels)
+            h_seq = h.permute(0, 2, 1)
+            h_seq = self.transformer(h_seq)
+            h = h_seq.permute(0, 2, 1)
+
         for block, skip in zip(self.decoder_blocks, reversed(skips)):
+
             h = block(h, skip)
 
         h = self.output_proj(h).squeeze(1)  # (batch, M_dim)
         x_pred = self.fc_out(h)
+        x_pred = self.output_activation(x_pred)
 
         return x_pred, None, None

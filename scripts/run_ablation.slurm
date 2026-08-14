@@ -11,7 +11,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --time=08:00:00
+#SBATCH --time=20:00:00
 #SBATCH --output=logs/ablation-%A_%a.out
 #SBATCH --error=logs/ablation-%A_%a.err
 #SBATCH --array=0-28
@@ -109,6 +109,7 @@ fi
     --run_tag "$RUN_TAG" \
     --num_layers "$NUM_LAYERS" \
     --num_pd_layers "$NUM_PD_LAYERS" \
+    --epochs 30 \
     "${EXTRA_ARGS[@]}"
 
 

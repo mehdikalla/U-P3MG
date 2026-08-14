@@ -23,6 +23,7 @@ class DenseBlock(nn.Module):
         layers.append(nn.ReLU(inplace=True))
         if dropout > 0.0:
             layers.append(nn.Dropout(dropout))
+        layers.append(nn.Softplus())
         self.body = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

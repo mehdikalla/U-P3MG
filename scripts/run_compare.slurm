@@ -27,7 +27,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --time=04:00:00
+#SBATCH --time=20:00:00
 #SBATCH --output=logs/compare-%j.out
 #SBATCH --error=logs/compare-%j.err
 
@@ -76,7 +76,8 @@ for DATA_FOLDER in "${DATA_FOLDERS[@]}"; do
         --mode compare \
         --data_folder "${DATA_FOLDER}" \
         --run_tag "${RUN_SET_TAG}/${DATA_FOLDER}" \
-        --criterion "${CRITERION}"
+        --criterion "${CRITERION}" \
+        --epochs 30
 
     RUN_DIR=$(find "runs/compare/${RUN_SET_TAG}/${DATA_FOLDER}" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
         | sort -n | tail -1 | cut -d' ' -f2-)
