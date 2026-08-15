@@ -1,14 +1,21 @@
 #!/bin/bash
 # =============================================================
-# Job SLURM - Generation des graphes loss vs. layers pour l'etude
-# d'ablation, decouple de l'execution des runs.
+# Job SLURM - Reconstruction du summary.csv et generation des
+# graphes loss vs. layers pour l'etude d'ablation, decouple de
+# l'execution des runs.
 #
 # Ce job est concu pour etre soumis avec une dependance `afterany`
 # sur le job array de scripts/run_ablation.slurm, ce qui garantit
 # qu'il s'execute une seule fois APRES que toutes les taches du
 # tableau se soient terminees, qu'elles aient reussi ou echoue.
-# Il ne depend donc plus de la reussite d'une tache "sentinelle"
-# particuliere (contrairement a l'ancienne implementation).
+#
+# Pour chaque volet (extern, intern, mlp), le summary.csv est
+# reconstruit directement a partir des sous-runs presents sur disque
+# (scripts/build_ablation_summary.py lit logs/run_config.json et
+# logs/test_results_table.txt de chaque sous-run), plutot que d'etre
+# assemble ligne par ligne pendant l'execution du job array (ancien
+# mecanisme fragile a base de parsing awk + flock, cf. commentaires
+# dans scripts/run_ablation.slurm).
 #
 # Usage (voir aussi scripts/submit_ablation.sh pour l'enchainement
 # automatique) :
@@ -44,7 +51,7 @@ if [ -z "$ARRAY_JOB_ID" ]; then
     exit 1
 fi
 
-echo "--- Generation des graphes d'ablation pour le job array ${ARRAY_JOB_ID} ---"
+echo "--- Consolidation et generation des graphes d'ablation pour le job array ${ARRAY_JOB_ID} ---"
 
 declare -A X_COL=( [extern]="num_layers" [intern]="num_pd_layers" [mlp]="mlp_hidden" )
 declare -A XLABEL=(
@@ -62,17 +69,27 @@ STATUS=0
 
 for STUDY in extern intern mlp; do
     STUDY_TAG="ablation_${STUDY}"
+    RUN_SET_DIR="runs/ablation/p3mg/${STUDY_TAG}/run_set_${ARRAY_JOB_ID}"
     RESULTS_DIR="runs/ablation/p3mg/${STUDY_TAG}/results_${ARRAY_JOB_ID}"
     SUMMARY_CSV="$RESULTS_DIR/summary.csv"
 
-    if [ ! -f "$SUMMARY_CSV" ]; then
-        echo "[WARN] $SUMMARY_CSV introuvable, volet '$STUDY' ignore (aucune tache n'a produit de resultat)."
+    if [ ! -d "$RUN_SET_DIR" ]; then
+        echo "[WARN] $RUN_SET_DIR introuvable, volet '$STUDY' ignore."
         STATUS=1
         continue
     fi
 
-    N_LINES=$(($(wc -l < "$SUMMARY_CSV") - 1))
-    echo "--- Volet $STUDY : $N_LINES ligne(s) de resultats trouvees dans $SUMMARY_CSV ---"
+    echo "--- Volet $STUDY : reconstruction de summary.csv depuis $RUN_SET_DIR ---"
+    python scripts/build_ablation_summary.py \
+        --run_set_dir "$RUN_SET_DIR" \
+        --study "$STUDY" \
+        --output "$SUMMARY_CSV"
+
+    if [ $? -ne 0 ] || [ ! -f "$SUMMARY_CSV" ]; then
+        echo "[WARN] Reconstruction de summary.csv echouee pour le volet $STUDY."
+        STATUS=1
+        continue
+    fi
 
     python scripts/plot_ablation.py \
         --csv "$SUMMARY_CSV" \

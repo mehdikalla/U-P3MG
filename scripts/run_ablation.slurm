@@ -114,65 +114,33 @@ fi
 
 
 
-# -------------------------------------------------------------
-# 4. Consolidation du resultat de ce run dans le CSV du volet
-#    (une ligne par tache, ajout protege par flock pour eviter
-#    les ecritures concurrentes entre taches du job array)
-# -------------------------------------------------------------
-# 'RUN_TAG' pointe vers le dossier des runs P3MG bruts (run_set_<id>).
-# La synthese (CSV + graphe) est ecrite dans un dossier "results_<id>"
-# distinct, cote a cote avec "run_set_<id>", au sein du meme volet.
-RUN_SET_DIR="runs/ablation/p3mg/${RUN_TAG}"
-RESULTS_DIR="runs/ablation/p3mg/${STUDY_TAG}/results_${SLURM_ARRAY_JOB_ID}"
-SUMMARY_CSV="$RESULTS_DIR/summary.csv"
-LOCK_FILE="$RESULTS_DIR/.summary.lock"
-mkdir -p "$RESULTS_DIR"
-
-RUN_DIR=$(find "$RUN_SET_DIR" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
-
-
-
-TABLE_FILE="$RUN_DIR/logs/test_results_table.txt"
-
-if [ -f "$TABLE_FILE" ]; then
-    MEAN=$(grep "Mean" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-    MEDIAN=$(grep "Median" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-    STD=$(grep "Std" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-    BEST=$(grep "Min (Best)" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-    WORST=$(grep "Max (Worst)" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-else
-    MEAN=""; MEDIAN=""; STD=""; BEST=""; WORST=""
-fi
-
-(
-    flock -x 200
-    if [ ! -f "$SUMMARY_CSV" ]; then
-        echo "study,num_layers,num_pd_layers,mlp_hidden,run_dir,mean,median,std,best,worst" > "$SUMMARY_CSV"
-    fi
-    echo "$STUDY,$NUM_LAYERS,$NUM_PD_LAYERS,\"$MLP_HIDDEN\",$RUN_DIR,$MEAN,$MEDIAN,$STD,$BEST,$WORST" >> "$SUMMARY_CSV"
-) 200>"$LOCK_FILE"
-
 echo "--- Tache ${SLURM_ARRAY_TASK_ID} terminee (volet: $STUDY) ---"
 
 # -------------------------------------------------------------
-# 5. Generation du graphe loss vs. layers
+# 4. Consolidation (summary.csv) et generation du graphe
 # -------------------------------------------------------------
-# NOTE IMPORTANTE : la generation du graphe N'EST PLUS declenchee ici.
-# L'ancienne implementation la confiait a une seule tache "sentinelle"
-# (le dernier SLURM_ARRAY_TASK_ID de chaque volet, correspondant
-# systematiquement a la configuration la plus lourde : num_layers=60,
-# num_pd_layers=60 ou le MLP le plus profond). Sous `set -euo pipefail`,
-# si CETTE tache precise echouait (OOM, timeout, crash node) avant
-# d'atteindre cette section, aucune autre tache du volet ne prenait le
-# relais : le graphe n'etait alors JAMAIS produit, meme si toutes les
-# autres configurations du volet avaient reussi.
+# NI L'UNE NI L'AUTRE ne sont plus effectuees ici. Deux defauts distincts
+# de l'ancienne implementation ont ete corriges en deportant ces etapes
+# vers un job SLURM independant (scripts/plot_ablation.slurm) :
 #
-# La generation des graphes est desormais deportee vers un job SLURM
-# independant (scripts/plot_ablation.slurm), soumis avec une dependance
-# `--dependency=afterany:<job_id>` sur ce job array : il s'execute une
-# seule fois, apres que TOUTES les taches (reussies ou non) se soient
-# terminees, et ne depend donc plus de la reussite d'une tache
-# particuliere. Voir scripts/submit_ablation.sh pour l'enchainement
-# automatique des deux jobs.
+#   1) Le graphe n'etait genere QUE par la derniere tache du volet
+#      (SLURM_ARRAY_TASK_ID sentinelle, systematiquement la config la plus
+#      lourde). Sous `set -euo pipefail`, l'echec de cette seule tache
+#      empechait toute generation, meme si les autres avaient reussi.
+#
+#   2) Le CSV summary.csv etait reconstruit ligne par ligne par CHAQUE
+#      tache via un parsing awk fragile du tableau test_results_table.txt,
+#      avec ecriture concurrente protegee par flock. Ce mecanisme dupliquait
+#      la configuration (NUM_LAYERS/NUM_PD_LAYERS/MLP_HIDDEN) depuis le
+#      tableau bash CONFIGS plutot que depuis la configuration reellement
+#      executee, risquant une desynchronisation silencieuse.
+#
+# scripts/build_ablation_summary.py reconstruit desormais summary.csv en
+# relisant directement, pour chaque sous-run trouve sur disque, le fichier
+# logs/run_config.json (configuration reelle, ecrite par
+# src.strategies.network.save_config) et logs/test_results_table.txt
+# (statistiques de test). Voir scripts/submit_ablation.sh pour
+# l'enchainement automatique des deux jobs.
+
 
 

@@ -28,7 +28,6 @@ mkdir -p "$RUN_SET_DIR" "$RESULTS_DIR"
 RUN_TAG="${STUDY_TAG}/run_set_${RUN_SET_IDX}"
 
 SUMMARY_CSV="$RESULTS_DIR/summary.csv"
-echo "num_layers,num_pd_layers,run_dir,mean,median,std,best,worst" > "$SUMMARY_CSV"
 
 echo "=== Ablation EXTERN : iteration run_set_${RUN_SET_IDX} ==="
 
@@ -41,24 +40,17 @@ for NUM_LAYERS in $(seq 5 5 60); do
         --run_group ablation \
         --run_tag "$RUN_TAG" \
         --num_layers $NUM_LAYERS \
-        --num_pd_layers $FIXED_NUM_PD_LAYERS
-
-    RUN_DIR=$(find "$RUN_SET_DIR" -mindepth 1 -maxdepth 1 -type d -name "*_full" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
-
-    TABLE_FILE="$RUN_DIR/logs/test_results_table.txt"
-
-    if [ -f "$TABLE_FILE" ]; then
-        MEAN=$(grep "Mean" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-        MEDIAN=$(grep "Median" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-        STD=$(grep "Std" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-        BEST=$(grep "Min (Best)" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-        WORST=$(grep "Max (Worst)" "$TABLE_FILE" | awk -F'|' '{gsub(/ /,"",$3); print $3}')
-    else
-        MEAN=""; MEDIAN=""; STD=""; BEST=""; WORST=""
-    fi
-
-    echo "$NUM_LAYERS,$FIXED_NUM_PD_LAYERS,$RUN_DIR,$MEAN,$MEDIAN,$STD,$BEST,$WORST" >> "$SUMMARY_CSV"
+        --num_pd_layers $FIXED_NUM_PD_LAYERS || echo "[AVERTISSEMENT] Echec pour num_layers=$NUM_LAYERS, poursuite."
 done
+
+# Reconstruction de summary.csv directement depuis les sous-runs sur disque
+# (logs/run_config.json + logs/test_results_table.txt), plutot qu'un
+# parsing awk fragile ligne par ligne pendant la boucle (source de
+# desynchronisation entre la config supposee et celle reellement executee).
+python scripts/build_ablation_summary.py \
+    --run_set_dir "$RUN_SET_DIR" \
+    --study extern \
+    --output "$SUMMARY_CSV"
 
 python scripts/plot_ablation.py \
     --csv "$SUMMARY_CSV" \
