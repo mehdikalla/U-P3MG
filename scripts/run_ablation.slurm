@@ -155,28 +155,24 @@ fi
 echo "--- Tache ${SLURM_ARRAY_TASK_ID} terminee (volet: $STUDY) ---"
 
 # -------------------------------------------------------------
-# 5. Generation du graphe loss vs. layers pour ce volet
-#    (uniquement effectuee par la derniere tache du volet dans le
-#    job array, une fois que toutes les autres taches du meme volet
-#    ont pu ecrire leur ligne dans le CSV)
+# 5. Generation du graphe loss vs. layers
 # -------------------------------------------------------------
-case "$STUDY" in
-    extern) LAST_TASK_ID=11; X_COL="num_layers"; XLABEL="Nombre de couches externes (num_layers)"; TITLE="Ablation - Loss vs. nombre de couches externes" ;;
-    intern) LAST_TASK_ID=23; X_COL="num_pd_layers"; XLABEL="Nombre de couches internes (num_pd_layers)"; TITLE="Ablation - Loss vs. nombre de couches internes" ;;
-    mlp)    LAST_TASK_ID=28; X_COL="mlp_hidden"; XLABEL="Profondeur du MLP interne"; TITLE="Ablation - Loss vs. profondeur du MLP interne" ;;
-    *) LAST_TASK_ID=-1 ;;
-esac
+# NOTE IMPORTANTE : la generation du graphe N'EST PLUS declenchee ici.
+# L'ancienne implementation la confiait a une seule tache "sentinelle"
+# (le dernier SLURM_ARRAY_TASK_ID de chaque volet, correspondant
+# systematiquement a la configuration la plus lourde : num_layers=60,
+# num_pd_layers=60 ou le MLP le plus profond). Sous `set -euo pipefail`,
+# si CETTE tache precise echouait (OOM, timeout, crash node) avant
+# d'atteindre cette section, aucune autre tache du volet ne prenait le
+# relais : le graphe n'etait alors JAMAIS produit, meme si toutes les
+# autres configurations du volet avaient reussi.
+#
+# La generation des graphes est desormais deportee vers un job SLURM
+# independant (scripts/plot_ablation.slurm), soumis avec une dependance
+# `--dependency=afterany:<job_id>` sur ce job array : il s'execute une
+# seule fois, apres que TOUTES les taches (reussies ou non) se soient
+# terminees, et ne depend donc plus de la reussite d'une tache
+# particuliere. Voir scripts/submit_ablation.sh pour l'enchainement
+# automatique des deux jobs.
 
-if [ "${SLURM_ARRAY_TASK_ID}" -eq "${LAST_TASK_ID}" ]; then
-    # Attente courte pour laisser les taches concurrentes finaliser leur ecriture CSV
-    sleep 30
-    python scripts/plot_ablation.py \
-        --csv "$SUMMARY_CSV" \
-        --x "$X_COL" \
-        --xlabel "$XLABEL" \
-        --title "$TITLE" \
-        --output "$RESULTS_DIR/loss_vs_layers.png" \
-        --metric "Loss" || echo "[WARN] Generation du graphe d'ablation echouee pour le volet $STUDY."
-
-fi
 

@@ -70,6 +70,15 @@ PER_DATASET_CSVS=()
 for DATA_FOLDER in "${DATA_FOLDERS[@]}"; do
     echo "=== [COMPARE] Dataset: ${DATA_FOLDER} ==="
 
+    # NOTE : le '|| true' est essentiel ici. Sous 'set -euo pipefail', si le
+    # run 'compare' d'un seul data_folder echoue (OOM, checkpoint manquant,
+    # crash), 'set -e' interromprait IMMEDIATEMENT tout le script sans
+    # jamais atteindre la section 3 (consolidation du CSV global) -- meme
+    # si les autres data_folders avaient reussi. Meme classe de bug que
+    # celui corrige dans run_ablation.slurm (tache "sentinelle" unique
+    # empechant toute sortie en cas d'echec). On isole donc chaque
+    # iteration pour que l'echec d'un dataset ne bloque pas les suivants
+    # ni la consolidation finale.
     ./scripts/run.sh \
         --config "${CONFIG}" \
         --gpu 0 \
@@ -77,7 +86,8 @@ for DATA_FOLDER in "${DATA_FOLDERS[@]}"; do
         --data_folder "${DATA_FOLDER}" \
         --run_tag "${RUN_SET_TAG}/${DATA_FOLDER}" \
         --criterion "${CRITERION}" \
-        --epochs 30
+        --epochs 30 || echo "[AVERTISSEMENT] Echec de 'compare' pour ${DATA_FOLDER}, poursuite avec les datasets restants."
+
 
     RUN_DIR=$(find "runs/compare/${RUN_SET_TAG}/${DATA_FOLDER}" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' \
         | sort -n | tail -1 | cut -d' ' -f2-)
