@@ -172,7 +172,6 @@ def train(loader, args, paths):
             hp['lmbd_ncvx'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['gamma'] = random.uniform(float(tau_min), float(tau_max))
         elif model_name == 'pmms':
-            # La valeur de reference nu=8e-5 est toujours explorée en premier
             if i == 0:
                 hp['nu'] = 8.0e-5
             else:

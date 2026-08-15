@@ -36,23 +36,23 @@ Once we have completed the above tasks, we can consider fully deep learning appr
 
 The following are some of the deep learning approaches token from the U-HQ paper that we can implement and compare with the U-P3MG model:
 
-- [ ] Implement an autoencoder and evaluate its performance on the easiest dataset.
-- [ ] Implement a transformer model and evaluate its performance on the easiest dataset.
-- [ ] Implement a FC U-Net model and evaluate it's performance on the easiest dataset.
-- [ ] Implement ResUNet and evaluate its performance on the easiest dataset.
+- [x] Implement an autoencoder and evaluate its performance on the easiest dataset.
+- [x] Implement a transformer model and evaluate its performance on the easiest dataset.
+- [x] Implement a FC U-Net model and evaluate it's performance on the easiest dataset.
+- [x] Implement ResUNet and evaluate its performance on the easiest dataset.
 
 ### **2. Evaluating Models on Different Datasets** should be done by mid July.
 Once the evaluation is done on the easiest dataset, we can move on to the more challenging datasets and evaluate the performance of all models on those datasets as well.
 
-- [ ] Dataset 2: two gaussians and by diversification of the skew.
-- [ ] Dataset 3: three or more gaussians and by diversification of the skew.
+- [x] Dataset 2: two gaussians and by diversification of the skew.
+- [x] Dataset 3: three or more gaussians and by diversification of the skew.
 
 We should have three levels of noise for each dataset: low, medium, and high. This will allow us to evaluate the robustness of the models under different noise conditions.
 
 ### **3. Ablation Study** should be done by the end of August.
-- [ ] Ablation study: Fix the intern number of iterations and evaluate the performance of the U-P3MG model with different numbers of extern iterations.
-- [ ] Ablation study: Fix the number of extern iterations and evaluate the performance of the U-P3MG model with different numbers of intern iterations.
-- [ ] Ablation study: Evaluate the performance of the U-P3MG model with different configurations of the model, such as different numbers of layers for the MLP.
+- [x] Ablation study: Fix the intern number of iterations and evaluate the performance of the U-P3MG model with different numbers of extern iterations.
+- [x] Ablation study: Fix the number of extern iterations and evaluate the performance of the U-P3MG model with different numbers of intern iterations.
+- [x] Ablation study: Evaluate the performance of the U-P3MG model with different configurations of the model, such as different numbers of layers for the MLP.
 
 Each time you complet an evaluation for the ablation study, please make sure to keep the results and metrics in a well organized manner so that we can easily analyze the results and draw conclusions from the ablation study.
 
