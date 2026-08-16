@@ -84,10 +84,10 @@ CONFIG="config.yaml"
 # P3MG dans les comparaisons de l'etude (memes couches externes, seule la
 # sous-resolution interne differe).
 declare -A NUM_LAYERS=(
-    [p3mg]=25
-    [pmms]=25
-    [ista]=10000
-    [hq]=25
+    [p3mg]=30
+    [pmms]=30
+    [ista]=55
+    [hq]=30
     [pd]=100
 )
 
@@ -95,7 +95,7 @@ declare -A NUM_LAYERS=(
 declare -A ALGO_ITERS=(
     [p3mg]=1000
     [pmms]=1000
-    [ista]=10000
+    [ista]=5000
     [hq]=1000
     [pd]=1000
 )
@@ -163,6 +163,9 @@ if [ -n "${NUM_PD_LAYERS[$MODEL]+x}" ]; then
 fi
 if [ "${STRATEGY}" = "random_search" ] && [ -n "${ALGO_ITERS[$MODEL]+x}" ]; then
     EXTRA_ARGS+=(--algo_iters "${ALGO_ITERS[$MODEL]}")
+fi
+if [ "$STRATEGY" = "unrolling" ] && [ "${MODEL}" = "ista" ]; then
+    EXTRA_ARGS+=(--epochs 150)
 fi
 
 echo "--- Arguments specifiques : ${EXTRA_ARGS[*]:-(aucun)} ---"
