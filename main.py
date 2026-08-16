@@ -73,8 +73,13 @@ def parse_args():
     parser.add_argument("--delta_ncvx", type=float, default=0.01)
     parser.add_argument('--lmbd_min', type=float, default=0.1)
     parser.add_argument('--lmbd_max', type=float, default=5.0)
+    parser.add_argument('--lmbd_ist_min', type=float, default=0.1,
+                         help="Borne inferieure pour la recherche de Lambda ISTA (independante de P3MG)")
+    parser.add_argument('--lmbd_ist_max', type=float, default=5.0,
+                         help="Borne superieure pour la recherche de Lambda ISTA (independante de P3MG)")
     parser.add_argument('--tau_min', type=float, default=0.01)
     parser.add_argument('--tau_max', type=float, default=2.0)
+
     parser.add_argument('--nu_min', type=float, default=1e-6,
                          help="Borne inferieure pour la recherche de nu (PMMS uniquement)")
     parser.add_argument('--nu_max', type=float, default=1e-3,
@@ -213,8 +218,10 @@ def main():
     set_seed(args.seed)
     
     args.lmbd_bounds = (args.lmbd_min, args.lmbd_max)
+    args.lmbd_ist_bounds = (args.lmbd_ist_min, args.lmbd_ist_max)
     args.tau_bounds = (args.tau_min, args.tau_max)
     args.nu_bounds = (args.nu_min, args.nu_max)
+
 
 
     print(f"=== Lancement : {args.model.upper()} | Stratégie : {args.strategy.upper()} | Mode : {args.mode.upper()} ===")

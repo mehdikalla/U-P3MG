@@ -166,6 +166,7 @@ def train(loader, args, paths):
     algo, static = get_algo_and_static(args, N_dim, M_dim, device)
     
     lmbd_min, lmbd_max = args.lmbd_bounds
+    lmbd_ist_min, lmbd_ist_max = getattr(args, 'lmbd_ist_bounds', (lmbd_min, lmbd_max))
     nu_min, nu_max = getattr(args, 'nu_bounds', (1e-6, 1e-3))
     algo_iters = args.algo_iters
     
@@ -177,6 +178,7 @@ def train(loader, args, paths):
     start = time.time()
     for i in range(args.n_trials):
         log_l_min, log_l_max = np.log10(float(lmbd_min)), np.log10(float(lmbd_max))
+        log_list_min, log_list_max = np.log10(float(lmbd_ist_min)), np.log10(float(lmbd_ist_max))
         log_nu_min, log_nu_max = np.log10(float(nu_min)), np.log10(float(nu_max))
         hp = {}
         
@@ -193,8 +195,9 @@ def train(loader, args, paths):
                 hp['nu'] = 10 ** random.uniform(log_nu_min, log_nu_max)
 
         elif model_name == 'ista':
-            hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
+            hp['lmbd'] = 10 ** random.uniform(log_list_min, log_list_max)
         elif model_name in ['p3mg', 'pd']:
+
             tau_min, tau_max = args.tau_bounds
             hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['tau'] = random.uniform(float(tau_min), float(tau_max))
