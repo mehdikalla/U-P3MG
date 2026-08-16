@@ -80,10 +80,24 @@ def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
         return x
 
     elif model_name == 'pd':
-        tau = torch.tensor(hp['tau'], device=device, dtype=torch.float64)
-        sigma = torch.tensor(hp['lmbd'], device=device, dtype=torch.float64)
-        rho = torch.tensor(0.1, device=device, dtype=torch.float64)
+        # Condition de stabilite du schema de Chambolle-Pock :
+        # tau * sigma * ||H||^2 <= 1. Sans cette contrainte, l'algorithme
+        # diverge numeriquement (SNR positif observe en mode compare).
+        # tau, sigma sont donc reprojetes sur cette contrainte a partir des
+        # valeurs brutes tirees par le random search, plutot qu'utilises tels
+        # quels.
         Hmat = static
+        L2 = torch.linalg.matrix_norm(Hmat, ord=2) ** 2
+        tau_raw = torch.tensor(hp['tau'], device=device, dtype=torch.float64)
+        sigma_raw = torch.tensor(hp['lmbd'], device=device, dtype=torch.float64)
+        rho = torch.tensor(0.1, device=device, dtype=torch.float64)
+
+        margin = 0.99  # marge de securite sous la borne critique
+        product = tau_raw * sigma_raw * L2
+        scale = torch.clamp(margin / (product + 1e-12), max=1.0)
+        tau = tau_raw * torch.sqrt(scale)
+        sigma = sigma_raw * torch.sqrt(scale)
+
         _, p0, d0 = algo.init_PD(x0, y)
         p, p_old, d, d_old = p0, p0, d0, d0
         for _ in range(max_iter):
@@ -93,6 +107,7 @@ def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
             p = p_new
             d = d_new
         return p
+
 
     elif model_name == 'pmms':
         nu = float(hp['nu'])

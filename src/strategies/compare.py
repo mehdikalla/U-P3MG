@@ -1,10 +1,10 @@
 """
-Mode de comparaison : applique tous les modeles algorithmiques (unrolling et
-random_search), a l'exclusion des modeles purement deep learning (fcae, fcun,
-fctn), sur l'integralite du jeu de test, en calculant a la fois la MSE et le
-SNR (uniquement en inference, avec les poids/parametres deja calibres), puis
-produit un rapport CSV comparatif (moyenne et ecart-type par modele/
-strategie) ainsi qu'une visualisation sur un signal tire aleatoirement.
+Mode de comparaison : applique tous les modeles disponibles (unrolling,
+random_search et deep learning pur), sur l'integralite du jeu de test, en
+calculant a la fois la MSE et le SNR (uniquement en inference, avec les
+poids/parametres deja calibres), puis produit un rapport CSV comparatif
+(moyenne et ecart-type par modele/strategie) ainsi qu'une visualisation
+individuelle (un graphe par methode) sur un signal tire aleatoirement.
 
 Les poids/parametres de chaque modele sont charges depuis le dernier run
 disponible pour la combinaison (modele, strategie) dans le dossier 'runs/'.
@@ -19,13 +19,18 @@ import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.models import NET_ARCHITECTURES
+from src.models import NET_ARCHITECTURES, FULLY_LEARNED_MODELS
 from src.strategies.network import init_static_params
 from src.strategies.random_search import get_algo_and_static, run_iterative_algo
 
-# Modeles algorithmiques disponibles pour chaque strategie (DL exclus).
+# Modeles algorithmiques disponibles pour chaque strategie.
 UNROLLING_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms']
 RANDOM_SEARCH_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms']
+
+# Modeles purement deep learning (pas d'algorithme itteratif statique),
+# evalues uniquement en strategie 'unrolling' (entrainement par gradient).
+DL_MODELS = sorted(FULLY_LEARNED_MODELS)
+
 
 # Metriques systematiquement calculees en inference, independamment du
 # critere utilise a l'entrainement/a la calibration.
@@ -93,7 +98,14 @@ def _build_unrolled_model(model_name, args, M_dim=None):
 
 
 
+def _build_dl_model(model_name, N_dim, M_dim):
+    """Instancie l'architecture deep learning pure correspondant a model_name."""
+    ModelClass = NET_ARCHITECTURES[model_name]
+    return ModelClass(N_dim=N_dim, M_dim=M_dim)
+
+
 def _compute_all_metrics(xh, xt):
+
     """Calcule toutes les metriques de REPORT_METRICS entre xh et xt (batch=1).
 
     Retourne un dict {nom_metrique: valeur_scalaire}.
@@ -214,7 +226,58 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device):
         args.model = original_model_arg
 
 
+def _evaluate_dl_on_testset(model_name, args, dataset, device):
+    """Evalue un modele deep learning pur sur l'integralite du jeu de test.
+
+    Retourne (metrics_per_sample, checkpoint_path) ou (None, None) si aucun
+    checkpoint n'est disponible. Les modeles DL sont toujours entraines/
+    charges sous la strategie 'unrolling' (entrainement par retropropagation).
+    """
+    data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
+    ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
+    if ckpt_path is None:
+        return None, None
+
+    try:
+        metrics_per_sample = {m: [] for m in REPORT_METRICS}
+        model = None
+        n_total = len(dataset)
+        progress_step = max(1, n_total // 10)
+
+        with torch.no_grad():
+            for idx in range(n_total):
+                sample = dataset[idx]
+                xt, y = sample[0], sample[1]
+                xt = xt.to(device).double().unsqueeze(0)
+                y = y.to(device).double().unsqueeze(0)
+                N_dim, M_dim = xt.shape[1], y.shape[1]
+
+                if model is None:
+                    model = _build_dl_model(model_name, N_dim, M_dim).to(device).double()
+                    ckpt = torch.load(ckpt_path, map_location=device)
+                    sd = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
+                    model.load_state_dict(sd, strict=False)
+                    model.eval()
+
+                x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
+                xp, _, _ = model(None, None, x0, y)
+
+                sample_metrics = _compute_all_metrics(xp, xt)
+                for m in REPORT_METRICS:
+                    metrics_per_sample[m].append(sample_metrics[m])
+
+                if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
+                    print(f"[COMPARE][deep_learning][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
+
+        return metrics_per_sample, ckpt_path
+
+    except Exception as e:
+        print(f"[COMPARE][deep_learning][{model_name}] Erreur lors de l'evaluation : {e}")
+        return None, None
+
+
 def run(dataset, args, paths):
+
     """
     Point d'entree du mode 'compare'.
 
@@ -338,6 +401,41 @@ def run(dataset, args, paths):
         except Exception as e:
             print(f"[COMPARE][random_search][{model_name}] Erreur lors du rendu qualitatif : {e}")
 
+    # --- Modeles deep learning purs ---
+    for model_name in DL_MODELS:
+        metrics_per_sample, ckpt_path = _evaluate_dl_on_testset(model_name, args, dataset, device)
+        if metrics_per_sample is None:
+            print(f"[COMPARE][deep_learning][{model_name}] Aucun checkpoint trouve, ignore.")
+            continue
+        _record(model_name, 'deep_learning', metrics_per_sample, ckpt_path)
+        print(f"[COMPARE][deep_learning][{model_name}] MSE={summary_rows[-1]['mse_mean']:.4e} "
+              f"SNR={summary_rows[-1]['snr_mean']:.4e} (poids: {ckpt_path})")
+
+    for model_name in DL_MODELS:
+        if not any(r['model'] == model_name and r['strategy'] == 'deep_learning' for r in summary_rows):
+            continue
+        try:
+            ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
+            sample = dataset[plot_idx]
+            xt, y = sample[0], sample[1]
+            xt = xt.to(device).double().unsqueeze(0)
+            y = y.to(device).double().unsqueeze(0)
+            N_dim, M_dim = xt.shape[1], y.shape[1]
+            x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
+
+            model = _build_dl_model(model_name, N_dim, M_dim).to(device).double()
+            ckpt = torch.load(ckpt_path, map_location=device)
+            sd = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
+            model.load_state_dict(sd, strict=False)
+            model.eval()
+
+            with torch.no_grad():
+                xp, _, _ = model(None, None, x0, y)
+            loss = _compute_all_metrics(xp, xt)[plot_criterion]
+            signal_results[f"{model_name}_deep_learning"] = (xp.squeeze(0).cpu().numpy(), loss)
+        except Exception as e:
+            print(f"[COMPARE][deep_learning][{model_name}] Erreur lors du rendu qualitatif : {e}")
+
     if not summary_rows:
         print("[COMPARE] Aucun modele n'a pu etre evalue. Verifiez que des runs existent dans 'runs/'.")
         return
@@ -349,31 +447,45 @@ def run(dataset, args, paths):
 
 
 def _plot_comparison(xt_np, results, idx, criterion_name, path_plots, data_folder):
-    """Trace le signal vrai et toutes les restaurations, plus un histogramme des pertes."""
-    fig, (ax_sig, ax_loss) = plt.subplots(2, 1, figsize=(12, 9))
+    """Trace un graphe individuel par methode (signal vrai vs restauration),
+    puis un graphe recapitulatif comparant toutes les methodes sur la
+    metrique choisie.
 
-    ax_sig.plot(xt_np, label='Signal vrai', color='black', linewidth=2)
+    Un sous-dossier 'signals/' regroupe les graphes individuels, afin de ne
+    pas encombrer 'path_plots' avec un fichier par methode.
+    """
+    signals_dir = os.path.join(path_plots, 'signals')
+    os.makedirs(signals_dir, exist_ok=True)
+
     for key, (xh_np, loss) in results.items():
-        ax_sig.plot(xh_np, '--', label=f"{key} ({criterion_name}={loss:.3e})")
-    ax_sig.set_title(f"Comparaison des restaurations - Signal test #{idx} ({data_folder})")
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.plot(xt_np, label='Signal vrai', color='black', linewidth=2)
+        ax.plot(xh_np, '--', label=f"{key} ({criterion_name}={loss:.3e})", color='tab:orange')
+        ax.set_title(f"{key} - Signal test #{idx} ({data_folder})")
+        ax.legend(fontsize=8)
+        ax.grid(True)
+        plt.tight_layout()
+        out_path = os.path.join(signals_dir, f'compare_signal_{idx}_{key}.png')
+        plt.savefig(out_path)
+        plt.close(fig)
+        print(f"[COMPARE] Graphique sauvegarde : {out_path}")
 
-    ax_sig.legend(fontsize=8)
-    ax_sig.grid(True)
-
+    # Graphe recapitulatif (histogramme des pertes par methode).
+    fig, ax_loss = plt.subplots(figsize=(12, 5))
     names = list(results.keys())
     losses = [results[k][1] for k in names]
     ax_loss.bar(range(len(names)), losses, color='steelblue')
     ax_loss.set_xticks(range(len(names)))
     ax_loss.set_xticklabels(names, rotation=45, ha='right', fontsize=8)
     ax_loss.set_ylabel(criterion_name)
-    ax_loss.set_title(f"{criterion_name} par modele/strategie")
+    ax_loss.set_title(f"{criterion_name} par modele/strategie - Signal test #{idx} ({data_folder})")
     ax_loss.grid(True, axis='y')
-
     plt.tight_layout()
-    out_path = os.path.join(path_plots, f'compare_signal_{idx}.png')
-    plt.savefig(out_path)
-    plt.close()
-    print(f"[COMPARE] Graphique sauvegarde : {out_path}")
+    summary_path = os.path.join(path_plots, f'compare_summary_{idx}.png')
+    plt.savefig(summary_path)
+    plt.close(fig)
+    print(f"[COMPARE] Graphique recapitulatif sauvegarde : {summary_path}")
+
 
 
 def _save_report(summary_rows, path_logs, data_folder):
