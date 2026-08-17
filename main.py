@@ -80,10 +80,17 @@ def parse_args():
     parser.add_argument('--tau_min', type=float, default=0.01)
     parser.add_argument('--tau_max', type=float, default=2.0)
 
+    parser.add_argument('--rho_min', type=float, default=0.01,
+                         help="Borne inferieure pour la recherche de rho (PD Standalone uniquement, "
+                              "homologue du rho_param appris en unrolling)")
+    parser.add_argument('--rho_max', type=float, default=2.0,
+                         help="Borne superieure pour la recherche de rho (PD Standalone uniquement)")
+
     parser.add_argument('--nu_min', type=float, default=1e-6,
                          help="Borne inferieure pour la recherche de nu (PMMS uniquement)")
     parser.add_argument('--nu_max', type=float, default=1e-3,
                          help="Borne superieure pour la recherche de nu (PMMS uniquement)")
+
 
 
     args = parser.parse_args()
@@ -220,7 +227,9 @@ def main():
     args.lmbd_bounds = (args.lmbd_min, args.lmbd_max)
     args.lmbd_ist_bounds = (args.lmbd_ist_min, args.lmbd_ist_max)
     args.tau_bounds = (args.tau_min, args.tau_max)
+    args.rho_bounds = (args.rho_min, args.rho_max)
     args.nu_bounds = (args.nu_min, args.nu_max)
+
 
 
 

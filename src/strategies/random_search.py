@@ -86,17 +86,24 @@ def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
         # tau, sigma sont donc reprojetes sur cette contrainte a partir des
         # valeurs brutes tirees par le random search, plutot qu'utilises tels
         # quels.
+        # NB: tau, sigma, rho sont explores exactement comme en unrolling
+        # (PD_Standalone_layer de src/models/pd/net.py), ou tau et sigma sont
+        # des fractions de 1/sqrt(L2) (via sigmoid) et rho est un scalaire
+        # positif (via softplus) : ici on tire ces 3 hyperparametres
+        # independamment (hp['tau'], hp['sigma'], hp['rho']) plutot que de
+        # reutiliser hp['lmbd'] comme proxy de sigma et de figer rho=0.1.
         Hmat = static
         L2 = torch.linalg.matrix_norm(Hmat, ord=2) ** 2
         tau_raw = torch.tensor(hp['tau'], device=device, dtype=torch.float64)
-        sigma_raw = torch.tensor(hp['lmbd'], device=device, dtype=torch.float64)
-        rho = torch.tensor(0.1, device=device, dtype=torch.float64)
+        sigma_raw = torch.tensor(hp['sigma'], device=device, dtype=torch.float64)
+        rho = torch.tensor(hp['rho'], device=device, dtype=torch.float64)
 
         margin = 0.99  # marge de securite sous la borne critique
         product = tau_raw * sigma_raw * L2
         scale = torch.clamp(margin / (product + 1e-12), max=1.0)
         tau = tau_raw * torch.sqrt(scale)
         sigma = sigma_raw * torch.sqrt(scale)
+
 
         _, p0, d0 = algo.init_PD(x0, y)
         p, p_old, d, d_old = p0, p0, d0, d0
@@ -196,11 +203,23 @@ def train(loader, args, paths):
 
         elif model_name == 'ista':
             hp['lmbd'] = 10 ** random.uniform(log_list_min, log_list_max)
-        elif model_name in ['p3mg', 'pd']:
+        elif model_name == 'p3mg':
 
             tau_min, tau_max = args.tau_bounds
             hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['tau'] = random.uniform(float(tau_min), float(tau_max))
+        elif model_name == 'pd':
+            # Exploration des memes hyperparametres que ceux appris en
+            # unrolling (PD_Standalone_layer, src/models/pd/net.py) : tau et
+            # sigma sont des fractions de la borne de stabilite de
+            # Chambolle-Pock (tirees dans [0, 1], comme sigmoid(logit)), et
+            # rho est un scalaire positif (tire dans args.rho_bounds, comme
+            # softplus(logit)).
+            rho_min, rho_max = args.rho_bounds
+            hp['tau'] = random.uniform(0.0, 1.0)
+            hp['sigma'] = random.uniform(0.0, 1.0)
+            hp['rho'] = random.uniform(float(rho_min), float(rho_max))
+
         
         val_loss = 0.0
         with torch.no_grad():
@@ -298,8 +317,11 @@ def test(loader, args, paths):
             best_params = {'nu': 8.0e-5}
         elif model_name == 'ista':
             best_params = {'lmbd': 1.0}
+        elif model_name == 'pd':
+            best_params = {'tau': 0.5, 'sigma': 0.5, 'rho': 0.1}
         else:
             best_params = {'lmbd': 1.0, 'tau': 0.5}
+
         print("[WARN] Paramètres par défaut chargés.")
 
     sample = next(iter(loader))
