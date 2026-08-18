@@ -2,85 +2,67 @@ import torch as tc
 import torch.nn as nn
 from src.models.pd.algo import PD_Standalone_algo
 
+S = nn.Softplus()
+
+# -------------------------
+# PD Standalone model layers
+# -------------------------
 class PD_Standalone_layer(nn.Module):
-    def __init__(self, init_tau, init_sigma, init_rho):
+    """
+    Couche Primal-Dual autonome, alignee sur PD_layer
+    (src/models/p3mg/primal_dual/net.py) : un unique hyperparametre appris,
+    tau, transmis directement a iter_PD.
+    """
+
+    def __init__(self):
         super().__init__()
         self.pd_algo = PD_Standalone_algo()
 
-        # tau_param/sigma_param sont maintenant des logits (sigmoid -> (0,1))
-        # utilises comme fractions de la borne de stabilite de Chambolle-Pock,
-        # et non plus des valeurs brutes passees dans un softplus. Voir
-        # forward() pour la reparametrisation garantissant tau*sigma*||H||^2 <= 1.
-        self.tau_param = nn.Parameter(tc.tensor(init_tau))
-        self.sigma_param = nn.Parameter(tc.tensor(init_sigma))
-        self.rho_param = nn.Parameter(tc.tensor(init_rho))
-        self.softplus = nn.Softplus()
-        self.sigmoid = nn.Sigmoid()
-
-    def forward(self, static, dynamic, y, L2):
-        """
-        Args:
-            L2 : carre de la norme d'operateur (plus grande valeur singuliere
-                 au carre) de Hmat, transmis par PD_Standalone_model.forward.
-                 Sert a reparametrer tau/sigma pour garantir la convergence
-                 du schema de Chambolle-Pock (condition tau*sigma*||H||^2 <= 1).
-        """
-        Hmat = static
-        p, p_old, d, d_old = dynamic
-
-        # Reparametrisation stable : tau, sigma in (0, 1/sqrt(L2)) chacun,
-        # via des sigmoides independantes. Le produit
-        # tau * sigma * L2 = sigmoid(tau_param) * sigmoid(sigma_param) < 1
-        # est donc garanti par construction, quelle que soit la valeur des
-        # parametres appris (plus de divergence numerique possible).
-        inv_sqrt_L2 = 1.0 / tc.sqrt(L2 + 1e-12)
-        tau = self.sigmoid(self.tau_param) * inv_sqrt_L2
-        sigma = self.sigmoid(self.sigma_param) * inv_sqrt_L2
-        rho = self.softplus(self.rho_param)
-
-        p_new, d_new = self.pd_algo.iter_PD(p, p_old, d, d_old, y, Hmat, tau, sigma, rho)
-        return p_new, d_new, (tau, sigma)
+    def forward(self, sub_static, w, y, tau_scalar):
+        w_new = self.pd_algo.iter_PD(sub_static, w, y, tau_scalar)
+        return w_new
 
 
 class PD_Standalone_model(nn.Module):
+    """
+    Modele Primal-Dual autonome deroule, aligne sur PD_model
+    (src/models/p3mg/primal_dual/net.py) : une seule sequence de couches
+    partageant le meme algorithme, chacune parametree par un scalaire tau_j
+    appris independamment (tau_params).
+    """
+
     def __init__(self, num_layers):
         super().__init__()
-        self.Layers = nn.ModuleList()
+        self.Layers = nn.ModuleList([PD_Standalone_layer() for _ in range(num_layers)])
         self.num_layers = num_layers
         self.algo = PD_Standalone_algo()
 
-        for _ in range(num_layers):
-            self.Layers.append(PD_Standalone_layer(0.01, 0.01, 0.1))
+        # tau_params : un logit par couche, transforme via sigmoid en (0, 1)
+        # puis reparametre dans iter_PD en fraction de la borne de stabilite
+        # de Chambolle-Pock. Seul hyperparametre appris du modele.
+        self.tau_params = nn.Parameter(tc.empty(num_layers).double().fill_(0.01))
 
     def forward(self, static, dynamic, x0, y, x_true=None, lmbd_override=None, tau_override=None):
         if static is None:
-            Hmat, p0, d0 = self.algo.init_PD(x0, y)
-            static = Hmat
-            # dynamic stocke les états courants et précédents
-            dynamic = (p0, p0, d0, d0)
+            w0, sub_static = self.algo.init_PD(x0, y)
+            static = sub_static
+            dynamic = w0
 
-        Hmat = static
-        p, p_old, d, d_old = dynamic
+        sub_static = static
+        w = dynamic
 
-        # Carre de la norme d'operateur de Hmat (borne de stabilite de
-        # Chambolle-Pock : tau*sigma*||H||^2 <= 1). Calcule une seule fois
-        # par appel forward (Hmat est statique pour un couple (N, M) donne).
-        # tc.linalg.matrix_norm(..., ord=2) renvoie la plus grande valeur
-        # singuliere ; on ne retro-propage pas au travers de ce calcul
-        # (Hmat n'est pas un parametre appris).
-        with tc.no_grad():
-            L2 = tc.linalg.matrix_norm(Hmat, ord=2) ** 2
+        if tau_override is not None:
+            tau_val = tau_override.to(x0.device).double()
+            tau_params = tau_val.expand(self.tau_params.shape)
+        else:
+            tau_params = tc.sigmoid(self.tau_params)
 
         learned_params = []
+        for j, layer in enumerate(self.Layers):
+            tau_j = tau_params[j]
+            w = layer(sub_static, w, y, tau_j)
+            learned_params.append(tau_j)
 
-        for layer in self.Layers:
-            p_new, d_new, params = layer(static, (p, p_old, d, d_old), y, L2)
-            p_old = p
-            d_old = d
-            p = p_new
-            d = d_new
-            learned_params.append(params)
-        
-        dynamic_new = (p, p_old, d, d_old)
+        p, d = w
+        dynamic_new = w
         return p, dynamic_new, learned_params
-

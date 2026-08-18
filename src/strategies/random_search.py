@@ -37,11 +37,15 @@ def get_algo_and_static(args, N_dim, M_dim, device):
         return algo, static
 
     elif model_name == 'pd':
+        # Aligne sur PrimalDual_algo (src/models/p3mg/primal_dual/algo.py) :
+        # init_PD retourne (w0, sub_static). sub_static = [Hmat, L2] est
+        # conserve tel quel comme "static" du random search ; w0 = [p0, d0]
+        # n'est pas reutilise ici (chaque appel de run_iterative_algo
+        # reinitialise son propre etat via algo.init_PD(x0, y)).
         from src.models.pd.algo import PD_Standalone_algo
         algo = PD_Standalone_algo().to(device).double()
-        Hmat, p0, d0 = algo.init_PD(dx, dy)
-        static = Hmat
-        return algo, static
+        _, sub_static = algo.init_PD(dx, dy)
+        return algo, sub_static
 
     elif model_name == 'pmms':
         from src.models.pmms.algo import PMMS_algo
@@ -80,41 +84,20 @@ def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
         return x
 
     elif model_name == 'pd':
-        # Condition de stabilite du schema de Chambolle-Pock :
-        # tau * sigma * ||H||^2 <= 1. Sans cette contrainte, l'algorithme
-        # diverge numeriquement (SNR positif observe en mode compare).
-        # tau, sigma sont donc reprojetes sur cette contrainte a partir des
-        # valeurs brutes tirees par le random search, plutot qu'utilises tels
-        # quels.
-        # NB: tau, sigma, rho sont explores exactement comme en unrolling
-        # (PD_Standalone_layer de src/models/pd/net.py), ou tau et sigma sont
-        # des fractions de 1/sqrt(L2) (via sigmoid) et rho est un scalaire
-        # positif (via softplus) : ici on tire ces 3 hyperparametres
-        # independamment (hp['tau'], hp['sigma'], hp['rho']) plutot que de
-        # reutiliser hp['lmbd'] comme proxy de sigma et de figer rho=0.1.
-        Hmat = static
-        L2 = torch.linalg.matrix_norm(Hmat, ord=2) ** 2
-        tau_raw = torch.tensor(hp['tau'], device=device, dtype=torch.float64)
-        sigma_raw = torch.tensor(hp['sigma'], device=device, dtype=torch.float64)
-        rho = torch.tensor(hp['rho'], device=device, dtype=torch.float64)
+        # Seul tau est explore (unique hyperparametre du modele PD
+        # Standalone, aligne sur P3MG/primal_dual). sigma est reparametre
+        # de maniere deterministe dans PD_Standalone_algo.iter_PD a partir
+        # de tau, garantissant par construction la condition de stabilite
+        # du schema de Chambolle-Pock (tau * sigma * ||H||^2 <= 1).
+        tau = torch.tensor(hp['tau'], device=device, dtype=torch.float64)
 
-        margin = 0.99  # marge de securite sous la borne critique
-        product = tau_raw * sigma_raw * L2
-        scale = torch.clamp(margin / (product + 1e-12), max=1.0)
-        tau = tau_raw * torch.sqrt(scale)
-        sigma = sigma_raw * torch.sqrt(scale)
-
-
-        _, p0, d0 = algo.init_PD(x0, y)
-        p, p_old, d, d_old = p0, p0, d0, d0
+        sub_static = static
+        w0, sub_static = algo.init_PD(x0, y)
+        w = w0
         for _ in range(max_iter):
-            p_new, d_new = algo.iter_PD(p, p_old, d, d_old, y, Hmat, tau, sigma, rho)
-            p_old = p
-            d_old = d
-            p = p_new
-            d = d_new
+            w = algo.iter_PD(sub_static, w, y, tau)
+        p, d = w
         return p
-
 
     elif model_name == 'pmms':
         nu = float(hp['nu'])
@@ -175,6 +158,7 @@ def train(loader, args, paths):
     lmbd_min, lmbd_max = args.lmbd_bounds
     lmbd_ist_min, lmbd_ist_max = getattr(args, 'lmbd_ist_bounds', (lmbd_min, lmbd_max))
     nu_min, nu_max = getattr(args, 'nu_bounds', (1e-6, 1e-3))
+    tau_min, tau_max = args.tau_bounds
     algo_iters = args.algo_iters
     
     l_mid_log = (np.log10(float(lmbd_min)) + np.log10(float(lmbd_max))) / 2
@@ -191,7 +175,6 @@ def train(loader, args, paths):
         
         # Attribution explicite des hyperparamètres selon le modèle
         if model_name == 'hq':
-            tau_min, tau_max = args.tau_bounds
             hp['lmbd_cvx'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['lmbd_ncvx'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['gamma'] = random.uniform(float(tau_min), float(tau_max))
@@ -204,21 +187,14 @@ def train(loader, args, paths):
         elif model_name == 'ista':
             hp['lmbd'] = 10 ** random.uniform(log_list_min, log_list_max)
         elif model_name == 'p3mg':
-
-            tau_min, tau_max = args.tau_bounds
             hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['tau'] = random.uniform(float(tau_min), float(tau_max))
         elif model_name == 'pd':
-            # Exploration des memes hyperparametres que ceux appris en
-            # unrolling (PD_Standalone_layer, src/models/pd/net.py) : tau et
-            # sigma sont des fractions de la borne de stabilite de
-            # Chambolle-Pock (tirees dans [0, 1], comme sigmoid(logit)), et
-            # rho est un scalaire positif (tire dans args.rho_bounds, comme
-            # softplus(logit)).
-            rho_min, rho_max = args.rho_bounds
-            hp['tau'] = random.uniform(0.0, 1.0)
-            hp['sigma'] = random.uniform(0.0, 1.0)
-            hp['rho'] = random.uniform(float(rho_min), float(rho_max))
+            # Modele Primal-Dual standalone : un unique hyperparametre
+            # recherche, tau, dans les memes bornes (args.tau_bounds) que
+            # celles utilisees pour l'apprentissage en unrolling
+            # (PD_Standalone_model, src/models/pd/net.py) et pour P3MG.
+            hp['tau'] = random.uniform(float(tau_min), float(tau_max))
 
         
         val_loss = 0.0
@@ -318,7 +294,7 @@ def test(loader, args, paths):
         elif model_name == 'ista':
             best_params = {'lmbd': 1.0}
         elif model_name == 'pd':
-            best_params = {'tau': 0.5, 'sigma': 0.5, 'rho': 0.1}
+            best_params = {'tau': 0.5}
         else:
             best_params = {'lmbd': 1.0, 'tau': 0.5}
 
