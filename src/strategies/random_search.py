@@ -9,12 +9,13 @@ import numpy as np
 from src.utils.functions import snr_loss, tsnr_loss
 from src.utils.plotting_manager import PlottingManager
 
-# tau fixe pour le modele PD standalone (parametre de pas garantissant la
-# stabilite du schema de Chambolle-Pock ; n'influence pas le probleme
-# resolu a convergence, cf. PD_Standalone_algo.iter_PD). Utilise a la fois
-# en calibration (train) et en fallback si 'tau' est absent des parametres
-# charges lors du test.
-PD_TAU_FIXED = 0.5
+# tau fixe pour le modele PD standalone : coefficient de relaxation
+# (sous/sur-relaxation) du schema de Chambolle-Pock, applique en fin
+# d'iteration (cf. PD_Standalone_algo.iter_PD). tau = 1.0 correspond au
+# schema standard sans relaxation. Il n'influence pas le probleme resolu
+# a convergence. Utilise a la fois en calibration (train) et en fallback
+# si 'tau' est absent des parametres charges lors du test.
+PD_TAU_FIXED = 1.0
 
 def get_criterion(name):
     if name == 'MSE': return nn.MSELoss(reduction='mean')

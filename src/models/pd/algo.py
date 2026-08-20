@@ -5,35 +5,53 @@ from src.utils.functions import dosy_mat, proj_simplex
 
 class PD_Standalone_algo(nn.Module):
     """
-    Algorithme Primal-Dual autonome (schema de Chambolle-Pock), aligne sur
-    l'architecture du module Primal-Dual interne de P3MG
-    (src/models/p3mg/primal_dual/algo.py) : une methode init_PD qui prepare
-    l'etat initial (w0) et les quantites statiques (sub_static), et une
-    methode iter_PD qui effectue une iteration a partir de ces deux objets.
+    Algorithme Primal-Dual autonome (schema de Chambolle-Pock), recode pour
+    suivre fidelement la structure de PrimalDual_algo
+    (src/models/p3mg/primal_dual/algo.py), et pas seulement son nommage :
 
-    tau est desormais fixe (non recherche) : c'est un pur parametre de pas
-    garantissant la stabilite du schema de Chambolle-Pock, sans influence
-    sur le probleme d'optimisation resolu. L'unique hyperparametre recherche
-    par le random search est lambda_reg, qui pondere un terme de
-    regularisation quadratique reellement present dans le probleme resolu
-    (voir iter_PD).
+    - delta0, gamma0 sont des pas FIXES, deduits une fois pour toutes des
+      quantites statiques (ici 1/sqrt(L2), L2 = ||H||^2), exactement comme
+      delta0 = gamma0 = 1/norm_D dans PrimalDual_algo. Ils garantissent par
+      construction la condition de stabilite delta0*gamma0*||H||^2 <= 1
+      (via self.margin).
+    - tau n'est PAS un pas de descente mais un coefficient de relaxation
+      (sous/sur-relaxation), applique en fin d'iteration exactement comme
+      dans PrimalDual_algo.iter_PD :
+          un_new = un + tau * (pn - un)
+          vn_new = vn + tau * (qn - vn)
+      Avec tau = 1, on retrouve l'iteration de Chambolle-Pock standard
+      (aucune relaxation). tau est donc, comme dans PrimalDual_algo, fixe
+      (non recherche) : il ne modifie pas le probleme resolu a convergence.
+    - Le seul hyperparametre desormais recherche par le random search est
+      lambda_reg, qui pondere un terme de regularisation quadratique
+      reellement present dans le probleme resolu :
+          min_x  0.5 * ||H x - y||^2  +  0.5 * lambda_reg * ||x||^2
+          s.c.   x dans le simplexe (positivite + somme = 1)
+      Contrairement a tau (qui ne fait que regler la vitesse/relaxation de
+      convergence vers l'unique minimiseur du probleme non regularise),
+      lambda_reg modifie reellement ce probleme : la loss de calibration
+      varie donc effectivement avec lambda_reg, y compris a convergence
+      complete (grand nombre d'iterations).
     """
 
     def __init__(self, margin: float = 0.99):
         super().__init__()
         # Marge de securite sous la borne critique de stabilite du schema de
-        # Chambolle-Pock (tau * sigma * ||H||^2 <= 1).
+        # Chambolle-Pock (delta0 * gamma0 * ||H||^2 <= 1).
         self.margin = margin
 
     def init_PD(self, x0, y):
         """
         Initialisation des variables et calculs preliminaires pour le
-        primal-dual.
+        primal-dual, alignee sur PrimalDual_algo.init_PD.
 
         Retourne :
-            w0 = [p0, d0] : etat initial (primal, dual)
-            sub_static = [Hmat, L2] : quantites statiques (matrice d'observation
-                et carre de sa norme d'operateur), reutilisees a chaque iteration.
+            w_new = [un, vn] : etat initial (primal, dual)
+            sub_static = [Hmat, delta0, gamma0] : quantites statiques
+                (matrice d'observation et pas fixes delta0/gamma0),
+                reutilisees a chaque iteration. delta0 = gamma0 =
+                margin / sqrt(L2), avec L2 = ||H||^2 (analogue de
+                delta0 = gamma0 = 1/norm_D dans PrimalDual_algo).
         """
         P, N, M = x0.size(0), x0.size(1), y.size(1)
 
@@ -41,92 +59,86 @@ class PD_Standalone_algo(nn.Module):
             int(N), int(M), 0, 1.5, 1, 1000, dtype=x0.dtype, device=x0.device
         )
 
-        # Initialisation du primal (p) et du dual (d)
-        p0 = x0
-        d0 = tc.zeros_like(tc.matmul(x0, Hmat.t()))
+        # Initialisation du primal (un) et du dual (vn)
+        un = x0
+        vn = tc.zeros_like(tc.matmul(x0, Hmat.t()))
 
-        # Carre de la norme d'operateur de Hmat (borne de stabilite de
-        # Chambolle-Pock). Calcule une seule fois, sans retropropagation
-        # (Hmat n'est pas un parametre appris).
+        # Pas fixes delta0 = gamma0 = margin / ||H|| (calcules une seule
+        # fois, sans retropropagation ; Hmat n'est pas un parametre appris).
+        # Garantit par construction delta0 * gamma0 * ||H||^2 <= margin^2 <= 1.
         with tc.no_grad():
             L2 = tc.linalg.matrix_norm(Hmat, ord=2) ** 2
+            step0 = self.margin / tc.sqrt(L2 + 1e-12)
+        delta0 = step0
+        gamma0 = step0
 
-        w0 = [p0, d0]
-        sub_static = [Hmat, L2]
+        w_new = [un, vn]
+        sub_static = [Hmat, delta0, gamma0]
 
-        return w0, sub_static
+        return w_new, sub_static
 
-    def iter_PD(self, sub_static, w, y, tau, lambda_reg=0.0):
+    def iter_PD(self, sub_static, w_new, y, tau, lambda_reg=0.0, q_d=1, q_g=1):
         """
-        Iteration Primal-Dual autonome (schema de Chambolle-Pock) avec
-        regularisation quadratique explicite.
+        Iteration generique du Primal-Dual autonome, structuree comme
+        PrimalDual_algo.iter_PD.
 
         Probleme resolu :
             min_x  0.5 * ||H x - y||^2  +  0.5 * lambda_reg * ||x||^2
             s.c.   x dans le simplexe (positivite + somme = 1)
 
-        Ordre de l'algorithme :
-        1. Mise a jour du primal a partir du dual courant (non extrapole),
-           avec retrecissement quadratique controle par lambda_reg puis
+        Etapes (miroir de PrimalDual_algo.iter_PD) :
+        1. delta = q_d * delta0, gamma = q_g * gamma0 (pas fixes, eventuel-
+           lement moduls par q_d/q_g comme dans PrimalDual_algo).
+        2. Calcul du candidat primal pn par prox de l'attache aux donnees
+           et de la regularisation quadratique (lambda_reg), suivi de la
            projection sur le simplexe :
-           p_new = proj_simplex( (p - tau * H^T d) / (1 + tau * lambda_reg) )
-        2. Extrapolation du primal (over-relaxation, theta = 1) :
-           p_bar = 2 * p_new - p
-        3. Mise a jour du dual a partir du primal extrapole (prox exact de
-           la conjuguee de l'attache aux donnees L2) :
-           d_new = (d + sigma * H * p_bar - sigma * y) / (1 + sigma)
+               pn = proj_simplex( (un - delta * H^T vn) / (1 + delta * lambda_reg) )
+        3. Calcul du candidat dual qn par prox exact de la conjuguee de
+           l'attache aux donnees L2, a partir du primal sur-relaxe (2pn-un) :
+               v  = vn + gamma * H * (2*pn - un)
+               qn = (v - gamma * y) / (1 + gamma)
+        4. Relaxation finale (sous/sur-relaxation), exactement comme dans
+           PrimalDual_algo :
+               un_new = un + tau * (pn - un)
+               vn_new = vn + tau * (qn - vn)
 
-        tau est un parametre de pas fixe, transmis explicitement a chaque
-        appel (non recherche) : il ne fait que garantir, via sigma qui en
-        est deduit de maniere deterministe, la condition de stabilite
-        tau * sigma * ||H||^2 <= 1 (voir self.margin). tau ne modifie pas le
-        probleme resolu ci-dessus ; a convergence, sa valeur (tant qu'elle
-        assure la stabilite) n'a donc aucun effet sur la loss finale, ce qui
-        explique pourquoi la recherche aleatoire sur tau seul donnait une
-        loss constante.
-
-        lambda_reg est desormais l'unique hyperparametre recherche par le
-        random search pour ce modele (cf. src/strategies/random_search.py).
-        Contrairement a tau, il modifie reellement le probleme d'optimisation
-        resolu (terme de regularisation quadratique), donc la loss de
-        calibration varie effectivement avec lambda_reg, y compris a
-        convergence complete (grand nombre d'iterations). Avec
-        lambda_reg = 0, on retrouve exactement le schema de Chambolle-Pock
-        standard, sans regularisation.
+        tau est un coefficient de relaxation FIXE (non recherche), transmis
+        explicitement a chaque appel. Avec tau = 1, l'iteration se reduit
+        exactement au schema de Chambolle-Pock standard (un_new = pn,
+        vn_new = qn). tau ne modifie pas le probleme resolu ci-dessus ; a
+        convergence, sa valeur (dans la plage de stabilite, tau in (0, 2))
+        n'a donc aucun effet sur la loss finale -- d'ou la necessite de
+        lambda_reg, seul hyperparametre desormais recherche par le random
+        search pour ce modele (cf. src/strategies/random_search.py).
 
         Contraintes/prox alignes sur les autres modeles de reference
         (P3MG, PMMS, ISTA) :
         - Le prox primal est la projection sur le simplexe (proj_simplex),
-          identique a la contrainte utilisee par P3MG/PMMS. Un simple ReLU
-          (positivite seule, sans somme=1) donnait a ce modele un espace de
-          solutions strictement plus large que les autres baselines, ce qui
-          biaisait toute comparaison en sa faveur.
+          identique a la contrainte utilisee par P3MG/PMMS.
         - Le prox dual correspond au prox exact de la conjuguee de l'attache
           aux donnees L2, F(z) = 0.5*||z - y||^2, dont la conjuguee est
-          F*(d) = 0.5*||d||^2 + <d, y>. Le prox exact est
-          prox_{sigma F*}(z) = (z - sigma*y) / (1 + sigma). Omettre la
-          division par (1 + sigma) transformait cette etape en simple pas
-          de gradient (sans regularisation proximale), permettant a la
-          variable duale de croitre sans controle et au modele de
-          surajuster les observations y.
+          F*(v) = 0.5*||v||^2 + <v, y>. Le prox exact est
+          prox_{gamma F*}(z) = (z - gamma*y) / (1 + gamma).
         """
-        Hmat, L2 = sub_static
-        p, d = w
+        Hmat, delta0, gamma0 = sub_static
+        un, vn = w_new
 
-        sigma = self.margin / (tau * L2 + 1e-12)
+        delta = q_d * delta0
+        gamma = q_g * gamma0
 
-        # 1. Mise a jour du primal : descente + retrecissement (lambda_reg)
-        #    + projection sur le simplexe.
-        bp = -tau * tc.matmul(d, Hmat)
-        p_shrunk = (p + bp) / (1.0 + tau * lambda_reg)
-        p_new = proj_simplex(p_shrunk)
+        # 2. Candidat primal : descente + retrecissement (lambda_reg) +
+        #    projection sur le simplexe.
+        bp = -delta * tc.matmul(vn, Hmat)
+        u_shrunk = (un + bp) / (1.0 + delta * lambda_reg)
+        pn = proj_simplex(u_shrunk)
 
-        # 2. Extrapolation du primal (over-relaxation)
-        p_bar = 2 * p_new - p
+        # 3. Candidat dual : prox exact, a partir du primal sur-relaxe.
+        v = vn + gamma * tc.matmul(2 * pn - un, Hmat.t())
+        qn = (v - gamma * y) / (1.0 + gamma)
 
-        # 3. Mise a jour du dual a partir du primal extrapole (prox exact)
-        z = d + sigma * tc.matmul(p_bar, Hmat.t())
-        d_new = (z - sigma * y) / (1.0 + sigma)
+        # 4. Relaxation finale (tau = 1 -> schema standard, sans relaxation).
+        un_new = un + tau * (pn - un)
+        vn_new = vn + tau * (qn - vn)
 
-        w_new = [p_new, d_new]
+        w_new = [un_new, vn_new]
         return w_new
