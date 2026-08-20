@@ -79,6 +79,13 @@ def parse_args():
                          help="Borne superieure pour la recherche de Lambda ISTA (independante de P3MG)")
     parser.add_argument('--tau_min', type=float, default=0.01)
     parser.add_argument('--tau_max', type=float, default=2.0)
+    parser.add_argument('--tau_pd_min', type=float, default=None,
+                         help="Borne inferieure specifique pour la recherche de Tau du modele PD "
+                              "standalone. Si non fourni, retombe sur --tau_min.")
+    parser.add_argument('--tau_pd_max', type=float, default=None,
+                         help="Borne superieure specifique pour la recherche de Tau du modele PD "
+                              "standalone. Si non fourni, retombe sur --tau_max.")
+
 
     parser.add_argument('--nu_min', type=float, default=1e-6,
 
@@ -222,7 +229,12 @@ def main():
     args.lmbd_bounds = (args.lmbd_min, args.lmbd_max)
     args.lmbd_ist_bounds = (args.lmbd_ist_min, args.lmbd_ist_max)
     args.tau_bounds = (args.tau_min, args.tau_max)
+    args.tau_pd_bounds = (
+        args.tau_pd_min if args.tau_pd_min is not None else args.tau_min,
+        args.tau_pd_max if args.tau_pd_max is not None else args.tau_max,
+    )
     args.nu_bounds = (args.nu_min, args.nu_max)
+
 
 
 

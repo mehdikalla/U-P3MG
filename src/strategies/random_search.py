@@ -159,6 +159,8 @@ def train(loader, args, paths):
     lmbd_ist_min, lmbd_ist_max = getattr(args, 'lmbd_ist_bounds', (lmbd_min, lmbd_max))
     nu_min, nu_max = getattr(args, 'nu_bounds', (1e-6, 1e-3))
     tau_min, tau_max = args.tau_bounds
+    tau_pd_min, tau_pd_max = getattr(args, 'tau_pd_bounds', (tau_min, tau_max))
+
     algo_iters = args.algo_iters
     
     l_mid_log = (np.log10(float(lmbd_min)) + np.log10(float(lmbd_max))) / 2
@@ -191,10 +193,11 @@ def train(loader, args, paths):
             hp['tau'] = random.uniform(float(tau_min), float(tau_max))
         elif model_name == 'pd':
             # Modele Primal-Dual standalone : un unique hyperparametre
-            # recherche, tau, dans les memes bornes (args.tau_bounds) que
-            # celles utilisees pour l'apprentissage en unrolling
-            # (PD_Standalone_model, src/models/pd/net.py) et pour P3MG.
-            hp['tau'] = random.uniform(float(tau_min), float(tau_max))
+            # recherche, tau, dans des bornes dediees (args.tau_pd_bounds,
+            # cf. --tau_pd_min/--tau_pd_max ou tau_pd_min/tau_pd_max dans le
+            # YAML). Retombe sur args.tau_bounds si non specifie.
+            hp['tau'] = random.uniform(float(tau_pd_min), float(tau_pd_max))
+
 
         
         val_loss = 0.0
