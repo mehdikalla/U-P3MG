@@ -1,6 +1,6 @@
 import torch as tc
 import torch.nn as nn
-from src.utils.functions import dosy_mat
+from src.utils.functions import dosy_mat, proj_simplex
 
 
 class PD_Standalone_algo(nn.Module):
@@ -65,9 +65,23 @@ class PD_Standalone_algo(nn.Module):
         Seul tau est un hyperparametre libre. sigma est reparametre de
         maniere deterministe a partir de tau afin de garantir par
         construction la condition de convergence tau * sigma * ||H||^2 <= 1
-        (voir self.margin). Le terme de regularisation duale (rho) est fixe
-        a 0, ce qui correspond au prox usuel de l'attache aux donnees L2
-        ||Hx - y||^2 sans terme additionnel.
+        (voir self.margin).
+
+        Contraintes/prox alignes sur les autres modeles de reference
+        (P3MG, PMMS, ISTA) :
+        - Le prox primal est la projection sur le simplexe (proj_simplex),
+          identique a la contrainte utilisee par P3MG/PMMS. Un simple ReLU
+          (positivite seule, sans somme=1) donnait a ce modele un espace de
+          solutions strictement plus large que les autres baselines, ce qui
+          biaisait toute comparaison en sa faveur.
+        - Le prox dual correspond au prox de la conjuguee de l'attache aux
+          donnees L2, F(z) = 0.5*||z - y||^2, dont la conjuguee est
+          F*(d) = 0.5*||d||^2 + <d, y>. Le prox exact est
+          prox_{sigma F*}(z) = (z - sigma*y) / (1 + sigma). Omettre la
+          division par (1 + sigma) transforme cette etape en simple pas de
+          gradient (sans regularisation proximale), permettant a la
+          variable duale de croitre sans controle et au modele de
+          surajuster les observations y.
         """
         Hmat, L2 = sub_static
         p, d = w
@@ -76,14 +90,14 @@ class PD_Standalone_algo(nn.Module):
 
         # 1. Mise a jour du primal a partir du dual courant
         bp = -tau * tc.matmul(d, Hmat)
-        p_new = tc.nn.functional.relu(p + bp)  # Activation primal (ex: ReLU)
+        p_new = proj_simplex(p + bp)
 
         # 2. Extrapolation du primal (over-relaxation)
         p_bar = 2 * p_new - p
 
-        # 3. Mise a jour du dual a partir du primal extrapole
-        bd = sigma * tc.matmul(p_bar, Hmat.t())
-        d_new = d + bd - sigma * y
+        # 3. Mise a jour du dual a partir du primal extrapole (prox exact)
+        z = d + sigma * tc.matmul(p_bar, Hmat.t())
+        d_new = (z - sigma * y) / (1.0 + sigma)
 
         w_new = [p_new, d_new]
         return w_new
