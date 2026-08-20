@@ -93,6 +93,11 @@ def parse_args():
     parser.add_argument('--nu_max', type=float, default=1e-3,
                          help="Borne superieure pour la recherche de nu (PMMS uniquement)")
 
+    parser.add_argument('--lambda_tau_min', type=float, default=None,
+                         help="Borne inferieure pour lambda_tau (regularisation du modele PD standalone). Si non fourni, retombe sur --lmbd_min.")
+    parser.add_argument('--lambda_tau_max', type=float, default=None,
+                         help="Borne superieure pour lambda_tau (regularisation du modele PD standalone). Si non fourni, retombe sur --lmbd_max.")
+
 
 
     args = parser.parse_args()
@@ -234,6 +239,10 @@ def main():
         args.tau_pd_max if args.tau_pd_max is not None else args.tau_max,
     )
     args.nu_bounds = (args.nu_min, args.nu_max)
+    args.lambda_tau_bounds = (
+        args.lambda_tau_min if args.lambda_tau_min is not None else args.lmbd_min,
+        args.lambda_tau_max if args.lambda_tau_max is not None else args.lmbd_max,
+    )
 
 
 

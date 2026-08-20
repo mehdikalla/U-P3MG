@@ -9,6 +9,13 @@ import numpy as np
 from src.utils.functions import snr_loss, tsnr_loss
 from src.utils.plotting_manager import PlottingManager
 
+# tau fixe pour le modele PD standalone (parametre de pas garantissant la
+# stabilite du schema de Chambolle-Pock ; n'influence pas le probleme
+# resolu a convergence, cf. PD_Standalone_algo.iter_PD). Utilise a la fois
+# en calibration (train) et en fallback si 'tau' est absent des parametres
+# charges lors du test.
+PD_TAU_FIXED = 0.5
+
 def get_criterion(name):
     if name == 'MSE': return nn.MSELoss(reduction='mean')
     elif name == 'SNR': return snr_loss()
@@ -84,18 +91,21 @@ def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
         return x
 
     elif model_name == 'pd':
-        # Seul tau est explore (unique hyperparametre du modele PD
-        # Standalone, aligne sur P3MG/primal_dual). sigma est reparametre
-        # de maniere deterministe dans PD_Standalone_algo.iter_PD a partir
-        # de tau, garantissant par construction la condition de stabilite
-        # du schema de Chambolle-Pock (tau * sigma * ||H||^2 <= 1).
-        tau = torch.tensor(hp['tau'], device=device, dtype=torch.float64)
+        # tau est desormais FIXE (parametre de pas garantissant la
+        # stabilite du schema de Chambolle-Pock, sans influence sur le
+        # probleme resolu a convergence -- cf. PD_Standalone_algo.iter_PD).
+        # L'unique hyperparametre explore par le random search est
+        # lambda_tau, qui pondere un terme de regularisation quadratique
+        # reellement present dans le probleme resolu, et fait donc varier
+        # la loss de calibration.
+        tau = torch.tensor(hp.get('tau', PD_TAU_FIXED), device=device, dtype=torch.float64)
+        lambda_tau = torch.tensor(hp['lambda_tau'], device=device, dtype=torch.float64)
 
         sub_static = static
         w0, sub_static = algo.init_PD(x0, y)
         w = w0
         for _ in range(max_iter):
-            w = algo.iter_PD(sub_static, w, y, tau)
+            w = algo.iter_PD(sub_static, w, y, tau, lambda_tau)
         p, d = w
         return p
 
@@ -160,6 +170,10 @@ def train(loader, args, paths):
     nu_min, nu_max = getattr(args, 'nu_bounds', (1e-6, 1e-3))
     tau_min, tau_max = args.tau_bounds
     tau_pd_min, tau_pd_max = getattr(args, 'tau_pd_bounds', (tau_min, tau_max))
+    # Bornes pour lambda_tau (regularisation quadratique du modele PD
+    # standalone). Retombe sur les bornes de lambda (P3MG/HQ) si non
+    # specifie explicitement dans la config (lambda_tau_min/lambda_tau_max).
+    lambda_tau_min, lambda_tau_max = getattr(args, 'lambda_tau_bounds', (lmbd_min, lmbd_max))
 
     algo_iters = args.algo_iters
     
@@ -173,6 +187,7 @@ def train(loader, args, paths):
         log_l_min, log_l_max = np.log10(float(lmbd_min)), np.log10(float(lmbd_max))
         log_list_min, log_list_max = np.log10(float(lmbd_ist_min)), np.log10(float(lmbd_ist_max))
         log_nu_min, log_nu_max = np.log10(float(nu_min)), np.log10(float(nu_max))
+        log_ltau_min, log_ltau_max = np.log10(float(lambda_tau_min)), np.log10(float(lambda_tau_max))
         hp = {}
         
         # Attribution explicite des hyperparamètres selon le modèle
@@ -192,11 +207,15 @@ def train(loader, args, paths):
             hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['tau'] = random.uniform(float(tau_min), float(tau_max))
         elif model_name == 'pd':
-            # Modele Primal-Dual standalone : un unique hyperparametre
-            # recherche, tau, dans des bornes dediees (args.tau_pd_bounds,
-            # cf. --tau_pd_min/--tau_pd_max ou tau_pd_min/tau_pd_max dans le
-            # YAML). Retombe sur args.tau_bounds si non specifie.
-            hp['tau'] = random.uniform(float(tau_pd_min), float(tau_pd_max))
+            # Modele Primal-Dual standalone : tau est FIXE (PD_TAU_FIXED),
+            # ce n'est qu'un parametre de pas garantissant la stabilite du
+            # schema de Chambolle-Pock, sans effet sur la solution a
+            # convergence. L'unique hyperparametre recherche est
+            # lambda_tau, qui pondere un terme de regularisation
+            # quadratique reellement present dans le probleme resolu (cf.
+            # PD_Standalone_algo.iter_PD), et fait donc varier la loss.
+            hp['tau'] = PD_TAU_FIXED
+            hp['lambda_tau'] = 10 ** random.uniform(log_ltau_min, log_ltau_max)
 
 
         
@@ -216,7 +235,7 @@ def train(loader, args, paths):
             best_loss = avg_loss
             best_params = hp.copy()
             
-            hp_str = " ".join([f"{k}={v:.4e}" if 'lmbd' in k or 'nu' in k else f"{k}={v:.4f}" for k, v in hp.items()])
+            hp_str = " ".join([f"{k}={v:.4e}" if 'lmbd' in k or 'nu' in k or 'lambda' in k else f"{k}={v:.4f}" for k, v in hp.items()])
             print(f"   [{i+1}/{args.n_trials}] New Best! {hp_str} | Loss={best_loss:.4e}")
 
     print(f"[RESULT] Best Params: {best_params}")
@@ -297,7 +316,7 @@ def test(loader, args, paths):
         elif model_name == 'ista':
             best_params = {'lmbd': 1.0}
         elif model_name == 'pd':
-            best_params = {'tau': 0.5}
+            best_params = {'tau': PD_TAU_FIXED, 'lambda_tau': 1.0}
         else:
             best_params = {'lmbd': 1.0, 'tau': 0.5}
 
@@ -319,7 +338,7 @@ def test(loader, args, paths):
              return -10 * torch.log10(s / (n + 1e-12))
         return torch.mean((xh - xt)**2, dim=1)
 
-    hp_str = " ".join([f"{k}={v:.4e}" if 'lmbd' in k or 'nu' in k else f"{k}={v:.4f}" for k, v in best_params.items()])
+    hp_str = " ".join([f"{k}={v:.4e}" if 'lmbd' in k or 'nu' in k or 'lambda' in k else f"{k}={v:.4f}" for k, v in best_params.items()])
     print(f"[INFO] Application sur {len(loader)} batchs avec {hp_str}...")
 
     with torch.no_grad():
