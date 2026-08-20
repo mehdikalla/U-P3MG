@@ -49,6 +49,27 @@ class FCTN_model(nn.Module):
         # strictement positif.
         self.output_activation = nn.Softplus()
 
+        # Initialisation dediee de la couche de sortie.
+        # Avec l'initialisation par defaut de nn.Linear, la sortie de fc_out
+        # est proche de 0, ce qui donne Softplus(0) = ln(2) ~= 0.69. Cette
+        # valeur est plusieurs ordres de grandeur au-dessus de l'echelle
+        # typique des signaux cibles de ce projet (souvent << 1, avec une
+        # forte proportion de zeros). L'erreur initiale enorme qui en
+        # resulte provoque une mise a jour Adam tres agressive des la
+        # premiere iteration, qui pousse les pre-activations vers de fortes
+        # valeurs negatives ou Softplus sature (gradient quasi nul). Le
+        # reseau reste alors bloque a predire une sortie quasi nulle pour
+        # tous les echantillons, et la loss stagne au niveau de
+        # mean(x_true**2) (predire 0 partout), ce qui se manifeste comme
+        # une loss constante des la deuxieme epoque.
+        # On initialise donc les poids/biais de la couche de sortie a des
+        # valeurs proches de zero afin que la sortie initiale du reseau
+        # (avant Softplus) soit elle-meme proche de zero, evitant ainsi le
+        # saut d'erreur initial et la saturation de l'activation.
+        nn.init.normal_(self.fc_out.weight, mean=0.0, std=1e-3)
+        nn.init.constant_(self.fc_out.bias, -5.0)
+
+
     def forward(self, static, dynamic, x0: torch.Tensor, y: torch.Tensor):
         """
         Passe avant du modèle FCTN.
