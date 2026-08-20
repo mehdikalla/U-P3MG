@@ -54,8 +54,8 @@ lmbd_ist_max: 1.1          # Borne supérieure pour la recherche de Lambda ISTA 
 
 tau_min: 0.01              # Borne inférieure pour la recherche de Tau (P3MG, PD)
 tau_max: 2.0               # Borne supérieure pour la recherche de Tau (P3MG, PD)
-tau_pd_min: 0.01           # Borne inférieure spécifique pour la recherche de Tau du modèle PD standalone (par défaut = tau_min)
-tau_pd_max: 2.0            # Borne supérieure spécifique pour la recherche de Tau du modèle PD standalone (par défaut = tau_max)
+tau_pd_min: 1e-9           # Borne inférieure spécifique pour la recherche de Tau du modèle PD standalone (par défaut = tau_min)
+tau_pd_max: 10            # Borne supérieure spécifique pour la recherche de Tau du modèle PD standalone (par défaut = tau_max)
 
 nu_min: 1.0e-9              # Borne inférieure pour la recherche de nu (PMMS uniquement)
 nu_max: 1.1              # Borne supérieure pour la recherche de nu (PMMS uniquement)
