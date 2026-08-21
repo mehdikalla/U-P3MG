@@ -28,6 +28,11 @@ Loss: "MSE"                # Fonction de coût principale
 
 # --- 4. Architecture du réseau ---
 num_layers: 30             # Nombre de couches déroulées (K) pour tous les modèles
+                            # NB: ISTA (contrairement a P3MG/HQ/PMMS) n'accelere la convergence
+                            # que via FISTA (O(1/k^2)), sans sous-espace de Majorize-Minimize :
+                            # il a donc besoin de sensiblement plus de couches (~100+) pour
+                            # atteindre une qualite de reconstruction comparable. Surcharger avec
+                            # --num_layers 100 (ou plus) lors de l'entrainement du modele 'ista'.
 num_pd_layers: 10          # Nombre de sous-couches Primal-Dual (T) (utilisé par P3MG et HQ)
 number_layers: 30         # Rétrocompatibilité avec l'ancien formalisme
 number_pd_layers: 10       # Rétrocompatibilité avec l'ancien formalisme

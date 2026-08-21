@@ -1,6 +1,6 @@
 import torch as tc
 import torch.nn as nn
-from src.utils.functions import dosy_mat
+from src.utils.functions import dosy_mat, proj_simplex
 
 def soft_thresholding(x, threshold):
     """
@@ -30,10 +30,20 @@ class ISTA_algo(nn.Module):
         
         return Hmat, L
 
-    def iter_ISTA(self, x, y, Hmat, gamma, lmbd):
+    def iter_ISTA(self, x, y, Hmat, gamma, lmbd, project_simplex=True):
         """
         Une itération de l'algorithme ISTA.
         x_{k+1} = shrink(x_k - gamma * H^T (H x_k - y), gamma * lambda)
+
+        `project_simplex` applique en plus une projection sur le simplexe
+        (positivite + somme unitaire) apres le seuillage doux. Ce jeu de
+        donnees DOSY genere des signaux `xtrue` verifiant par construction
+        `sum(xtrue) == 1` et `xtrue >= 0` (cf. Dataset/data_*/train.pt) : sans
+        cette contrainte physique, le simple seuillage doux ISTA ne peut pas
+        exploiter cette information et plafonne tres pres d'un baseline
+        trivial (zero/moyenne), contrairement a P3MG/PMMS qui projettent
+        explicitement sur le simplexe (cf. src/models/p3mg/algo.py,
+        src/models/pmms/algo.py, fonction proj_simplex).
         """
         # 1. Calcul du gradient : H^T (H x - y)
         Hx = tc.matmul(x, Hmat.t()) # (Batch, M)
@@ -47,5 +57,9 @@ class ISTA_algo(nn.Module):
         # Le seuil effectif est gamma * lambda
         threshold = gamma * lmbd
         x_new = soft_thresholding(z, threshold)
+
+        # 4. Projection sur le simplexe (contrainte physique du probleme DOSY)
+        if project_simplex:
+            x_new = proj_simplex(x_new)
 
         return x_new
