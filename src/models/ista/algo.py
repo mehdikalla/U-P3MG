@@ -9,38 +9,6 @@ def soft_thresholding(x, threshold):
     """
     return tc.sign(x) * tc.nn.functional.relu(tc.abs(x) - threshold)
 
-def proj_simplex_ista(x, eta=1.0):
-    """
-    Projection euclidienne sur le simplexe {v : sum(v) = eta, v >= 0},
-    appliquee ligne par ligne pour un batch (P, N), entierement vectorisee
-    (algorithme de tri + cumsum de Held-Wolfe-Crowder / Duchi et al. 2008).
-
-    NOTE: `src.utils.functions.proj_simplex` (utilisee par P3MG/PMMS) boucle
-    en Python sur chaque echantillon du batch, ce qui est ~15-20x plus lent
-    (mesure empirique) que la version vectorisee ci-dessous. Comme ISTA
-    appelle cette projection a CHAQUE couche deroulee, ce cout se multiplie
-    par num_layers et dominait le temps d'entrainement. Une projection
-    dediee, rapide et verifiee independamment est donc utilisee ici, sans
-    modifier le fichier partage `functions.py`.
-    """
-    orig_shape = x.shape
-    if x.ndim == 1:
-        x = x.unsqueeze(0)
-
-    P, N = x.shape
-    sorted_x, _ = tc.sort(x, dim=1, descending=True)
-    cssx = tc.cumsum(sorted_x, dim=1)
-    idx = tc.arange(1, N + 1, device=x.device, dtype=x.dtype).unsqueeze(0)
-    cond = sorted_x - (cssx - eta) / idx > 0
-    # Nombre d'elements verifiant la condition, pour chaque ligne (rho).
-    rho = cond.to(x.dtype).sum(dim=1, keepdim=True).clamp(min=1.0)
-    rho_idx = (rho.long() - 1).clamp(min=0)
-    css_rho = tc.gather(cssx, 1, rho_idx)
-    theta = (css_rho - eta) / rho
-    x_proj = tc.clamp(x - theta, min=0.0)
-
-    return x_proj.reshape(orig_shape)
-
 class ISTA_algo(nn.Module):
     def __init__(self):
         super().__init__()
@@ -66,10 +34,6 @@ class ISTA_algo(nn.Module):
         """
         Une itération de l'algorithme ISTA.
         x_{k+1} = shrink(x_k - gamma * H^T (H x_k - y), gamma * lambda)
-<<<<<<< HEAD
-
-=======
->>>>>>> f935bd4 (correct)
         """
         # 1. Calcul du gradient : H^T (H x - y)
         Hx = tc.matmul(x, Hmat.t()) # (Batch, M)
@@ -80,14 +44,8 @@ class ISTA_algo(nn.Module):
         z = x - gamma * grad
 
         # 3. Opérateur proximal (Shrinkage)
+        # Le seuil effectif est gamma * lambda
         threshold = gamma * lmbd
         x_new = soft_thresholding(z, threshold)
 
-<<<<<<< HEAD
-        # 4. Projection sur le simplexe (contrainte physique du probleme DOSY)
-        if project_simplex:
-            x_new = proj_simplex_ista(x_new)
-
-=======
->>>>>>> f935bd4 (correct)
         return x_new
