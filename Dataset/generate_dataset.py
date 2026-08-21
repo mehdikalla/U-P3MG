@@ -129,6 +129,62 @@ def generate_dosy_dataset(
     for _ in range(num_samples):
         xtrue_raw = np.zeros(N)
 
+        if number in (2, 3):
+            # Paramétrage spécifique à deux ou trois pics, calqué sur la
+            # version MATLAB de référence : chaque pic possède sa propre
+            # plage d'amplitude, de position (exprimée en fraction de N)
+            # et de sigma, centrée sur une valeur "typique". Le pic 3
+            # (utilisé uniquement si number == 3) est extrapolé de la
+            # même logique que les pics 1 et 2 : les positions sont
+            # régulièrement espacées de 0.30*N, les sigmas doublent
+            # d'un pic au suivant, et les amplitudes décroissent selon
+            # le même ratio que celui observé entre les pics 1 et 2
+            # (0.7/1.0 = 0.7).
+            peak_ranges = [
+                # (amp_min, amp_max, amp_typique, pos_min, pos_max, pos_typique, sigma_min, sigma_max, sigma_typique)
+                (0.9, 1.1, 1.0, 0.15, 0.25, 0.20, 4, 6, 5),      # pic 2 (le plus étroit/haut)
+                (0.6, 0.8, 0.7, 0.45, 0.55, 0.50, 8, 12, 10),    # pic 1
+                (0.4, 0.6, 0.5, 0.75, 0.85, 0.80, 16, 24, 20),   # pic 3 (extrapolé)
+            ]
+            selected_ranges = peak_ranges[:number]
+
+            amplitudes = np.empty(number)
+            positions = np.empty(number)
+            sigmas = np.empty(number)
+            for idx, (a_min, a_max, a_typ, p_min, p_max, p_typ, s_min, s_max, s_typ) in enumerate(selected_ranges):
+                if randomize_peaks:
+                    amplitudes[idx] = np.random.uniform(a_min, a_max)
+                    positions[idx] = np.random.uniform(p_min, p_max)
+                    sigmas[idx] = np.random.uniform(s_min, s_max)
+                else:
+                    amplitudes[idx] = a_typ
+                    positions[idx] = p_typ
+                    sigmas[idx] = s_typ
+
+            shapes = np.full(number, beta if skew else 2.0)
+            skews = (
+                np.random.uniform(skew_range[0], skew_range[1], size=number)
+                if (skew and randomize_peaks)
+                else np.zeros(number)
+            )
+
+            for pos, sigma, amp, shape, sk in zip(positions, sigmas, amplitudes, shapes, skews):
+                if skew:
+                    xtrue_raw += amp * _generalized_gaussian_peak(n, pos * N, sigma, shape, sk)
+                else:
+                    xtrue_raw += amp * np.exp(-0.5 * ((n - pos * N) / sigma) ** 2)
+
+            xtrue = xtrue_raw / np.sum(xtrue_raw)
+
+            xblured = Hmat @ xtrue
+
+            noise = noise_std * np.random.randn(M)
+            y = xblured + noise
+
+            X_true_list.append(xtrue)
+            Y_list.append(y)
+            continue
+
         amplitudes = (
             np.random.uniform(0.5, 1.0, size=number) if randomize_peaks
             else np.full(number, 1.0)
