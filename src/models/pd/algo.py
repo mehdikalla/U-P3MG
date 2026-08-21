@@ -63,9 +63,8 @@ class PD_Standalone_algo(nn.Module):
         un = x0
         vn = tc.zeros_like(tc.matmul(x0, Hmat.t()))
 
-        # Pas fixes delta0 = gamma0 = margin / ||H|| (calcules une seule
-        # fois, sans retropropagation ; Hmat n'est pas un parametre appris).
-        # Garantit par construction delta0 * gamma0 * ||H||^2 <= margin^2 <= 1.
+        # Pas fixes delta0 = gamma0 = margin / ||H|| (sans retropropagation).
+        # Garantit delta0 * gamma0 * ||H||^2 <= margin^2 <= 1.
         with tc.no_grad():
             L2 = tc.linalg.matrix_norm(Hmat, ord=2) ** 2
             step0 = self.margin / tc.sqrt(L2 + 1e-12)

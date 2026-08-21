@@ -4,16 +4,35 @@ import torch.nn as nn
 
 class DenseBlock(nn.Module):
     """
-    Bloc dense (Fully Connected) avec activation ReLU et normalisation optionnelle.
-    Sert d'unite de base pour l'encodeur et le decodeur du FCUN.
+    Bloc dense (Fully Connected) avec activation ReLU, normalisation et
+    dropout optionnels. Sert d'unite de base pour l'encodeur et le decodeur
+    du FCUN.
+
+    Le dropout limite le surapprentissage (le FCUN ayant une capacite
+    importante face a des jeux de donnees de taille modeste), tandis que
+    l'initialisation Kaiming (adaptee a l'activation ReLU en aval) accelere
+    la convergence en debut d'entrainement par rapport a l'initialisation
+    par defaut de nn.Linear.
     """
 
-    def __init__(self, in_dim: int, out_dim: int, use_batchnorm: bool = True) -> None:
+    def __init__(
+        self,
+        in_dim: int,
+        out_dim: int,
+        use_batchnorm: bool = True,
+        dropout: float = 0.0,
+    ) -> None:
         super().__init__()
-        layers = [nn.Linear(in_dim, out_dim)]
+        linear = nn.Linear(in_dim, out_dim)
+        nn.init.kaiming_normal_(linear.weight, nonlinearity='relu')
+        nn.init.zeros_(linear.bias)
+
+        layers = [linear]
         if use_batchnorm:
             layers.append(nn.BatchNorm1d(out_dim))
         layers.append(nn.ReLU(inplace=True))
+        if dropout > 0.0:
+            layers.append(nn.Dropout(dropout))
         self.body = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -39,6 +58,10 @@ class FCUN_model(nn.Module):
             de l'encodeur divise cette largeur par deux (largeur minimale
             forcee a 8) ; le decodeur remonte symetriquement.
         use_batchnorm: Active la normalisation par batch dans les blocs denses.
+        dropout: Taux de dropout applique dans chaque bloc dense de
+            l'encodeur, du bottleneck et du decodeur (0.0 pour desactiver).
+            Reduit le surapprentissage sans modifier la capacite nominale du
+            reseau.
     """
 
     def __init__(
@@ -48,6 +71,7 @@ class FCUN_model(nn.Module):
         num_layers: int = 4,
         base_width: int = 256,
         use_batchnorm: bool = True,
+        dropout: float = 0.1,
     ) -> None:
         super().__init__()
 
@@ -66,27 +90,26 @@ class FCUN_model(nn.Module):
         self.encoder_blocks = nn.ModuleList()
         in_dim = M_dim
         for width in encoder_widths:
-            self.encoder_blocks.append(DenseBlock(in_dim, width, use_batchnorm))
+            self.encoder_blocks.append(DenseBlock(in_dim, width, use_batchnorm, dropout))
             in_dim = width
 
         # --- Goulot d'etranglement (bottleneck) ---
         bottleneck_dim = max(encoder_widths[-1] // 2, 4)
-        self.bottleneck = DenseBlock(encoder_widths[-1], bottleneck_dim, use_batchnorm)
+        self.bottleneck = DenseBlock(encoder_widths[-1], bottleneck_dim, use_batchnorm, dropout)
 
-        # --- Decodeur ---
-        # Chaque bloc decodeur recoit la concatenation de la sortie du niveau
-        # precedent et de la sortie de l'encodeur au meme niveau (skip connection).
+        # --- Decodeur : chaque bloc recoit la sortie du niveau precedent
+        # concatenee a la sortie de l'encodeur au meme niveau (skip connection). ---
         decoder_widths = list(reversed(encoder_widths))
         self.decoder_blocks = nn.ModuleList()
         in_dim = bottleneck_dim
         for width in decoder_widths:
-            self.decoder_blocks.append(DenseBlock(in_dim + width, width, use_batchnorm))
+            self.decoder_blocks.append(DenseBlock(in_dim + width, width, use_batchnorm, dropout))
             in_dim = width
 
-        # --- Projection finale vers la dimension du signal reconstruit ---
-        # Suivie d'une activation Softplus afin de garantir un signal
-        # reconstruit strictement positif.
+        # --- Projection finale + Softplus (signal positif), init Xavier. ---
         self.fc_out = nn.Linear(decoder_widths[-1], N_dim)
+        nn.init.xavier_normal_(self.fc_out.weight)
+        nn.init.zeros_(self.fc_out.bias)
         self.output_activation = nn.Softplus()
 
     def forward(self, static, dynamic, x0: torch.Tensor, y: torch.Tensor):

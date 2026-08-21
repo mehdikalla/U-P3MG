@@ -17,7 +17,13 @@ class DenseBlock(nn.Module):
         dropout: float = 0.0,
     ) -> None:
         super().__init__()
-        layers = [nn.Linear(in_dim, out_dim)]
+        linear = nn.Linear(in_dim, out_dim)
+        # Initialisation Kaiming (He), adaptee a l'activation ReLU qui suit,
+        # pour accelerer la convergence par rapport a l'init par defaut.
+        nn.init.kaiming_normal_(linear.weight, nonlinearity='relu')
+        nn.init.zeros_(linear.bias)
+
+        layers = [linear]
         if use_batchnorm:
             layers.append(nn.BatchNorm1d(out_dim))
         layers.append(nn.ReLU(inplace=True))
@@ -80,10 +86,10 @@ class Decoder(nn.Module):
             for i in range(len(dims) - 1)
         ]
         self.hidden = nn.Sequential(*blocks)
-        # Projection finale vers la dimension du signal, suivie d'une
-        # activation Softplus afin de garantir un signal reconstruit
-        # strictement positif.
+        # Projection finale suivie d'une Softplus garantissant un signal positif.
         self.to_output = nn.Linear(dims[-1], out_dim)
+        nn.init.xavier_normal_(self.to_output.weight)
+        nn.init.zeros_(self.to_output.bias)
         self.output_activation = nn.Softplus()
 
     def forward(self, z: torch.Tensor) -> torch.Tensor:
@@ -120,7 +126,7 @@ class FCAE_model(nn.Module):
         latent_dim: int = 12,
         hidden_dims: list = None,
         use_batchnorm: bool = True,
-        dropout: float = 0.0,
+        dropout: float = 0.1,
     ) -> None:
         super().__init__()
 

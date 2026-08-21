@@ -3,9 +3,7 @@ import torch.nn as nn
 from src.models.p3mg.primal_dual.algo import PrimalDual_algo  
 S = nn.Softplus()
 
-# -------------------------
 # Primal-Dual model layers
-# -------------------------
 class PD_layer(nn.Module):
     
     def __init__(self):

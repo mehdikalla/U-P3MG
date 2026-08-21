@@ -74,9 +74,7 @@ def init_static_params(args, N_dim, M_dim, device):
         
     return static, algo_tmp
 
-# =============================================================================
 # 1. FONCTION D'ENTRAINEMENT (Sécurisée et Dynamique)
-# =============================================================================
 def train(model, train_loader, val_loader, args, paths):
     device = args.device
     criterion_name = args.criterion if hasattr(args, 'criterion') else 'MSE'
@@ -147,7 +145,11 @@ def train(model, train_loader, val_loader, args, paths):
             # CORRECTION MAJEURE: Ne passer les statiques que pour P3MG.
             # ISTA/PMMS doivent recevoir `None` sinon ils by-passent leurs poids appris !
             current_static = static_params
-            xp, _, _ = model(current_static, None, x0, y)
+            if model_name == 'ista':
+                # `args` transmis pour calibrer lambda sur les bornes du config (cf. init_params_from_static).
+                xp, _, _ = model(current_static, None, x0, y, args=args)
+            else:
+                xp, _, _ = model(current_static, None, x0, y)
             
             loss = criterion(xp, xt)
             
@@ -156,6 +158,11 @@ def train(model, train_loader, val_loader, args, paths):
                     print("ALERT: NaN détecté avant backward ! Vérifiez vos lambdas.")
                     return # Arrêtez l'entraînement
                 loss.backward()
+                # Ecretage du gradient : securise l'entrainement des parametres
+                # sensibles (nu pour PMMS, lambda/gamma pour ISTA).
+                torch.nn.utils.clip_grad_norm_(
+                    [p for g in param_groups for p in g['params']], max_norm=5.0
+                )
                 optimizer.step()
                 
             running_loss += loss.item()
@@ -207,9 +214,7 @@ def train(model, train_loader, val_loader, args, paths):
 
     print(f"--- [TRAIN] Terminé en {(time.time()-start_time)/60:.2f} min ---")
 
-# =============================================================================
 # 2. FONCTION DE TEST (Dynamique)
-# =============================================================================
 def test(model, test_loader, args, paths, checkpoint_path=None):
     device = args.device
     criterion_name = args.criterion if hasattr(args, 'criterion') else 'MSE'

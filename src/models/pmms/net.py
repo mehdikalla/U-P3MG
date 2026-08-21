@@ -1,42 +1,58 @@
+import math
 import torch.nn as nn
 import torch as tc
 from src.models.pmms.algo import PMMS_algo
 
-# Valeur fixe de reference pour l'hyperparametre nu, utilisee a chaque couche.
+# Valeur fixe de reference pour l'hyperparametre nu, utilisee comme point
+# de depart de l'apprentissage (cf. PMMS_model.init_params_from_args).
 DEFAULT_NU = 8.0e-5
 
 
 class PMMS_layer(nn.Module):
     """
-    Couche d'unrolling PMMS non entrainable.
+    Couche d'unrolling PMMS avec hyperparametre nu appris par couche.
 
-    L'hyperparametre nu est fixe (DEFAULT_NU) a chaque couche, sans reseau
-    de correction ni parametre appris.
+    Contrairement a la version precedente (nu fixe a DEFAULT_NU, forward
+    execute sous torch.no_grad(), tous les parametres geles), nu est ici
+    un parametre reel du reseau, positif par construction via Softplus.
+    Sans cette correction, le "reseau deroule" n'etait qu'une repetition
+    de l'algorithme PMMS classique avec un hyperparametre non calibre, ce
+    qui explique la sous-performance systematique face a l'equivalent
+    random_search (qui calibre nu par recherche log-uniforme sur
+    n_trials tirages et l'applique ensuite sur algo_iters iterations).
     """
 
-    def __init__(self):
+    def __init__(self, initial_nu):
         super().__init__()
         self.pmms_algo = PMMS_algo()
+        self.softplus = nn.Softplus()
+
+        # Inversion du softplus : nu_param tel que softplus(nu_param) = initial_nu
+        init_nu = max(float(initial_nu), 1e-12)
+        inv_softplus_nu = math.log(math.expm1(init_nu)) if init_nu > 1e-6 else math.log(init_nu)
+        self.nu_param = nn.Parameter(tc.tensor(inv_softplus_nu))
 
     def forward(self, static, dynamic, x, y, nu_override=None):
         if nu_override is not None:
             nu = nu_override.to(x.device).double()
         else:
-            nu = tc.tensor(DEFAULT_NU, dtype=x.dtype, device=x.device)
+            nu = self.softplus(self.nu_param).to(dtype=x.dtype, device=x.device)
 
-        with tc.no_grad():
-            x_new, dynamic_new = self.pmms_algo.iter_PMMS(static, dynamic, x, y, nu)
+        x_new, dynamic_new = self.pmms_algo.iter_PMMS(static, dynamic, x, y, nu)
 
         return x_new, dynamic_new, nu
 
 
 class PMMS_model(nn.Module):
     """
-    Modele d'unrolling PMMS non entraine.
+    Modele d'unrolling PMMS avec nu appris independamment a chaque couche.
 
-    Le reseau est constitue de la repetition de `num_layers` iterations de
-    l'algorithme PMMS, avec nu fixe a DEFAULT_NU (aucun parametre appris,
-    aucun gradient calcule).
+    Chaque couche dispose de son propre parametre nu (positif via
+    Softplus), initialise a DEFAULT_NU (valeur de reference physique) puis
+    affine par retropropagation sur la loss de reconstruction, a la
+    maniere du lambda appris par couche dans le modele ISTA. Ceci
+    remplace l'ancienne version figee (nu constant, reseau gele) qui ne
+    beneficiait d'aucun apprentissage.
     """
 
     def __init__(self, num_layers):
@@ -46,17 +62,11 @@ class PMMS_model(nn.Module):
         self.algo = PMMS_algo()
 
         for _ in range(num_layers):
-            self.Layers.append(PMMS_layer())
-
-        # Aucun parametre entrainable : reseau fige.
-        for param in self.parameters():
-            param.requires_grad = False
+            self.Layers.append(PMMS_layer(DEFAULT_NU))
 
     def forward(self, static, dynamic, x0, y, x_true=None, nu_override=None):
         # static et dynamic doivent toujours etre initialises ensemble : si l'un
-        # des deux est absent (ex: static fourni par init_static_params mais
-        # dynamic non recalcule par l'appelant), on reinitialise les deux via
-        # les valeurs statiques fournies (sigma/beta/eta) si disponibles.
+        # manque, on reinitialise les deux via sigma/beta/eta si disponibles.
         if dynamic is None:
             if static is not None:
                 _, sigma, beta, eta, _ = static
@@ -73,3 +83,4 @@ class PMMS_model(nn.Module):
             dynamic_nu.append(nu_k)
 
         return x, dynamic, dynamic_nu
+

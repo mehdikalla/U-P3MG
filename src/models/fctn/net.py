@@ -10,34 +10,11 @@ class FCTN_model(nn.Module):
     """
     Fully Connected Transformer Network (FCTN).
 
-    Architecture par patchs combinee a un contexte global non lineaire.
-
-    Deux problemes ont ete identifies et corriges par rapport aux
-    versions precedentes de ce modele :
-
-      1. Blocage du gradient (loss constante des la 2e epoque), du a une
-         activation de sortie saturante (Softplus) mal initialisee par
-         rapport a l'echelle tres faible des signaux cibles. Corrige par
-         une contrainte de positivite via mise au carre (gradient jamais
-         nul) et une LayerNorm avant la sortie.
-      2. Absence de melange global de l'observation (la loss decroit mais
-         reste totalement decorrelee du signal vrai). La matrice
-         d'observation `Hmat` est dense : chaque composante du signal
-         reconstruit depend en principe de la totalite de `y`. Fournir a
-         chaque jeton (patch) uniquement une projection lineaire par
-         position de `y` ne permet pas d'apprendre ce melange global via
-         la seule auto-attention entre patchs. On introduit donc un
-         vecteur de contexte global non lineaire (MLP applique a `y` dans
-         son integralite, a la maniere de l'encodeur d'un autoencodeur
-         dense) qui est diffuse (broadcast) a chaque jeton avant
-         l'encodeur Transformer, qui affine ensuite cette information en
-         tenant compte de la position et du voisinage de chaque portion
-         du signal.
-
-    Le signal initial `x0` est decoupe en patchs (segments contigus) qui
-    fournissent un a priori local par position ; le contexte global
-    (derive de `y`) et l'encodage positionnel appris sont ajoutes a chaque
-    jeton avant le passage dans l'encodeur Transformer.
+    Architecture par patchs combinee a un contexte global non lineaire :
+    contrainte de positivite via mise au carre + LayerNorm (evite le
+    blocage du gradient d'une Softplus saturante), et vecteur de contexte
+    global (MLP sur `y`) diffuse a chaque jeton pour apprendre le melange
+    global que l'auto-attention seule ne peut pas capturer.
     """
 
     def __init__(
@@ -58,47 +35,49 @@ class FCTN_model(nn.Module):
         self.M_dim = M_dim
         self.patch_size = patch_size
 
-        # Nombre de patchs necessaires pour couvrir N_dim, avec padding a
-        # droite si N_dim n'est pas un multiple exact de patch_size.
+        # Nombre de patchs pour couvrir N_dim, avec padding a droite si besoin.
         self.num_patches = math.ceil(N_dim / patch_size)
         self.padded_dim = self.num_patches * patch_size
         self.pad_amount = self.padded_dim - N_dim
 
-        # 1. Contexte global non lineaire derive de l'observation complete
-        # `y`. Cette branche joue le meme role que l'encodeur d'un
-        # autoencodeur dense (cf. FCAE) : elle apprend le melange global
-        # necessaire pour inverser (approximativement) l'operateur
-        # d'observation dense `Hmat`, ce qu'une simple projection lineaire
-        # par position de patch ne peut pas apprendre efficacement seule.
+        # 1. Contexte global (role similaire a l'encodeur d'un FCAE) : apprend
+        # le melange global necessaire pour inverser `Hmat`.
         self.global_context = nn.Sequential(
             nn.Linear(M_dim, context_hidden),
             nn.ReLU(inplace=True),
+            nn.Dropout(dropout),
             nn.Linear(context_hidden, d_model),
         )
+        # Initialisation Kaiming (couche cachee, suivie de ReLU) et Xavier
+        # (projection finale sans activation), pour accelerer la convergence.
+        nn.init.kaiming_normal_(self.global_context[0].weight, nonlinearity='relu')
+        nn.init.zeros_(self.global_context[0].bias)
+        nn.init.xavier_normal_(self.global_context[-1].weight)
+        nn.init.zeros_(self.global_context[-1].bias)
 
-        # 1bis. Decodeur dense direct (chemin residuel).
-        # `Hmat` est generalement tres mal conditionnee, voire de rang tres
-        # inferieur a N_dim (probleme inverse mal pose). Dans ce contexte,
-        # un decodeur entierement connecte (a la maniere du FCAE) reste la
-        # facon la plus directe et la plus fiable d'apprendre le melange
-        # global observation -> signal. Ce chemin dense produit une
-        # premiere estimation du signal complet, que l'encodeur Transformer
-        # (via patch_embedding/positional_embedding/global_ctx) vient
-        # ensuite raffiner de maniere residuelle (a priori local + contexte
-        # + relations inter-patchs). Cette combinaison permet de conserver
-        # un veritable encodeur Transformer au coeur de l'architecture tout
-        # en beneficiant de la robustesse d'un decodeur dense pour le
-        # melange global difficile a apprendre par la seule auto-attention.
+        # 1bis. Decodeur dense direct (chemin residuel, type FCAE), raffine
+        # ensuite par le Transformer (a priori local + contexte + attention).
         self.dense_decoder = nn.Sequential(
             nn.Linear(M_dim, context_hidden),
             nn.ReLU(inplace=True),
+            nn.Dropout(dropout),
             nn.Linear(context_hidden, context_hidden),
             nn.ReLU(inplace=True),
+            nn.Dropout(dropout),
             nn.Linear(context_hidden, N_dim),
         )
+        # Kaiming pour les couches cachees (ReLU), Xavier pour la sortie.
+        nn.init.kaiming_normal_(self.dense_decoder[0].weight, nonlinearity='relu')
+        nn.init.zeros_(self.dense_decoder[0].bias)
+        nn.init.kaiming_normal_(self.dense_decoder[3].weight, nonlinearity='relu')
+        nn.init.zeros_(self.dense_decoder[3].bias)
+        nn.init.xavier_normal_(self.dense_decoder[-1].weight)
+        nn.init.zeros_(self.dense_decoder[-1].bias)
 
         # 2. Embedding des patchs de x0 (a priori local par position).
         self.patch_embedding = nn.Linear(patch_size, d_model)
+        nn.init.xavier_normal_(self.patch_embedding.weight)
+        nn.init.zeros_(self.patch_embedding.bias)
 
         # 3. Encodage positionnel appris (un vecteur par position de patch).
         self.positional_embedding = nn.Parameter(
@@ -117,46 +96,18 @@ class FCTN_model(nn.Module):
             norm_first=True,
         )
 
-        # 5. Normalisation appliquee juste avant la projection de sortie.
-        # Contraint l'echelle des pre-activations independamment de la
-        # derive des poids/biais au cours de l'entrainement, ce qui evite
-        # qu'une activation de positivite saturante (Softplus, ELU, ...)
-        # ne se retrouve durablement dans sa zone a gradient quasi nul.
+        # 5. Normalisation avant la sortie : stabilise l'echelle des
+        # pre-activations et evite le gradient quasi nul d'une Softplus saturante.
         self.pre_out_norm = nn.LayerNorm(d_model)
 
-        # 6. Couche Fully Connected de sortie : projette chaque jeton de
-        # dimension d_model vers un patch residuel de longueur patch_size,
-        # ajoute (dans l'espace positif, via mise au carre) a l'estimation
-        # dense directe pour produire le signal reconstruit final.
+        # 6. Sortie : projette chaque jeton vers un patch residuel, ajoute a l'estimation dense.
         self.fc_out = nn.Linear(d_model, patch_size)
-        # Initialisation proche de zero afin que la contribution residuelle
-        # du Transformer soit negligeable en debut d'entrainement : le
-        # modele demarre donc essentiellement comme le decodeur dense
-        # (chemin fiable et bien conditionne), puis apprend progressivement
-        # a exploiter le raffinement local/contextuel apporte par
-        # l'auto-attention.
+        # Initialisation proche de zero : le modele demarre comme le
+        # decodeur dense puis apprend progressivement le raffinement residuel.
         nn.init.normal_(self.fc_out.weight, mean=0.0, std=1e-3)
         nn.init.zeros_(self.fc_out.bias)
 
-        # Contrainte de positivite du signal reconstruit via une mise au
-        # carre plutot qu'une activation de type Softplus/ELU/ReLU.
-        # Justification : les signaux cibles de ce projet sont a tres
-        # faible echelle (souvent << 1) avec une forte proportion de
-        # valeurs nulles. Une activation saturante cote negatif
-        # (Softplus, ELU, ReLU) expose le reseau a un phenomene de
-        # "neurone mort" : des que l'optimiseur pousse les pre-activations
-        # vers de fortes valeurs negatives (ce qui se produit tres vite ici
-        # car la sortie initiale est bien plus grande que la cible), le
-        # gradient de l'activation devient quasi nul et l'apprentissage se
-        # bloque durablement, la loss se stabilisant a la valeur triviale
-        # "prediction nulle partout" (mean(x_true**2)). La mise au carre
-        # n'a pas ce probleme : son gradient (2x) reste proportionnel a
-        # l'ecart a zero, quel que soit le signe de la pre-activation, ce
-        # qui permet a l'optimiseur de corriger l'echelle de sortie sans
-        # jamais se retrouver bloque dans une zone a gradient nul.
-        # L'initialisation par defaut de nn.Linear (poids/biais proches de
-        # zero) est ici directement adaptee, car elle produit une sortie
-        # initiale elle-meme proche de zero.
+        # Contrainte de positivite via mise au carre plutot qu'une Softplus/ELU/ReLU saturante.
 
 
     def _to_patches(self, x: torch.Tensor) -> torch.Tensor:
@@ -185,13 +136,10 @@ class FCTN_model(nn.Module):
             Tuple contenant le signal reconstruit et deux variables nulles
             pour compatibilite.
         """
-        # Estimation dense directe du signal complet a partir de
-        # l'observation (chemin fiable, bien conditionne, cf. FCAE).
+        # Estimation dense directe (chemin fiable, bien conditionne, cf. FCAE).
         dense_estimate = self.dense_decoder(y)
 
-        # Contexte global non lineaire issu de l'observation complete,
-        # diffuse identiquement a tous les patchs d'un meme echantillon :
-        # (batch, d_model) -> (batch, 1, d_model)
+        # Contexte global diffuse a tous les patchs : (batch, d_model) -> (batch, 1, d_model)
         global_ctx = self.global_context(y).unsqueeze(1)
 
         x0_patches = self._to_patches(x0)
@@ -206,12 +154,8 @@ class FCTN_model(nn.Module):
         if self.pad_amount > 0:
             residual = residual[:, : self.N_dim]
 
-        # Le Transformer apprend un raffinement additif (positif ou
-        # negatif) de l'estimation dense directe, exploitant le contexte
-        # local par patch et les relations inter-patchs via
-        # l'auto-attention. La contrainte de positivite du signal final
-        # est appliquee une seule fois, sur la somme, via une mise au
-        # carre (gradient jamais nul, cf. commentaire plus haut).
+        # Raffinement additif de l'estimation dense via l'auto-attention ;
+        # contrainte de positivite appliquee une seule fois, sur la somme.
         x_pred = (dense_estimate + residual) ** 2
 
         return x_pred, None, None

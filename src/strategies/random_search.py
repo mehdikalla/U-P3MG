@@ -9,12 +9,8 @@ import numpy as np
 from src.utils.functions import snr_loss, tsnr_loss
 from src.utils.plotting_manager import PlottingManager
 
-# tau fixe pour le modele PD standalone : coefficient de relaxation
-# (sous/sur-relaxation) du schema de Chambolle-Pock, applique en fin
-# d'iteration (cf. PD_Standalone_algo.iter_PD). tau = 1.0 correspond au
-# schema standard sans relaxation. Il n'influence pas le probleme resolu
-# a convergence. Utilise a la fois en calibration (train) et en fallback
-# si 'tau' est absent des parametres charges lors du test.
+# tau fixe pour le modele PD standalone : coefficient de relaxation du
+# schema de Chambolle-Pock (cf. PD_Standalone_algo.iter_PD), sans effet a convergence.
 PD_TAU_FIXED = 1.0
 
 def get_criterion(name):
@@ -45,11 +41,8 @@ def get_algo_and_static(args, N_dim, M_dim, device):
         return algo, static
 
     elif model_name == 'pd':
-        # Aligne sur PrimalDual_algo (src/models/p3mg/primal_dual/algo.py) :
-        # init_PD retourne (w0, sub_static). sub_static = [Hmat, L2] est
-        # conserve tel quel comme "static" du random search ; w0 = [p0, d0]
-        # n'est pas reutilise ici (chaque appel de run_iterative_algo
-        # reinitialise son propre etat via algo.init_PD(x0, y)).
+        # Aligne sur PrimalDual_algo : init_PD retourne (w0, sub_static) ;
+        # seul sub_static = [Hmat, L2] est conserve comme "static" ici.
         from src.models.pd.algo import PD_Standalone_algo
         algo = PD_Standalone_algo().to(device).double()
         _, sub_static = algo.init_PD(dx, dy)
@@ -92,13 +85,8 @@ def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
         return x
 
     elif model_name == 'pd':
-        # tau est desormais FIXE (parametre de pas garantissant la
-        # stabilite du schema de Chambolle-Pock, sans influence sur le
-        # probleme resolu a convergence -- cf. PD_Standalone_algo.iter_PD).
-        # L'unique hyperparametre explore par le random search est
-        # lambda_tau, qui pondere un terme de regularisation quadratique
-        # reellement present dans le probleme resolu, et fait donc varier
-        # la loss de calibration.
+        # tau est FIXE (stabilite du schema de Chambolle-Pock, sans effet a
+        # convergence) ; seul lambda_tau est explore par le random search.
         tau = torch.tensor(hp.get('tau', PD_TAU_FIXED), device=device, dtype=torch.float64)
         lambda_tau = torch.tensor(hp['lambda_tau'], device=device, dtype=torch.float64)
 
@@ -145,9 +133,7 @@ def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
             x = algo.iter_HQ(x, y, Hmat, Ht_H, gamma, lmbd_cvx, lmbd_ncvx)
         return x
 
-# =============================================================================
 # TRAIN (Calibration)
-# =============================================================================
 def train(loader, args, paths):
     device = args.device
     criterion = get_criterion(args.criterion)
@@ -171,9 +157,7 @@ def train(loader, args, paths):
     nu_min, nu_max = getattr(args, 'nu_bounds', (1e-6, 1e-3))
     tau_min, tau_max = args.tau_bounds
     tau_pd_min, tau_pd_max = getattr(args, 'tau_pd_bounds', (tau_min, tau_max))
-    # Bornes pour lambda_tau (regularisation quadratique du modele PD
-    # standalone). Retombe sur les bornes de lambda (P3MG/HQ) si non
-    # specifie explicitement dans la config (lambda_tau_min/lambda_tau_max).
+    # Bornes pour lambda_tau (PD standalone), retombant sur celles de lambda si non specifiees.
     lambda_tau_min, lambda_tau_max = getattr(args, 'lambda_tau_bounds', (lmbd_min, lmbd_max))
 
     algo_iters = args.algo_iters
@@ -208,13 +192,7 @@ def train(loader, args, paths):
             hp['lmbd'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['tau'] = random.uniform(float(tau_min), float(tau_max))
         elif model_name == 'pd':
-            # Modele Primal-Dual standalone : tau est FIXE (PD_TAU_FIXED),
-            # ce n'est qu'un parametre de pas garantissant la stabilite du
-            # schema de Chambolle-Pock, sans effet sur la solution a
-            # convergence. L'unique hyperparametre recherche est
-            # lambda_tau, qui pondere un terme de regularisation
-            # quadratique reellement present dans le probleme resolu (cf.
-            # PD_Standalone_algo.iter_PD), et fait donc varier la loss.
+            # PD standalone : tau est FIXE (PD_TAU_FIXED), seul lambda_tau est recherche.
             hp['tau'] = PD_TAU_FIXED
             hp['lambda_tau'] = 10 ** random.uniform(log_ltau_min, log_ltau_max)
 
@@ -244,9 +222,7 @@ def train(loader, args, paths):
         json.dump(best_params, f, indent=4)
     print(f"--- [TRAIN] Terminé en {(time.time()-start)/60:.2f} min ---")
 
-# =============================================================================
 # TEST (Application & Reporting Complet)
-# =============================================================================
 def find_latest_best_params(model_name, strategy, data_folder=None, current_base_dir=None, run_group=None):
     """
     Recherche le fichier 'best_params.json' le plus récent pour un modèle,

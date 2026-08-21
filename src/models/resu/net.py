@@ -35,6 +35,10 @@ class ResU_model(nn.Module):
         transformer_dim_feedforward: Dimension du reseau feedforward interne
             du Transformer.
         transformer_dropout: Taux de dropout applique dans le Transformer.
+        dropout: Taux de dropout applique dans les blocs convolutifs
+            (encodeur, bottleneck et decodeur). Complementaire au dropout
+            propre au Transformer (transformer_dropout), il reduit le
+            surapprentissage du chemin purement convolutif.
     """
 
     def __init__(
@@ -50,6 +54,7 @@ class ResU_model(nn.Module):
         transformer_num_layers: int = 2,
         transformer_dim_feedforward: int = 256,
         transformer_dropout: float = 0.1,
+        dropout: float = 0.05,
     ) -> None:
 
         super().__init__()
@@ -61,9 +66,7 @@ class ResU_model(nn.Module):
         self.M_dim = M_dim
         self.num_layers = num_layers
 
-        # Projection initiale de l'observation (scalaire par position) vers
-        # un tenseur (batch, canal=1, longueur=M_dim) exploitable par les
-        # convolutions 1D.
+        # Projection de l'observation vers (batch, canal=1, longueur=M_dim) pour les convolutions 1D.
         self.input_proj = nn.Identity()
 
         channel_widths = [base_channels * (2 ** i) for i in range(num_layers)]
@@ -73,13 +76,13 @@ class ResU_model(nn.Module):
         in_channels = 1
         for width in channel_widths:
             self.encoder_blocks.append(
-                ResUNetBlock(in_channels, width, num_convs, use_batchnorm)
+                ResUNetBlock(in_channels, width, num_convs, use_batchnorm, dropout)
             )
             in_channels = width
 
         # --- Goulot d'etranglement (bottleneck) ---
         bottleneck_channels = channel_widths[-1] * 2
-        self.bottleneck = BasicConv(channel_widths[-1], bottleneck_channels, use_batchnorm)
+        self.bottleneck = BasicConv(channel_widths[-1], bottleneck_channels, use_batchnorm, dropout)
 
         # --- Module d'attention (Transformer) sur le goulot d'etranglement ---
         # Le nombre de tetes doit diviser le nombre de canaux du bottleneck.
@@ -106,13 +109,17 @@ class ResU_model(nn.Module):
         in_channels = bottleneck_channels
         for width in reversed(channel_widths):
             self.decoder_blocks.append(
-                ResUNetUpBlock(in_channels, width, width, num_convs, use_batchnorm)
+                ResUNetUpBlock(in_channels, width, width, num_convs, use_batchnorm, dropout)
             )
             in_channels = width
 
         # --- Projection finale vers la dimension du signal reconstruit ---
         self.output_proj = nn.Conv1d(channel_widths[0], 1, kernel_size=1)
+        nn.init.kaiming_normal_(self.output_proj.weight, nonlinearity='linear')
+        nn.init.zeros_(self.output_proj.bias)
         self.fc_out = nn.Linear(M_dim, N_dim)
+        nn.init.xavier_normal_(self.fc_out.weight)
+        nn.init.zeros_(self.fc_out.bias)
         self.output_activation = nn.Softplus()
 
     def forward(self, static, dynamic, x0: tc.Tensor, y: tc.Tensor):

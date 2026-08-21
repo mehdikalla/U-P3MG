@@ -4,15 +4,11 @@ from src.models.pd.algo import PD_Standalone_algo
 
 S = nn.Softplus()
 
-# -------------------------
 # PD Standalone model layers
-# -------------------------
 class PD_layer(nn.Module):
     """
-    Couche Primal-Dual autonome, nommee et structuree comme PD_layer
-    (src/models/p3mg/primal_dual/net.py) : un pas de descente (tau) fixe,
-    et un hyperparametre de regularisation (lambda_reg) transmis
-    directement a iter_PD.
+    Couche Primal-Dual autonome (cf. src/models/p3mg/primal_dual/net.py) :
+    pas de descente (tau) fixe, lambda_reg transmis directement a iter_PD.
     """
 
     def __init__(self):
@@ -26,16 +22,10 @@ class PD_layer(nn.Module):
 
 class PD_model(nn.Module):
     """
-    Modele Primal-Dual autonome deroule, nomme et structure comme PD_model
-    (src/models/p3mg/primal_dual/net.py) : une seule sequence de couches
-    partageant le meme algorithme.
-
-    tau_params est fixe (non appris), aligne sur PD_Standalone_algo ou tau
-    n'est qu'un parametre de pas garantissant la stabilite du schema de
-    Chambolle-Pock, sans influence sur le probleme resolu a convergence.
-    lambda_params est l'unique parametre appris par couche, ponderant le
-    terme de regularisation quadratique reellement present dans le
-    probleme resolu (cf. PD_Standalone_algo.iter_PD).
+    Modele Primal-Dual autonome deroule (cf. PD_model dans
+    src/models/p3mg/primal_dual/net.py). tau_params est fixe (pas de
+    Chambolle-Pock, sans effet a convergence) ; lambda_params est l'unique
+    parametre appris, ponderant la regularisation quadratique.
     """
 
     def __init__(self, num_layers, tau_fixed: float = 1.0):
@@ -44,13 +34,11 @@ class PD_model(nn.Module):
         self.num_layers = num_layers
         self.algo = PD_Standalone_algo()
 
-        # tau_fixed : coefficient de relaxation fixe, identique pour toutes les couches,
-        # non appris (cf. PD_Standalone_algo.iter_PD).
+        # tau_fixed : coefficient de relaxation fixe, non appris (cf. iter_PD).
         self.register_buffer('tau_fixed', tc.tensor(tau_fixed).double())
 
         # lambda_params : un logit par couche, transforme via softplus en
-        # une valeur positive de lambda_reg. Seul hyperparametre appris du
-        # modele.
+        # lambda_reg positif. Seul hyperparametre appris du modele.
         self.lambda_params = nn.Parameter(tc.empty(num_layers).double().fill_(0.0))
 
     def forward(self, static, dynamic, x0, y, x_true=None, lmbd_override=None, tau_override=None):

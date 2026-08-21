@@ -1,6 +1,4 @@
-# -----------------------------------------------------------------------------
-# Import des composants des différents modèles
-# -----------------------------------------------------------------------------
+# Import des composants des différents modèles.
 
 # --- Modèle 1 : P3MG ---
 from src.models.p3mg.net import P3MG_model
@@ -35,10 +33,7 @@ from src.models.fcun.net import FCUN_model
 from src.models.resu.net import ResU_model
 
 
-# -----------------------------------------------------------------------------
-# Registres (Dictionnaires)
-# C'est ce que le main.py va utiliser pour sélectionner le modèle
-# -----------------------------------------------------------------------------
+# Registres (Dictionnaires) utilisés par main.py pour sélectionner le modèle.
 
 
 NET_ARCHITECTURES = {
