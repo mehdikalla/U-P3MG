@@ -49,8 +49,13 @@ n_trials: 100          # Nombre de tirages d'hyperparametres a tester (calibrati
 algo_iters: 1000            # Nombre d'itérations pour l'algorithme itératif standard
 lmbd_min: 1.0e-9             # Borne inférieure pour la recherche de Lambda (P3MG, HQ)
 lmbd_max: 1.1              # Borne supérieure pour la recherche de Lambda (P3MG, HQ)
-lmbd_ist_min: 1.0e-9         # Borne inférieure pour la recherche de Lambda ISTA (indépendante de P3MG)
-lmbd_ist_max: 1.1          # Borne supérieure pour la recherche de Lambda ISTA (indépendante de P3MG)
+lmbd_ist_min: 0.1            # Borne inférieure pour la recherche de Lambda ISTA (indépendante de P3MG)
+lmbd_ist_max: 5.0            # Borne supérieure pour la recherche de Lambda ISTA (indépendante de P3MG)
+                              # NB: bornes choisies pour que la moyenne géométrique (~0.7, cf.
+                              # init_params_from_static dans src/models/ista/net.py) tombe dans la
+                              # zone à forte pente de softplus (sigmoid(x) proche de 0.5-0.7),
+                              # evitant un gradient quasi nul sur lambda_param (cf. bornes 1e-9/1.1
+                              # precedentes qui donnaient un gradient ~3e-5, noye par eps=1e-8 d'Adam).
 
 tau_min: 0.01              # Borne inférieure pour la recherche de Tau (P3MG, PD)
 tau_max: 2.0               # Borne supérieure pour la recherche de Tau (P3MG, PD)
