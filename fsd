@@ -1,0 +1,501 @@
+[33mcommit ed91f0060df3b397f377e789b803879a64c8a8c4[m[33m ([m[1;36mHEAD[m[33m)[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Fri Aug 21 16:20:13 2026 +0000
+
+    qsd
+
+[33mcommit 527075170d38305a3bb513a8b2b31ffa8e586fc7[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 21 17:26:28 2026 +0200
+
+    improve ista
+
+[33mcommit 111c7f165fa6221a30e73b8819c3725c0973c377[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 21 17:01:13 2026 +0200
+
+    ista fix
+
+[33mcommit cf6dd7cf8641c35ecc183339758777179b1412fd[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 21 16:33:01 2026 +0200
+
+    ad
+
+[33mcommit 44dfba4d89d8be32a4c779aa97d01aa9f6be5fb0[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 21 15:58:53 2026 +0200
+
+    clean up
+
+[33mcommit 994d6d48765466c0695611061a6291d4290462a5[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 21 13:44:49 2026 +0200
+
+    corrected script
+
+[33mcommit ac6a1c8c57f4f8afddad5001f4c74a285c3f117c[m
+Author: Indra <indra@debian>
+Date:   Thu Aug 20 18:05:07 2026 +0200
+
+    fctn
+
+[33mcommit a7456a4f28561fc50de14bb0b6e967f0b0d36a66[m
+Author: Indra <indra@debian>
+Date:   Thu Aug 20 16:39:53 2026 +0200
+
+    gctn
+
+[33mcommit 06ae663e0ef0ce0048b861217271147a6c9a44b1[m
+Author: Indra <indra@debian>
+Date:   Thu Aug 20 14:03:00 2026 +0200
+
+    corrected PD
+
+[33mcommit 1befb5b1511de550eef6be2508455a6a935328fe[m
+Author: Indra <indra@debian>
+Date:   Thu Aug 20 11:46:47 2026 +0200
+
+    prt
+
+[33mcommit e237af92ed6c6f8fcad71c0bc9a4874ac79b5976[m
+Author: Indra <indra@debian>
+Date:   Thu Aug 20 11:27:33 2026 +0200
+
+    proj_simplex
+
+[33mcommit 7d94ea01c6ffbfca8c78356ca8d6de433e29bcb0[m
+Author: Indra <indra@debian>
+Date:   Thu Aug 20 10:57:43 2026 +0200
+
+    bodn
+
+[33mcommit 022f9bbe4844362d48c925a32185ee35cafb330d[m
+Author: Indra <indra@debian>
+Date:   Thu Aug 20 10:51:21 2026 +0200
+
+    primal dual bounds
+
+[33mcommit 4b9c604a54fb0e5f7abe68d94314c5adf5fa6eb0[m
+Author: Indra <indra@debian>
+Date:   Tue Aug 18 16:52:38 2026 +0200
+
+    add
+
+[33mcommit 95f81617c45c6657b21a86b2b542d99d086c41b7[m
+Author: Indra <indra@debian>
+Date:   Mon Aug 17 11:04:38 2026 +0200
+
+    pd hyperparams
+
+[33mcommit 12b5596635fca7e1dfeba1dc2a0b40f2c37ef2d8[m
+Author: Indra <indra@debian>
+Date:   Sun Aug 16 23:06:46 2026 +0200
+
+    corrected ista bounds
+
+[33mcommit cef763ccbc01c4722094c6f3c03dd21ba7710f9e[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Sun Aug 16 21:04:54 2026 +0000
+
+    mod
+
+[33mcommit 949e67e71c3045bad44caeaff1bc9cdfe668dbee[m
+Author: Indra <indra@debian>
+Date:   Sun Aug 16 21:28:17 2026 +0200
+
+    add pd
+
+[33mcommit 37b6bce21a09dc50509fa1f5664bdb0f886d42b4[m
+Author: Indra <indra@debian>
+Date:   Sun Aug 16 16:56:29 2026 +0200
+
+    pd correction
+
+[33mcommit 2a2b910aa84a3d0dd25869e6b382ace01ac34bf4[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Sat Aug 15 17:07:38 2026 +0000
+
+    add stuff
+
+[33mcommit dd178a8a306ee51c2ac799b0855e2f677d41fb8e[m
+Author: Indra <indra@debian>
+Date:   Sat Aug 15 16:32:32 2026 +0200
+
+    fqs
+
+[33mcommit 7564d59aadffef4c282628811971caff39641ed4[m
+Author: Indra <indra@debian>
+Date:   Sat Aug 15 16:32:10 2026 +0200
+
+    correct ablation
+
+[33mcommit 3749865536a3f1927f69a6ccdf573ae375a9fc6f[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 14 15:19:26 2026 +0200
+
+    correct rs
+
+[33mcommit 335755a7d9cb802d9be2f2e9c52c5ad6e620fcee[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 14 14:50:37 2026 +0200
+
+    corrected achitecture
+
+[33mcommit 5cad898c33a0f8dc66b838acfb7ed67cd0c8b1d8[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 14 14:33:55 2026 +0200
+
+    corrected PMMS
+
+[33mcommit 43054c8e4a7e83da2b92a3a85c35ecbb996349a2[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 14 14:20:22 2026 +0200
+
+    improved DL
+
+[33mcommit 81e0cb63b757a287fc588f16567f3f7b4218fefe[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 14 13:57:47 2026 +0200
+
+    qa
+
+[33mcommit da5790e3340eaee79e0ce782dc361121769b91c4[m
+Author: Indra <indra@debian>
+Date:   Fri Aug 14 10:16:58 2026 +0200
+
+    improve dl
+
+[33mcommit 598596172c55b5c9c565f80bfb385b223e0bc311[m
+Author: Indra <indra@debian>
+Date:   Mon Aug 3 11:07:36 2026 +0200
+
+    better paths
+
+[33mcommit c9b806a33b603ba8b589f423840e5517c7e2a9c1[m
+Author: Indra <indra@debian>
+Date:   Mon Aug 3 10:26:33 2026 +0200
+
+    correct paths
+
+[33mcommit 1e7807caad259d158edab0017b40047e9635d92a[m
+Merge: f47f5ba c55f850
+Author: Indra <indra@debian>
+Date:   Mon Aug 3 10:13:57 2026 +0200
+
+    Merge branch 'main' of https://github.com/mehdikalla/U-P3MG
+
+[33mcommit f47f5bacdec1b683995b1bf2b34fab4388921af9[m
+Author: Indra <indra@debian>
+Date:   Mon Aug 3 10:13:14 2026 +0200
+
+    correct ablation
+
+[33mcommit c55f850750a09a2d5cbca05abfa122723ec3e2fa[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Sat Aug 1 22:06:09 2026 +0000
+
+    add gitignore
+
+[33mcommit 9b64c7000a84456078c6a54610bcd4e5a0f05006[m
+Author: Indra <indra@debian>
+Date:   Sun Aug 2 00:02:52 2026 +0200
+
+    corrected u-pmms
+
+[33mcommit 1a95991f29661a073a0febe286c3ad6c6332efb7[m
+Author: Indra <indra@debian>
+Date:   Sun Aug 2 00:00:20 2026 +0200
+
+    correct PMMS
+
+[33mcommit 055a96824c8db9a35e132d8590c0506491266130[m
+Author: Indra <indra@debian>
+Date:   Sat Aug 1 23:49:18 2026 +0200
+
+    ablation improvements
+
+[33mcommit 805a1d735b97bc8396bd317ddbf6c4518d967f13[m
+Author: Indra <indra@debian>
+Date:   Sat Aug 1 23:34:15 2026 +0200
+
+    corrections
+
+[33mcommit 57d5e0e0726677b0dbf5517e4813e6bf2e0b6174[m
+Author: Indra <indra@debian>
+Date:   Sat Aug 1 22:49:06 2026 +0200
+
+    round up
+
+[33mcommit ba6857a99b49bb2a41710607d1ad6f74580ec513[m
+Author: Indra <indra@debian>
+Date:   Fri Jul 24 03:56:46 2026 +0200
+
+    add slurm
+
+[33mcommit 134f4f95adbb712add026e3d35bc1f3d7521c7db[m
+Author: Indra <indra@debian>
+Date:   Fri Jul 24 03:54:34 2026 +0200
+
+    delete extras
+
+[33mcommit 20b1a60fa0cbf0f742877475991cee96d526cc86[m
+Author: Indra <indra@debian>
+Date:   Fri Jul 24 03:52:42 2026 +0200
+
+    Finalize implementations
+
+[33mcommit d5172331dc773bd4e32f0bb1dcaa6a19d0546f14[m
+Author: Indra <indra@debian>
+Date:   Mon Jul 6 23:12:54 2026 +0200
+
+    Fixed DL models
+
+[33mcommit 9d3bc3d3875f169a49b4d22d4db72247242cf581[m
+Author: Indra <indra@debian>
+Date:   Mon Jul 6 23:05:45 2026 +0200
+
+    naming conventions
+
+[33mcommit 31aa8c10e14f89d0579f6dfe72c41c02606012e7[m
+Author: Indra <indra@debian>
+Date:   Mon Jul 6 22:53:54 2026 +0200
+
+    Architecture improvements
+
+[33mcommit 5de0659d164a27afee48570d26ed0b687271e4ae[m
+Author: Indra <indra@debian>
+Date:   Fri Jul 3 12:43:31 2026 +0200
+
+    DL FCTN
+
+[33mcommit e1826532044fcc734407043b9522f945707e317c[m
+Author: Indra <indra@debian>
+Date:   Fri Jul 3 10:30:12 2026 +0200
+
+    Fcae net.py
+
+[33mcommit 2565134114562e56c15767ca9c58a871c7478402[m
+Author: Indra <indra@debian>
+Date:   Wed Jul 1 11:45:10 2026 +0200
+
+    add DL models
+
+[33mcommit 9a85eec1aa6c14af2fa7b8054b2b02729d948ac7[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Mon Jun 29 11:10:49 2026 +0200
+
+    Correct task name from FCU-Net to FCNet
+    
+    Updated task list to replace 'FCU-Net' with 'FCNet'.
+
+[33mcommit 968485d7eb666fd11f5b5ded5b1191c37dc3753c[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Wed Jun 24 17:41:06 2026 +0200
+
+    Update TODO list with completed tasks
+
+[33mcommit 12241e22d6c0ebb1d5734462a5dfe3cc6ce4ec59[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Wed Jun 24 15:31:49 2026 +0000
+
+    corrected HQ
+
+[33mcommit d72a534dea908beae797d0b0cb70328eccba23de[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Wed Jun 24 12:34:17 2026 +0000
+
+    updates
+
+[33mcommit 52ce27237adb4dccab76359632b886a9fe901b5f[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Wed Jun 24 12:32:14 2026 +0000
+
+    update HQ
+
+[33mcommit ad3d8812150d71a69256ce327e5ffd465ed9f82e[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Wed Jun 24 11:15:37 2026 +0000
+
+    updates
+
+[33mcommit 342ad88f3dd8e93781a5f903e55ad1f52fc70ebb[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Tue Jun 23 08:34:05 2026 +0000
+
+    unrolling pmms
+
+[33mcommit 1850840a0094cc95eaa7fcac852a0a2ef5e1bcc4[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Mon Jun 22 12:06:25 2026 +0000
+
+    updated config
+
+[33mcommit e22165c97d48c5a6ff06c1213677ca7f5c351beb[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Thu Jun 18 13:25:50 2026 +0000
+
+    pycache
+
+[33mcommit e3d0a7b62c25ddcd3e5e3f3213f3e9ce1495dced[m
+Author: mehdikalla <mmehdiiikalla@gmail.com>
+Date:   Thu Jun 18 13:23:15 2026 +0000
+
+    compatibilite
+
+[33mcommit e203af2f61398ec4b8d3be037dcbf2df6a55520a[m
+Author: Indra <indra@debian>
+Date:   Mon Jun 8 19:16:16 2026 +0400
+
+    todo
+
+[33mcommit d50710f8a0316f10df21318eb2dfc692b8b83d5f[m
+Author: Indra <indra@debian>
+Date:   Mon Jun 8 19:14:13 2026 +0400
+
+    todo
+
+[33mcommit 5087eeb1606d1856f3bb64f3316aa6aea695cac8[m
+Author: Indra <indra@debian>
+Date:   Mon Jun 8 19:13:42 2026 +0400
+
+    add traditional algorithm
+
+[33mcommit 209d6ddd2dbbb5fba444a4a7055b6cff37d40ed9[m
+Merge: 5123778 9fee3fa
+Author: Indra <indra@debian>
+Date:   Mon Jun 8 17:23:43 2026 +0400
+
+    modif dataset
+
+[33mcommit 9fee3faeef07fa7d67b0e6f9674738f3f842c6ad[m
+Author: AYAD Ishak <36072891+Ishak96@users.noreply.github.com>
+Date:   Tue May 12 12:08:10 2026 +0200
+
+    Revise TODO list for refactoring and documentation
+    
+    Updated the completion status of refactoring and documentation tasks in the TODO list.
+
+[33mcommit a94521ee63967e1f3295c9d42abb6395365cb215[m
+Author: AYAD Ishak <36072891+Ishak96@users.noreply.github.com>
+Date:   Tue May 12 12:06:56 2026 +0200
+
+    Revise TODO list with completed tasks
+    
+    Updated the TODO list to reflect completed tasks and milestones.
+
+[33mcommit d2ac65e04b45a6be5ea18a39523fa79725c76ee1[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Mon May 11 11:27:14 2026 +0200
+
+    Update TODO list to mark tasks as complete
+
+[33mcommit a71363db1fe392d540e7956eb6f384ef23d75bf5[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Mon May 11 11:26:52 2026 +0200
+
+    Add .slurm files to .gitignore
+
+[33mcommit 003718b702de82767223191a285c76595b5f86c8[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Mon May 11 11:19:15 2026 +0200
+
+    Mark 'Provide a code to simulate signals' as complete
+
+[33mcommit 5123778e6c28ed166c1fe2addf47cdd19986a07c[m
+Author: Indra <indra@debian>
+Date:   Tue May 5 14:07:53 2026 +0200
+
+    Bug correction
+
+[33mcommit 25d9ab6425f599ab5dd1ec469efb50770b68fab2[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Tue May 5 11:04:03 2026 +0200
+
+    Add dataset simulation instructions to README
+    
+    Added instructions for simulating a dataset using a command.
+
+[33mcommit 11110e2fc27ed5a1bbd18ac0b03a9d3a831286c9[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Tue May 5 11:02:45 2026 +0200
+
+    Add dataset generation and verification for DOSY signals
+    
+    Generates a DOSY dataset of NMR signals with noise and saves it in specified directory. Includes verification and plotting of generated datasets.
+
+[33mcommit 956260067429f5455d58ab28f3fc3f4479901fcf[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Tue May 5 10:39:40 2026 +0200
+
+    Mark completed tasks in TODO.md
+    
+    Updated TODO list to reflect completed tasks.
+
+[33mcommit adb41cf7ed1c13edfba40c09abcc468438d506ab[m
+Author: AYAD Ishak <36072891+Ishak96@users.noreply.github.com>
+Date:   Sun May 3 18:28:35 2026 +0200
+
+    Reduce logo width in README.md
+    
+    Updated image styles in README to have a width of 150px.
+
+[33mcommit 32bc6bdff045dae13994668307f6a988c98cfbce[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Mon Apr 27 16:30:32 2026 +0200
+
+    Add task for signal simulation code
+    
+    Added a task to provide code for simulating signals.
+
+[33mcommit fc01f32ed8ae2b72f59057ea70ca081064108e3f[m
+Author: Mohammad Mehdi Kalla <mkalla@ad.inria.fr>
+Date:   Mon Apr 27 15:12:49 2026 +0200
+
+    Tasks update
+
+[33mcommit 4a172e2d85d882d0dace1160955cb5d234495f05[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Mon Apr 20 14:04:02 2026 +0200
+
+    Mark tasks as complete in TODO.md
+    
+    Updated the TODO list to reflect completed tasks.
+
+[33mcommit 2a3690e1c1557c5703529ba72b6f096792ace636[m
+Author: Mehdi Kalla <139477643+mehdikalla@users.noreply.github.com>
+Date:   Mon Apr 20 14:03:29 2026 +0200
+
+    Enhance project description and overview in README
+    
+    Updated project description and overview in README.md.
+
+[33mcommit ccba6378dd8875a4ad2535158a47a09359f501cd[m
+Author: ishak96 <ishakayad96@outlook.fr>
+Date:   Tue Mar 31 00:02:38 2026 +0200
+
+    Instruction add please look at the TODO.md file for the list of tasks to be completed.
+
+[33mcommit 6ab806755b39252fe778d1f1b30695855763d8da[m
+Author: Mohammad Mehdi Kalla <mkalla@margaret.saclay.inria.fr>
+Date:   Wed Feb 18 15:01:30 2026 +0100
+
+    final correction to U_P3MG
+
+[33mcommit 002025a6f525d97e621d901f42f849a3cfb98190[m
+Author: Mohammad Mehdi Kalla <mkalla@margaret.saclay.inria.fr>
+Date:   Wed Feb 4 16:59:30 2026 +0100
+
+    pycache removal
+
+[33mcommit 8750b48695e880f88fc44852cbad81a69bea0680[m
+Author: Mohammad Mehdi Kalla <mkalla@margaret.saclay.inria.fr>
+Date:   Wed Feb 4 16:58:39 2026 +0100
+
+    working
+
+[33mcommit d64a78adc08ed8bae72f6b884b76ba0048dcf2cc[m
+Author: Mohammad Mehdi Kalla <mkalla@ad.inria.fr>
+Date:   Wed Feb 4 14:58:52 2026 +0100
+
+    First commit
