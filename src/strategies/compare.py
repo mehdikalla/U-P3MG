@@ -79,22 +79,60 @@ def find_latest_best_params(model_name, strategy, data_folder):
     return None
 
 
-def _build_unrolled_model(model_name, args, M_dim=None):
+def _load_ckpt_arch_config(ckpt_path):
+    """Recupere (num_layers, num_pd_layers) reellement utilises a l'entrainement.
+
+    Le fichier 'logs/run_config.json', ecrit par src.strategies.network.save_config
+    au lancement de l'entrainement, est la source de verite pour l'architecture du
+    modele associe a un checkpoint (cf. scripts/build_ablation_summary.py, qui
+    applique deja ce meme principe). A defaut, retombe sur (None, None), auquel
+    cas l'appelant doit utiliser les valeurs courantes de 'args' (au risque d'un
+    'size mismatch' si l'architecture a change depuis l'entrainement).
+    """
+    run_dir = os.path.dirname(os.path.dirname(ckpt_path))  # .../checkpoints/best_model.pt -> run_dir
+    config_path = os.path.join(run_dir, 'logs', 'run_config.json')
+    if not os.path.isfile(config_path):
+        return None, None
+    try:
+        with open(config_path, 'r') as f:
+            ckpt_config = json.load(f)
+        num_layers = int(ckpt_config['num_layers']) if 'num_layers' in ckpt_config else None
+        num_pd_layers = int(ckpt_config['num_pd_layers']) if 'num_pd_layers' in ckpt_config else None
+        return num_layers, num_pd_layers
+    except (KeyError, ValueError, json.JSONDecodeError) as e:
+        print(f"[COMPARE] [WARN] Lecture de {config_path} impossible ({e}), "
+              f"utilisation des parametres d'architecture courants.")
+        return None, None
+
+
+def _build_unrolled_model(model_name, args, M_dim=None, ckpt_path=None):
     """Instancie l'architecture unrolled correspondant a model_name.
 
     Le parametre M_dim est requis pour HQ afin de dimensionner correctement
     les couches lineaires internes (fc_cvx/fc_ncvx), sous peine de charger un
     state_dict incompatible en silence (strict=False).
+
+    Si ckpt_path est fourni, num_layers/num_pd_layers sont lus depuis le
+    'run_config.json' du run d'origine plutot que depuis 'args', afin d'eviter
+    tout 'size mismatch' lorsque l'architecture courante (config.yaml/CLI) a
+    change depuis l'entrainement du checkpoint charge.
     """
     ModelClass = NET_ARCHITECTURES[model_name]
+    num_layers, num_pd_layers = args.num_layers, args.num_pd_layers
+    if ckpt_path is not None:
+        ckpt_num_layers, ckpt_num_pd_layers = _load_ckpt_arch_config(ckpt_path)
+        if ckpt_num_layers is not None:
+            num_layers = ckpt_num_layers
+        if ckpt_num_pd_layers is not None:
+            num_pd_layers = ckpt_num_pd_layers
     if model_name == 'hq':
-        kwargs = {'num_layers': args.num_layers, 'num_pd_layers': args.num_pd_layers}
+        kwargs = {'num_layers': num_layers, 'num_pd_layers': num_pd_layers}
         if M_dim is not None:
             kwargs['M_dim'] = M_dim
         return ModelClass(**kwargs)
     if model_name == 'p3mg':
-        return ModelClass(num_layers=args.num_layers, num_pd_layers=args.num_pd_layers)
-    return ModelClass(num_layers=args.num_layers)
+        return ModelClass(num_layers=num_layers, num_pd_layers=num_pd_layers)
+    return ModelClass(num_layers=num_layers)
 
 
 
@@ -132,7 +170,7 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
     original_model_arg = args.model
     args.model = model_name
     try:
-        model = _build_unrolled_model(model_name, args).to(device).double()
+        model = _build_unrolled_model(model_name, args, ckpt_path=ckpt_path).to(device).double()
         ckpt = torch.load(ckpt_path, map_location=device)
         sd = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
         model.load_state_dict(sd, strict=False)
@@ -339,7 +377,7 @@ def run(dataset, args, paths):
             ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
             original_model_arg = args.model
             args.model = model_name
-            model = _build_unrolled_model(model_name, args).to(device).double()
+            model = _build_unrolled_model(model_name, args, ckpt_path=ckpt_path).to(device).double()
             ckpt = torch.load(ckpt_path, map_location=device)
             sd = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
             model.load_state_dict(sd, strict=False)

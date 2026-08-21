@@ -119,7 +119,7 @@ def run_unrolling(model_name, args, xt, y, x0, N_dim, M_dim, device, output_dir)
     original_model = args.model
     args.model = model_name
     try:
-        model = _build_unrolled_model(model_name, args).to(device).double()
+        model = _build_unrolled_model(model_name, args, ckpt_path=ckpt_path).to(device).double()
         ckpt = torch.load(ckpt_path, map_location=device)
         sd = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
         model.load_state_dict(sd, strict=False)
