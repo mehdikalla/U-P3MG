@@ -145,11 +145,11 @@ def train(model, train_loader, val_loader, args, paths):
             # CORRECTION MAJEURE: Ne passer les statiques que pour P3MG.
             # ISTA/PMMS doivent recevoir `None` sinon ils by-passent leurs poids appris !
             current_static = static_params
-            if model_name == 'ista':
-                # `args` transmis pour calibrer lambda sur les bornes du config (cf. init_params_from_static).
-                xp, _, _ = model(current_static, None, x0, y, args=args)
-            else:
-                xp, _, _ = model(current_static, None, x0, y)
+            # NOTE: ISTA_model.forward n'accepte pas de kwarg `args`; la calibration de
+            # lambda via init_params_from_static est déclenchée automatiquement en
+            # interne au premier passage (static is None), donc aucun paramètre
+            # supplémentaire n'est requis ici.
+            xp, _, _ = model(current_static, None, x0, y)
             
             loss = criterion(xp, xt)
             
