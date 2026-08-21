@@ -49,13 +49,8 @@ n_trials: 100          # Nombre de tirages d'hyperparametres a tester (calibrati
 algo_iters: 1000            # Nombre d'itérations pour l'algorithme itératif standard
 lmbd_min: 1.0e-9             # Borne inférieure pour la recherche de Lambda (P3MG, HQ)
 lmbd_max: 1.1              # Borne supérieure pour la recherche de Lambda (P3MG, HQ)
-lmbd_ist_min: 0.1            # Borne inférieure pour la recherche de Lambda ISTA (indépendante de P3MG)
-lmbd_ist_max: 5.0            # Borne supérieure pour la recherche de Lambda ISTA (indépendante de P3MG)
-<<<<<<< HEAD
-
-=======
-          
->>>>>>> f935bd4 (correct)
+lmbd_ist_min: 1.0e-9           # Borne inférieure pour la recherche de Lambda ISTA (indépendante de P3MG)
+lmbd_ist_max: 1.1            # Borne supérieure pour la recherche de Lambda ISTA (indépendante de P3MG)
 tau_min: 0.01              # Borne inférieure pour la recherche de Tau (P3MG, PD)
 tau_max: 2.0               # Borne supérieure pour la recherche de Tau (P3MG, PD)
 tau_pd_min: 1e-9           # Borne inférieure spécifique pour la recherche de Tau du modèle PD standalone (par défaut = tau_min)
