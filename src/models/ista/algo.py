@@ -62,11 +62,14 @@ class ISTA_algo(nn.Module):
         
         return Hmat, L
 
-    def iter_ISTA(self, x, y, Hmat, gamma, lmbd, project_simplex=True):
+    def iter_ISTA(self, x, y, Hmat, gamma, lmbd):
         """
         Une itération de l'algorithme ISTA.
         x_{k+1} = shrink(x_k - gamma * H^T (H x_k - y), gamma * lambda)
+<<<<<<< HEAD
 
+=======
+>>>>>>> f935bd4 (correct)
         """
         # 1. Calcul du gradient : H^T (H x - y)
         Hx = tc.matmul(x, Hmat.t()) # (Batch, M)
@@ -80,8 +83,11 @@ class ISTA_algo(nn.Module):
         threshold = gamma * lmbd
         x_new = soft_thresholding(z, threshold)
 
+<<<<<<< HEAD
         # 4. Projection sur le simplexe (contrainte physique du probleme DOSY)
         if project_simplex:
             x_new = proj_simplex_ista(x_new)
 
+=======
+>>>>>>> f935bd4 (correct)
         return x_new

@@ -42,10 +42,12 @@ mkdir -p logs
 # 1. Definition de l'espace de recherche
 # -----------------------------------------------------------------------------
 # Modeles algorithmiques (supportent 'unrolling' ET 'random_search')
-ALGO_MODELS=(p3mg ista hq pd pmms)
+ALGO_MODELS=(ista)
+
+#p3mg ista hq pd pmms
 
 # Modeles purement deep-learning (supportent uniquement 'unrolling')
-DL_MODELS=(fcae fctn fcun resu)
+#DL_MODELS=(fcae fctn fcun resu)
 
 
 STRATEGIES=(unrolling random_search)
@@ -86,16 +88,16 @@ CONFIG="config.yaml"
 declare -A NUM_LAYERS=(
     [p3mg]=30
     [pmms]=30
-    [ista]=55
+    [ista]=50
     [hq]=30
-    [pd]=100
+    [pd]=50
 )
 
 
 declare -A ALGO_ITERS=(
     [p3mg]=1000
     [pmms]=1000
-    [ista]=5000
+    [ista]=1000
     [hq]=1000
     [pd]=1000
 )
@@ -165,7 +167,7 @@ if [ "${STRATEGY}" = "random_search" ] && [ -n "${ALGO_ITERS[$MODEL]+x}" ]; then
     EXTRA_ARGS+=(--algo_iters "${ALGO_ITERS[$MODEL]}")
 fi
 if [ "$STRATEGY" = "unrolling" ] && [ "${MODEL}" = "ista" ]; then
-    EXTRA_ARGS+=(--epochs 150)
+    EXTRA_ARGS+=(--epochs 50)
 fi
 
 echo "--- Arguments specifiques : ${EXTRA_ARGS[*]:-(aucun)} ---"
