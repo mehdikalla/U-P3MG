@@ -3,44 +3,55 @@ import torch.nn as nn
 from src.models.hq.algo import HQ_algo
 
 class HQ_layer(nn.Module):
-    def __init__(self, in_features=100):
+    """
+    Couche HQ (half-quadratic) deroulee.
+
+   
+    """
+
+    def __init__(self, in_features=100, gamma_max: float = 2.0, gamma_margin: float = 0.99):
         super().__init__()
         self.hq_algo = HQ_algo()
-        
+
         self.fc_cvx = nn.Linear(in_features, 1, bias=True).double()
         self.fc_ncvx = nn.Linear(in_features, 1, bias=True).double()
-        
+
         nn.init.uniform_(self.fc_cvx.weight, a=0.01, b=0.02)
-        nn.init.constant_(self.fc_cvx.bias, 0.1) 
-        
+        nn.init.constant_(self.fc_cvx.bias, 0.1)
+
         nn.init.uniform_(self.fc_ncvx.weight, a=0.01, b=0.02)
         nn.init.constant_(self.fc_ncvx.bias, 0.1)
-        
-        self.gamma = nn.Parameter(tc.tensor([0.5], dtype=tc.float64), requires_grad=True)
+
+        self.gamma_max = gamma_max
+        self.gamma_margin = gamma_margin
+        # Parametre brut controlant gamma via une sigmoide bornee. Initialise
+        # a 0 => sigmoid(0) = 0.5, soit gamma = margin * gamma_max / 2 ~ 1.0
+        # (proche du pas de Newton pur, un choix stable et raisonnable).
+        self.gamma_raw = nn.Parameter(tc.tensor(0.0, dtype=tc.float64), requires_grad=True)
         self.softplus = nn.Softplus()
 
     def forward(self, static, x, y, gamma_override=None, lmbd_cvx_override=None, lmbd_ncvx_override=None):
         # Ht_y a été supprimé des variables statiques
         Hmat, Ht_H = static
-        
+
         Hx = tc.matmul(x, Hmat.t().contiguous())
         res = ((Hx - y) ** 2).contiguous()
-        
+
         if gamma_override is not None:
             gamma_val = tc.tensor(gamma_override, device=x.device, dtype=tc.float64)
         else:
-            gamma_val = self.softplus(self.gamma)
-            
+            gamma_val = self.gamma_margin * tc.sigmoid(self.gamma_raw) * self.gamma_max
+
         if lmbd_cvx_override is not None:
             lmbd_cvx = tc.tensor(lmbd_cvx_override, device=x.device, dtype=tc.float64)
         else:
             lmbd_cvx = self.softplus(self.fc_cvx(res))
-            
+
         if lmbd_ncvx_override is not None:
             lmbd_ncvx = tc.tensor(lmbd_ncvx_override, device=x.device, dtype=tc.float64)
         else:
             lmbd_ncvx = self.softplus(self.fc_ncvx(res))
-        
+
         x_new = self.hq_algo.iter_HQ(x, y, Hmat, Ht_H, gamma_val, lmbd_cvx, lmbd_ncvx)
         return x_new, (lmbd_cvx, lmbd_ncvx, gamma_val)
 
