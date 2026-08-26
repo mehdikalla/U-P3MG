@@ -3,13 +3,13 @@
 # ==============================================================================
 
 # --- 1. Paramètres généraux et stratégie ---
-model: "hq"               # Choix de l'architecture : 'p3mg', 'ista', 'hq', 'pmms', 'pd'
-strategy: "random_search"       # Stratégie de résolution : 'unrolling' ou 'random_search'
+model: "p3mg"               # Choix de l'architecture : 'p3mg', 'ista', 'hq', 'pmms', 'pd'
+strategy: "unrolling"       # Stratégie de résolution : 'unrolling' ou 'random_search'
 seed: 42                    # Graine aléatoire pour la reproductibilité
 
 # --- 2. Chemins et données ---
 dataset_dir: "./Dataset"
-data_folder: "data_1"       # Sous-dossier de génération à utiliser (ex: data_0, data_1, ...)
+data_folder: "data_0"       # Sous-dossier de génération à utiliser (ex: data_0, data_1, ...)
 train: "train.pt"
 
 val: "val.pt"
@@ -46,11 +46,11 @@ delta_ncvx: 0.01           # Paramètre de lissage pour la pénalité non-convex
 
 # --- 6. Paramètres algorithmiques (Random Search / Oracle) ---
 n_trials: 100          # Nombre de tirages d'hyperparametres a tester (calibration)
-algo_iters: 1000            # Nombre d'itérations pour l'algorithme itératif standard
+algo_iters: 10000            # Nombre d'itérations pour l'algorithme itératif standard
 lmbd_min: 1.0e-9             # Borne inférieure pour la recherche de Lambda (P3MG, HQ)
 lmbd_max: 1.1              # Borne supérieure pour la recherche de Lambda (P3MG, HQ)
-lmbd_ist_min: 1.0e-9           # Borne inférieure pour la recherche de Lambda ISTA (indépendante de P3MG)
-lmbd_ist_max: 1.1            # Borne supérieure pour la recherche de Lambda ISTA (indépendante de P3MG)
+lmbd_ist_min: 0.1          # Borne inférieure pour la recherche de Lambda ISTA (indépendante de P3MG)
+lmbd_ist_max: 5           # Borne supérieure pour la recherche de Lambda ISTA (indépendante de P3MG)
 tau_min: 0.01              # Borne inférieure pour la recherche de Tau (P3MG, PD)
 tau_max: 2.0               # Borne supérieure pour la recherche de Tau (P3MG, PD)
 tau_pd_min: 1e-9           # Borne inférieure spécifique pour la recherche de Tau du modèle PD standalone (par défaut = tau_min)

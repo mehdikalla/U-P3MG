@@ -7,20 +7,13 @@ S = nn.Softplus()
 # PD Standalone model layers
 class PD_layer(nn.Module):
     """
-    Couche Primal-Dual autonome (cf. src/models/p3mg/primal_dual/net.py) :
-    lambda_reg est appris par couche ; tau (coefficient de relaxation) est
-    egalement appris par couche, mais borne dans l'intervalle de stabilite
-    (0, tau_margin * 2.0) du schema de Chambolle-Pock (cf. Chambolle-Pock,
-    la sur/sous-relaxation converge pour tau dans (0, 2)).
+    Couche Primal-Dual autonome (
     """
 
     def __init__(self, tau_margin: float = 0.99):
         super().__init__()
         self.pd_algo = PD_Standalone_algo()
         self.tau_margin = tau_margin
-        # Parametre brut controlant tau via une sigmoide bornee. Initialise
-        # a 0 => sigmoid(0) = 0.5 => tau = tau_margin * 1.0, proche du
-        # schema de Chambolle-Pock standard (tau = 1, sans relaxation).
         self.tau_raw = nn.Parameter(tc.tensor(0.0).double())
 
     def forward(self, sub_static, w_new, y, tau_override, lambda_scalar):
@@ -34,12 +27,7 @@ class PD_layer(nn.Module):
 
 class PD_model(nn.Module):
     """
-    Modele Primal-Dual autonome deroule (cf. PD_model dans
-    src/models/p3mg/primal_dual/net.py). lambda_params et tau_params sont
-    desormais tous deux appris, un couple par couche : lambda_params
-    pondere la regularisation quadratique du probleme resolu, tau_params
-    est le coefficient de relaxation, borne de facon inconditionnelle
-    dans la plage de stabilite du schema de Chambolle-Pock (cf. PD_layer).
+    Modele Primal-Dual autonome deroule 
     """
 
     def __init__(self, num_layers, tau_fixed: float = 1.0):

@@ -5,7 +5,7 @@ from src.models.p3mg.primal_dual.algo import PrimalDual_algo
 from src.models.p3mg.primal_dual.net import PD_model 
 
 class P3MG_algo(nn.Module):
-    def __init__(self, num_pd_layers: int = 3):
+    def __init__(self, num_pd_layers: int = 10):
         super().__init__()
         self.pd_algo = PrimalDual_algo()
         self.num_pd_layers = num_pd_layers

@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================
-# Configuration SLURM - Test Modèle HQ
+# Configuration SLURM - Test Modèle 
 # =============================================================
 #SBATCH --job-name=Test
 #SBATCH --partition=opis

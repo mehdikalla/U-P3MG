@@ -6,16 +6,16 @@
 # algo_iters=1000), en job array sur {strategie x dataset}.
 #
 # Usage:
-#   sbatch scripts/run_pmms.slurm
+#   sbatch scripts/run_algo.slurm
 # =============================================================================
-#SBATCH --job-name=UP3MG_PMMS
+#SBATCH --job-name=UP3MG_algo
 #SBATCH --partition=opis
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
 #SBATCH --time=08:00:00
-#SBATCH --output=logs/slurm-pmms-%A_%a.out
-#SBATCH --error=logs/slurm-pmms-%A_%a.err
+#SBATCH --output=logs/slurm-algo-%A_%a.out
+#SBATCH --error=logs/slurm-algo-%A_%a.err
 #SBATCH --array=0-5
 
 set -euo pipefail
@@ -33,7 +33,7 @@ mkdir -p logs
 # -----------------------------------------------------------------------------
 # 1. Definition de l'espace de recherche (PMMS uniquement)
 # -----------------------------------------------------------------------------
-MODEL="pmms"
+MODEL="ista"
 STRATEGIES=(unrolling random_search)
 DATA_FOLDERS=(data_0 data_1 data_2)
 
@@ -41,8 +41,7 @@ MODE="full"
 CONFIG="config.yaml"
 
 # Hyperparametres specifiques a PMMS (cf. run_all.slurm)
-NUM_LAYERS=25
-ALGO_ITERS=1000
+NUM_LAYERS=50
 
 # -----------------------------------------------------------------------------
 # 2. Construction de la liste des combinaisons {strategie x dataset}

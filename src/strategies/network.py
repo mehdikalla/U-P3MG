@@ -8,6 +8,8 @@ import numpy as np
 
 from src.utils.functions import snr_loss, tsnr_loss 
 from src.utils.plotting_manager import PlottingManager
+from src.models.ista.algo import ISTA_algo
+
 
 def get_criterion(name):
     if name == 'MSE':
@@ -49,7 +51,7 @@ def init_static_params(args, N_dim, M_dim, device):
     
     if model_name == 'p3mg':
         from src.models.p3mg.algo import P3MG_algo
-        algo_tmp = P3MG_algo(num_pd_layers=getattr(args, 'num_pd_layers', 5)).to(device).double()
+        algo_tmp = P3MG_algo(num_pd_layers=getattr(args, 'num_pd_layers', 10)).to(device).double()
         params = [args.alpha, args.beta, args.eta]
         static = algo_tmp.init_P3MG(params, dx, dy)
         
@@ -67,6 +69,11 @@ def init_static_params(args, N_dim, M_dim, device):
         eta = getattr(args, 'eta', 1e-2)
         static, _ = algo_tmp.init_PMMS(dx, dy, sigma=sigma, beta=beta, eta=eta)
 
+    elif model_name == 'ista':
+        # --- Cas ISTA ---
+        algo_tmp = ISTA_algo().to(device).double()
+        static = algo_tmp.init_ISTA(dx,dy)
+     
     else:
 
         algo_tmp = None
@@ -100,6 +107,7 @@ def train(model, train_loader, val_loader, args, paths):
     
     if has_parameters:
         optimizer = optim.Adam(param_groups, lr=args.lr)
+        #scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10, min_lr=1e-7)
     else:
         optimizer = None
         print("[INFO] Aucun paramètre apprenable détecté. Évaluation sans rétropropagation.")
@@ -109,6 +117,9 @@ def train(model, train_loader, val_loader, args, paths):
     N_dim, M_dim = xt_s.shape[1], y_s.shape[1]
     
     static_params, algo_tmp = init_static_params(args, N_dim, M_dim, device)
+    # Ancrage physique des poids
+    if hasattr(model, 'init_params_from_static'):
+        model.init_params_from_static(static_params)
 
     plot_manager = PlottingManager(
         model=model,
@@ -141,6 +152,7 @@ def train(model, train_loader, val_loader, args, paths):
 
             if has_parameters:
                 optimizer.zero_grad()
+                
             
             # CORRECTION MAJEURE: Ne passer les statiques que pour P3MG.
             # ISTA/PMMS doivent recevoir `None` sinon ils by-passent leurs poids appris !
@@ -185,6 +197,8 @@ def train(model, train_loader, val_loader, args, paths):
         
         ep_val_loss = val_loss / len(val_loader)
         val_losses.append(ep_val_loss)
+        #if has_parameters:
+            #scheduler.step(ep_val_loss)
 
         print(f"Ep {ep+1}/{args.epochs} | Tr: {ep_tr_loss:.4e} | Val: {ep_val_loss:.4e} | T: {time.time()-t0:.1f}s")
 
@@ -198,7 +212,8 @@ def train(model, train_loader, val_loader, args, paths):
             }
             if has_parameters:
                 save_dict['optimizer_state_dict'] = optimizer.state_dict()
-                
+                #save_dict['scheduler_state_dict'] = scheduler.state_dict()
+
             torch.save(save_dict, ckpt_path)
             
             if ep_val_loss < best_vloss:
