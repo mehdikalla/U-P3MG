@@ -5,12 +5,14 @@ from src.models.p3mg.primal_dual.algo import PrimalDual_algo
 from src.models.p3mg.primal_dual.net import PD_model 
 
 class P3MG_algo(nn.Module):
-    def __init__(self, num_pd_layers: int = 10):
+    def __init__(self, num_pd_layers: int = 3):
         super().__init__()
         self.pd_algo = PrimalDual_algo()
         self.num_pd_layers = num_pd_layers
         
-    # init_P3MG
+    # -------------------------
+    # init_P3MG 
+    # -------------------------
     def init_P3MG(self, static_input, x0, y):
         P, N, M = x0.size(0), x0.size(1), y.size(1)
         alpha, beta, eta = static_input
@@ -34,8 +36,10 @@ class P3MG_algo(nn.Module):
 
         return Hmat, alpha, beta, eta, gamma, Cg2, Vprec, Sprec_2, Hnorm2
 
+    # --------------------------------
     # iter_P3MG_base (Correction pour Tau)
-    def iter_P3MG_base(self, static, x, y, lmbd, tau_params):
+    # --------------------------------
+    def iter_P3MG_base(self, static, x, y, lmbd, tau_params): # <-- AJOUT DE tau_params
         """
         Première itération P3MG.
         """
@@ -120,8 +124,10 @@ class P3MG_algo(nn.Module):
         dynamic = [dx_new, Pgradx]
         return x_new, dynamic
 
-    # iter_P3MG
-    def iter_P3MG(self, static, dynamic, x, y, lmbd, tau_params):
+    # -----------------------------
+    # iter_P3MG 
+    # -----------------------------
+    def iter_P3MG(self, static, dynamic, x, y, lmbd, tau_params): # <-- AJOUT DE tau_params
         """
         Itérations P3MG génériques (k>1).
         """

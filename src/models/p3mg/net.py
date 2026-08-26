@@ -7,7 +7,9 @@ S = nn.Softplus()
 def S2(x):
     return 2*tc.sigmoid(x)
 
+# --------------------
 # P3MG model layers
+# --------------------
 class layer_0(nn.Module):
     def __init__(self, num_pd_layers: int, mlp_hidden: list = None):
         super().__init__()
@@ -72,7 +74,9 @@ class layer_k(nn.Module):
         return x_new, dynamic_new, lmbd
 
 
+# --------------------
 # P3MG model container
+# --------------------
 class P3MG_model(nn.Module):
     def __init__(self, num_layers, num_pd_layers, mlp_hidden: list = None):
         super().__init__()
