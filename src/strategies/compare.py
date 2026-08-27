@@ -497,7 +497,7 @@ def _plot_comparison(xt_np, results, idx, criterion_name, path_plots, data_folde
 
     for key, (xh_np, loss) in results.items():
         fig, ax = plt.subplots(figsize=(10, 4))
-        ax.plot(xt_np, label='Signal vrai', color='black', linewidth=2)
+        ax.plot(xt_np, label='True signal', color='black', linewidth=2)
         ax.plot(xh_np, '--', label=f"{key} ({criterion_name}={loss:.3e})", color='tab:orange')
         ax.set_title(f"{key} - Signal test #{idx} ({data_folder})")
         ax.legend(fontsize=8)

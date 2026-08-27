@@ -98,12 +98,12 @@ def verify_and_plot_dataset(dataset_dir):
         
         plt.subplot(1, 2, 1)
         plt.plot(data['xtrue'][idx].numpy(), color='blue', linewidth=1.5)
-        plt.title(f"Signal Vrai (X_true) - Index {idx}")
+        plt.title(f"True signal (X_true) - Index {idx}")
         plt.grid(True, linestyle='--', alpha=0.7)
         
         plt.subplot(1, 2, 2)
         plt.plot(data['yblur'][idx].numpy(), color='red', linewidth=1.5)
-        plt.title(f"Observation bruitée (Y) - Index {idx}")
+        plt.title(f"Observation (y) - Index {idx}")
         plt.grid(True, linestyle='--', alpha=0.7)
         
         plt.tight_layout()

@@ -97,7 +97,7 @@ def _get_test_dataset(args):
 
 def _save_signal_plot(xt_np, xh_np, title, metrics, out_path):
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(xt_np, label='Signal vrai', color='black', linewidth=2)
+    ax.plot(xt_np, label='True signal', color='black', linewidth=2)
     ax.plot(xh_np, '--', label='Reconstruction', color='tab:orange')
     metric_str = " | ".join(f"{k}={v:.4e}" for k, v in metrics.items())
     ax.set_title(f"{title}\n{metric_str}")
@@ -240,7 +240,7 @@ def main():
     # Sauvegarde du signal vrai seul, pour reference.
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(xt.squeeze(0).cpu().numpy(), color='black', linewidth=2)
-    ax.set_title(f"Signal vrai - index {idx} ({args.data_folder})")
+    ax.set_title(f"True signal - index {idx} ({args.data_folder})")
     ax.grid(True)
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, "signal_reference.png"))

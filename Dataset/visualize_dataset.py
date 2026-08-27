@@ -71,8 +71,8 @@ class DatasetVisualizer:
         (self.line_true,) = self.ax_true.plot([], [], color="tab:blue", linewidth=1.5)
         (self.line_obs,) = self.ax_obs.plot([], [], color="tab:red", linewidth=1.5)
 
-        self.ax_true.set_title("Signal vrai (xtrue)")
-        self.ax_obs.set_title("Observation bruitée (yblur)")
+        self.ax_true.set_title("True signal (xtrue)")
+        self.ax_obs.set_title("Observation (yblur)")
         self.ax_true.grid(True, linestyle="--", alpha=0.6)
         self.ax_obs.grid(True, linestyle="--", alpha=0.6)
 
@@ -113,8 +113,8 @@ class DatasetVisualizer:
         self.ax_obs.relim()
         self.ax_obs.autoscale_view()
 
-        self.ax_true.set_title(f"Signal vrai (xtrue) - Index {idx}")
-        self.ax_obs.set_title(f"Observation bruitée (yblur) - Index {idx}")
+        self.ax_true.set_title(f"True signal (xtrue) - Index {idx}")
+        self.ax_obs.set_title(f"Observation (yblur) - Index {idx}")
 
         self.fig.suptitle(
             f"Dataset : {self.dataset_path} "
