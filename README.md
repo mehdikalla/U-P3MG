@@ -83,9 +83,9 @@ scripts/generate_dataset_suite.sh
 
 To visualize a dataset, you can run : 
 
-'''bash
+```bash
 python3 Dataset/visualize_dataset.py --path $PATH OF THE DATASET$
-'''
+```
 ---
 
 ### **D. Training and Evaluation**
