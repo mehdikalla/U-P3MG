@@ -394,8 +394,8 @@ def run(dataset, args, paths):
             current_static = static_params if model_name in ('p3mg', 'pmms') else None
             with torch.no_grad():
                 xp, _, _ = model(current_static, None, x0, y)
-            loss = _compute_all_metrics(xp, xt)[plot_criterion]
-            signal_results[f"{model_name}_unrolling"] = (xp.squeeze(0).cpu().numpy(), loss)
+            metrics = _compute_all_metrics(xp, xt)
+            signal_results[f"{model_name}_unrolling"] = (xp.squeeze(0).cpu().numpy(), metrics)
             args.model = original_model_arg
         except Exception as e:
             print(f"[COMPARE][unrolling][{model_name}] Erreur lors du rendu qualitatif : {e}")
@@ -433,8 +433,8 @@ def run(dataset, args, paths):
                     model_name, algo, y, x0, static,
                     hp=best_params, max_iter=args.algo_iters
                 )
-            loss = _compute_all_metrics(xh, xt)[plot_criterion]
-            signal_results[f"{model_name}_random_search"] = (xh.squeeze(0).cpu().numpy(), loss)
+            metrics = _compute_all_metrics(xh, xt)
+            signal_results[f"{model_name}_random_search"] = (xh.squeeze(0).cpu().numpy(), metrics)
             args.model = original_model_arg
         except Exception as e:
             print(f"[COMPARE][random_search][{model_name}] Erreur lors du rendu qualitatif : {e}")
@@ -469,8 +469,8 @@ def run(dataset, args, paths):
 
             with torch.no_grad():
                 xp, _, _ = model(None, None, x0, y)
-            loss = _compute_all_metrics(xp, xt)[plot_criterion]
-            signal_results[f"{model_name}_deep_learning"] = (xp.squeeze(0).cpu().numpy(), loss)
+            metrics = _compute_all_metrics(xp, xt)
+            signal_results[f"{model_name}_deep_learning"] = (xp.squeeze(0).cpu().numpy(), metrics)
         except Exception as e:
             print(f"[COMPARE][deep_learning][{model_name}] Erreur lors du rendu qualitatif : {e}")
 
@@ -481,6 +481,7 @@ def run(dataset, args, paths):
     xt_plot = dataset[plot_idx][0].double().cpu().numpy()
     if signal_results:
         _plot_comparison(xt_plot, signal_results, plot_idx, plot_criterion, path_plots, data_folder)
+
     _save_report(summary_rows, path_logs, data_folder)
 
 
@@ -495,11 +496,15 @@ def _plot_comparison(xt_np, results, idx, criterion_name, path_plots, data_folde
     signals_dir = os.path.join(path_plots, 'signals')
     os.makedirs(signals_dir, exist_ok=True)
 
-    for key, (xh_np, loss) in results.items():
-        fig, ax = plt.subplots(figsize=(10, 4))
+    for key, (xh_np, metrics) in results.items():
+        mse = metrics.get('MSE')
+        snr = metrics.get('SNR')
+        fig, ax = plt.subplots(figsize=(7, 5))
         ax.plot(xt_np, label='True signal', color='black', linewidth=2)
-        ax.plot(xh_np, '--', label=f"{key} ({criterion_name}={loss:.3e})", color='tab:orange')
-        ax.set_title(f"{key} - Signal test #{idx} ({data_folder})")
+        ax.plot(xh_np, '--', label=f"Reconstruction ({key})", color='tab:orange')
+        ax.set_title(f"{key} - Test signal #{idx} ({data_folder})\nMSE={mse:.3e} | SNR={snr:.3e}")
+        ax.set_xlabel('Sample')
+        ax.set_ylabel('Amplitude')
         ax.legend(fontsize=8)
         ax.grid(True)
         plt.tight_layout()
@@ -508,15 +513,16 @@ def _plot_comparison(xt_np, results, idx, criterion_name, path_plots, data_folde
         plt.close(fig)
         print(f"[COMPARE] Graphique sauvegarde : {out_path}")
 
-    # Graphe recapitulatif (histogramme des pertes par methode).
+    # Graphe recapitulatif (histogramme des pertes par methode, sur la metrique choisie).
     fig, ax_loss = plt.subplots(figsize=(12, 5))
     names = list(results.keys())
-    losses = [results[k][1] for k in names]
+    losses = [results[k][1][criterion_name] for k in names]
     ax_loss.bar(range(len(names)), losses, color='steelblue')
     ax_loss.set_xticks(range(len(names)))
     ax_loss.set_xticklabels(names, rotation=45, ha='right', fontsize=8)
+    ax_loss.set_xlabel('Model / strategy')
     ax_loss.set_ylabel(criterion_name)
-    ax_loss.set_title(f"{criterion_name} par modele/strategie - Signal test #{idx} ({data_folder})")
+    ax_loss.set_title(f"{criterion_name} by model/strategy - Test signal #{idx} ({data_folder})")
     ax_loss.grid(True, axis='y')
     plt.tight_layout()
     summary_path = os.path.join(path_plots, f'compare_summary_{idx}.png')
