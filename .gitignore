@@ -19,3 +19,4 @@ __pycache__/*
 /Dataset/data_1
 /Dataset/data_2
 .vscode
+old_runs/

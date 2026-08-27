@@ -21,8 +21,8 @@
 #SBATCH --time=08:00:00
 #SBATCH --output=logs/slurm-%A_%a.out
 #SBATCH --error=logs/slurm-%A_%a.err
-#SBATCH --array=0-999%16
-# ^ Borne superieure large (recalculee/validee au runtime), %16 = 16 taches
+#SBATCH --array=0-999%4
+# ^ Borne superieure large (recalculee/validee au runtime), %4 = 4 taches
 #   simultanees au maximum (a ajuster selon les GPUs disponibles sur la
 #   partition).
 
