@@ -102,9 +102,24 @@ def train(model, train_loader, val_loader, args, paths):
     
     if has_parameters:
         optimizer = optim.Adam(param_groups, lr=args.lr)
+        # Réduit le LR si la loss de validation stagne, pour limiter les
+        # pas d'optimisation trop agressifs qui provoquent des sursauts.
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode='min', factor=0.5, patience=5
+        )
     else:
         optimizer = None
+        scheduler = None
         print("[INFO] Aucun paramètre apprenable détecté. Évaluation sans rétropropagation.")
+
+    # Garde-fou anti-sursaut : sauvegarde du dernier état stable des poids
+    # et de l'optimiseur, avec restauration automatique si la loss d'une
+    # époque explose au-delà d'un facteur toléré par rapport à la moyenne
+    # glissante récente.
+    grad_clip_norm = getattr(args, 'grad_clip_norm', 1.0)
+    loss_spike_factor = getattr(args, 'loss_spike_factor', 2.0)
+    stable_state = None
+    stable_optim_state = None
 
     sample_batch = next(iter(train_loader))
     xt_s, y_s, _ = _unpack_batch(sample_batch, device)
@@ -156,6 +171,9 @@ def train(model, train_loader, val_loader, args, paths):
                     print("ALERT: NaN détecté avant backward ! Vérifiez vos lambdas.")
                     return # Arrêtez l'entraînement
                 loss.backward()
+                # Clip du gradient : évite qu'un batch difficile ne produise
+                # un pas d'optimisation démesuré responsable d'un sursaut de loss.
+                torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip_norm)
                 optimizer.step()
                 
             running_loss += loss.item()
@@ -177,7 +195,39 @@ def train(model, train_loader, val_loader, args, paths):
                 val_loss += criterion(xp, xt).item()
         
         ep_val_loss = val_loss / len(val_loader)
+
+        # Détection et rejet des sursauts de loss (spikes) : si la loss de
+        # validation dépasse d'un facteur `loss_spike_factor` la moyenne
+        # glissante des dernières époques stables, on rejette la mise à jour
+        # en restaurant le dernier état stable connu, plutôt que de laisser
+        # le modèle diverger.
+        window = val_losses[-5:] if len(val_losses) >= 1 else []
+        recent_mean = float(np.mean(window)) if window else None
+        is_spike = (
+            recent_mean is not None
+            and recent_mean > 0
+            and ep_val_loss > loss_spike_factor * recent_mean
+        )
+
+        if is_spike and stable_state is not None:
+            print(f"[SPIKE] Ep {ep+1}: Val {ep_val_loss:.4e} >> {loss_spike_factor}x moyenne récente "
+                  f"({recent_mean:.4e}). Restauration de l'état stable et réduction du LR.")
+            model.load_state_dict(stable_state)
+            if has_parameters and stable_optim_state is not None:
+                optimizer.load_state_dict(stable_optim_state)
+                for g in optimizer.param_groups:
+                    g['lr'] *= 0.5
+            # On n'enregistre pas cette époque divergente dans l'historique
+            tr_losses.pop()
+            continue
+
         val_losses.append(ep_val_loss)
+
+        # Mise à jour de l'état stable de référence
+        stable_state = {k: v.clone() for k, v in model.state_dict().items()}
+        if has_parameters:
+            stable_optim_state = optimizer.state_dict()
+            scheduler.step(ep_val_loss)
 
         print(f"Ep {ep+1}/{args.epochs} | Tr: {ep_tr_loss:.4e} | Val: {ep_val_loss:.4e} | T: {time.time()-t0:.1f}s")
 

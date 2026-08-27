@@ -12,10 +12,17 @@ class ISTA_layer(nn.Module):
         self.lmbd_param = nn.Parameter(tc.tensor(initial_lmbd))
         self.softplus = nn.Softplus()
 
-    def forward(self, Hmat, x, y):
+    def forward(self, Hmat, x, y, L=None):
         gamma = self.softplus(self.gamma_param)
         lmbd = self.softplus(self.lmbd_param)
-        
+
+        # Garde-fou de stabilité : ISTA converge uniquement si gamma <= 1/L
+        # (L = constante de Lipschitz du gradient). Sans cette contrainte,
+        # un pas d'Adam trop agressif peut pousser gamma au-dela de 1/L et
+        # faire diverger la couche, provoquant un sursaut brutal de la loss.
+        if L is not None:
+            gamma = tc.clamp(gamma, max=0.99 / (L + 1e-12))
+
         x_new = self.ista_algo.iter_ISTA(x, y, Hmat, gamma, lmbd)
         return x_new, lmbd
 
@@ -71,7 +78,7 @@ class ISTA_model(nn.Module):
         learned_lambdas = []
 
         for layer in self.Layers:
-            x, lmbd_val = layer(Hmat, x, y)
+            x, lmbd_val = layer(Hmat, x, y, L=L)
             learned_lambdas.append(lmbd_val)
         
         # Retour compatible avec la signature P3MG (x, dynamic, list_lambdas)
