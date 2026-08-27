@@ -2,6 +2,8 @@
 # Fichier : scripts/ablation_mlp.sh
 # Ablation c) : architecture (nombre de couches) du MLP interne (lambda) du P3MG.
 # num_layers et num_pd_layers restent fixes ; seule la profondeur du MLP varie.
+# Entrainement realise exclusivement sur le dataset 'data_0'. Runs executes
+# sequentiellement sur un unique GPU ($GPU_ID) : au plus 1 GPU utilise a la fois.
 #
 # Structure de sortie (une iteration du script = un "run_set") :
 #   runs/ablation/p3mg/ablation_mlp/run_set_<i>/   -> tous les runs P3MG de cette iteration
@@ -48,6 +50,7 @@ for MLP_HIDDEN in "${MLP_CONFIGS[@]}"; do
     ./scripts/run.sh --config "$CONFIG" --gpu $GPU_ID --full \
         --model p3mg \
         --strategy unrolling \
+        --data_folder data_0 \
         --run_group ablation \
         --run_tag "$RUN_TAG" \
         --num_layers $FIXED_NUM_LAYERS \

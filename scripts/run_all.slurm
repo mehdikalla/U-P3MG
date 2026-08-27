@@ -21,10 +21,12 @@
 #SBATCH --time=08:00:00
 #SBATCH --output=logs/slurm-%A_%a.out
 #SBATCH --error=logs/slurm-%A_%a.err
-#SBATCH --array=0-999%4
-# ^ Borne superieure large (recalculee/validee au runtime), %4 = 4 taches
-#   simultanees au maximum (a ajuster selon les GPUs disponibles sur la
-#   partition).
+#SBATCH --array=0-29%4
+# ^ Borne exacte = (nb modeles algo * nb strategies * nb datasets) - 1, soit
+#   5 modeles * 2 strategies * 3 datasets = 30 taches (indices 0-29). A
+#   recalculer si ALGO_MODELS/DL_MODELS/STRATEGIES/DATA_FOLDERS changent
+#   ci-dessous (voir section 1). %4 = 4 taches simultanees au maximum
+#   (a ajuster selon les GPUs disponibles sur la partition).
 
 set -euo pipefail
 module purge
@@ -122,13 +124,30 @@ for data in "${DATA_FOLDERS[@]}"; do
             COMBOS+=("${model}|${strat}|${data}")
         done
     done
-    for model in "${DL_MODELS[@]}"; do
-        COMBOS+=("${model}|unrolling|${data}")
-    done
+    # DL_MODELS est desactive (voir section 1 ci-dessus). On ne parcourt le
+    # tableau que s'il est effectivement declare, afin d'eviter une erreur
+    # de variable non liee sous "set -u" lorsqu'il est commente.
+    if declare -p DL_MODELS &>/dev/null; then
+        for model in "${DL_MODELS[@]}"; do
+            COMBOS+=("${model}|unrolling|${data}")
+        done
+    fi
 done
 
 TOTAL=${#COMBOS[@]}
 echo "--- Nombre total de combinaisons definies : ${TOTAL} ---"
+
+# -----------------------------------------------------------------------------
+# Avertissement si la borne SBATCH --array (statique, definie en en-tete) ne
+# correspond plus au nombre reel de combinaisons calculees dynamiquement
+# ci-dessus. Un simple avertissement suffit : le garde-fou de la section 3
+# (TASK_ID >= TOTAL) empeche toute execution hors bornes.
+# -----------------------------------------------------------------------------
+if [ -n "${SLURM_ARRAY_TASK_COUNT:-}" ] && [ "${SLURM_ARRAY_TASK_COUNT}" -ne "${TOTAL}" ]; then
+    echo "[AVERTISSEMENT] SLURM_ARRAY_TASK_COUNT (${SLURM_ARRAY_TASK_COUNT}) != TOTAL calcule (${TOTAL})." \
+         "Mettez a jour '#SBATCH --array' en tete de ce script (ou relancez avec" \
+         "'sbatch --array=0-$((TOTAL - 1))%4 scripts/run_all.slurm')." >&2
+fi
 
 # -----------------------------------------------------------------------------
 # 3. Selection de la combinaison correspondant a cette tache du job array

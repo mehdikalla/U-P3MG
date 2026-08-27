@@ -5,6 +5,13 @@
 #   a) extern : num_layers  in {5,10,...,60} | num_pd_layers=10
 #   b) intern : num_pd_layers in {5,10,...,60} | num_layers=30
 #   c) mlp    : architectures du MLP interne | num_layers=30, num_pd_layers=10
+#
+# Contraintes imposees :
+#   - Entrainement realise exclusivement sur le dataset 'data_0'
+#     (--data_folder data_0 explicite sur chaque appel de run.sh).
+#   - Au plus 4 GPU utilises simultanement : le job array est throttle
+#     via le suffixe '%4' de --array, limitant a 4 le nombre de taches
+#     (donc de GPU, --gres=gpu:1 par tache) executees en parallele.
 # =============================================================
 #SBATCH --job-name=Ablation_P3MG
 #SBATCH --partition=opis
@@ -14,7 +21,7 @@
 #SBATCH --time=20:00:00
 #SBATCH --output=logs/ablation-%A_%a.out
 #SBATCH --error=logs/ablation-%A_%a.err
-#SBATCH --array=0-28
+#SBATCH --array=0-28%4
 
 # -------------------------------------------------------------
 # 1. Environnement et Modules
@@ -105,6 +112,7 @@ fi
 ./scripts/run.sh --config "$CONFIG" --gpu 0 --mode full \
     --model p3mg \
     --strategy unrolling \
+    --data_folder data_0 \
     --run_group ablation \
     --run_tag "$RUN_TAG" \
     --num_layers "$NUM_LAYERS" \

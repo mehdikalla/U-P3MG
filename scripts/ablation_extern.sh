@@ -1,6 +1,8 @@
 #!/bin/bash
 # Fichier : scripts/ablation_extern.sh
 # Ablation a) : num_pd_layers (intern) fixe, num_layers (extern) varie.
+# Entrainement realise exclusivement sur le dataset 'data_0'. Runs executes
+# sequentiellement sur un unique GPU ($GPU_ID) : au plus 1 GPU utilise a la fois.
 #
 # Structure de sortie (une iteration du script = un "run_set") :
 #   runs/ablation/p3mg/ablation_extern/run_set_<i>/   -> tous les runs P3MG de cette iteration
@@ -37,6 +39,7 @@ for NUM_LAYERS in $(seq 5 5 60); do
     ./scripts/run.sh --config "$CONFIG" --gpu $GPU_ID --full \
         --model p3mg \
         --strategy unrolling \
+        --data_folder data_0 \
         --run_group ablation \
         --run_tag "$RUN_TAG" \
         --num_layers $NUM_LAYERS \
