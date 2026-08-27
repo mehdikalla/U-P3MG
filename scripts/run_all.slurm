@@ -44,12 +44,12 @@ mkdir -p logs
 # 1. Definition de l'espace de recherche
 # -----------------------------------------------------------------------------
 # Modeles algorithmiques (supportent 'unrolling' ET 'random_search')
-ALGO_MODELS=(p3mg pmms ista hq pd)
+#ALGO_MODELS=(p3mg pmms ista hq pd)
 
 #p3mg pmms ista hq pd
 
 # Modeles purement deep-learning (supportent uniquement 'unrolling')
-#DL_MODELS=(fcae fctn fcun resu)
+DL_MODELS=(fcae fctn fcun resu)
 
 
 STRATEGIES=(unrolling random_search)
@@ -186,7 +186,7 @@ if [ "${STRATEGY}" = "random_search" ] && [ -n "${ALGO_ITERS[$MODEL]+x}" ]; then
     EXTRA_ARGS+=(--algo_iters "${ALGO_ITERS[$MODEL]}")
 fi
 if [ "$STRATEGY" = "unrolling" ] && [ "${MODEL}" = "ista" ]; then
-    EXTRA_ARGS+=(--epochs 150)
+    EXTRA_ARGS+=(--epochs 50)
 fi
 
 echo "--- Arguments specifiques : ${EXTRA_ARGS[*]:-(aucun)} ---"

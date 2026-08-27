@@ -18,10 +18,10 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --time=08:00:00
+#SBATCH --time=16:00:00
 #SBATCH --output=logs/slurm-rs-%A_%a.out
 #SBATCH --error=logs/slurm-rs-%A_%a.err
-#SBATCH --array=0-14
+#SBATCH --array=0-9%3
 
 set -euo pipefail
 module purge
@@ -39,7 +39,7 @@ mkdir -p logs
 # -----------------------------------------------------------------------------
 # 1. Definition de l'espace de recherche (modeles x datasets)
 # -----------------------------------------------------------------------------
-MODELS=(p3mg pd pmms ista hq)
+MODELS=(p3mg)
 DATA_FOLDERS=(data_0 data_1 data_2)
 
 STRATEGY="random_search"
