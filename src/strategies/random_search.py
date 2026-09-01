@@ -8,6 +8,7 @@ import numpy as np
 
 from src.utils.functions import snr_loss, tsnr_loss
 from src.utils.plotting_manager import PlottingManager
+from src.utils.memory_profiler import MemoryProfiler
 
 # tau fixe pour le modele PD standalone : coefficient de relaxation du
 # schema de Chambolle-Pock (cf. PD_Standalone_algo.iter_PD), sans effet a convergence.
@@ -168,6 +169,8 @@ def train(loader, args, paths):
     best_params = {}
     
     start = time.time()
+    mem_profiler = MemoryProfiler(path_logs, tag=f"train_{model_name}_random_search", device=device)
+    mem_profiler.__enter__()
     for i in range(args.n_trials):
         log_l_min, log_l_max = np.log10(float(lmbd_min)), np.log10(float(lmbd_max))
         log_list_min, log_list_max = np.log10(float(lmbd_ist_min)), np.log10(float(lmbd_ist_max))
@@ -216,6 +219,8 @@ def train(loader, args, paths):
             
             hp_str = " ".join([f"{k}={v:.4e}" if 'lmbd' in k or 'nu' in k or 'lambda' in k else f"{k}={v:.4f}" for k, v in hp.items()])
             print(f"   [{i+1}/{args.n_trials}] New Best! {hp_str} | Loss={best_loss:.4e}")
+
+    mem_profiler.__exit__(None, None, None)
 
     print(f"[RESULT] Best Params: {best_params}")
     with open(os.path.join(path_checkpoints, 'best_params.json'), 'w') as f:

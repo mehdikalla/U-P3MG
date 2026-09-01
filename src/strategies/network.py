@@ -8,6 +8,7 @@ import numpy as np
 
 from src.utils.functions import snr_loss, tsnr_loss 
 from src.utils.plotting_manager import PlottingManager
+from src.utils.memory_profiler import MemoryProfiler
 
 def get_criterion(name):
     if name == 'MSE':
@@ -144,6 +145,9 @@ def train(model, train_loader, val_loader, args, paths):
     best_vloss = float('inf')
     start_time = time.time()
 
+    mem_profiler = MemoryProfiler(path_logs, tag=f"train_{model_name}_unrolling", device=device)
+    mem_profiler.__enter__()
+
     for ep in range(args.epochs):
         t0 = time.time()
         
@@ -169,6 +173,7 @@ def train(model, train_loader, val_loader, args, paths):
             if has_parameters and loss.requires_grad:
                 if torch.isnan(loss).any():
                     print("ALERT: NaN détecté avant backward ! Vérifiez vos lambdas.")
+                    mem_profiler.__exit__(None, None, None)
                     return # Arrêtez l'entraînement
                 loss.backward()
                 # Clip du gradient : évite qu'un batch difficile ne produise
@@ -254,6 +259,8 @@ def train(model, train_loader, val_loader, args, paths):
                 plot_manager.plot_learned_params_evolution(ckpt_path)
             except Exception:
                 pass 
+
+    mem_profiler.__exit__(None, None, None)
 
     print(f"--- [TRAIN] Terminé en {(time.time()-start_time)/60:.2f} min ---")
 

@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 from src.models import NET_ARCHITECTURES, FULLY_LEARNED_MODELS
 from src.strategies.network import init_static_params
 from src.strategies.random_search import get_algo_and_static, run_iterative_algo
+from src.utils.torch_profiler_utils import TorchOpProfiler
 
 # Modeles algorithmiques disponibles pour chaque strategie.
 UNROLLING_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms']
@@ -166,17 +167,23 @@ def _compute_all_metrics(xh, xt):
     return {'MSE': mse, 'SNR': snr}
 
 
-def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
+def _evaluate_unrolling_on_testset(model_name, args, dataset, device, path_logs=None):
     """Evalue un modele 'unrolling' sur l'integralite du jeu de test.
 
     Retourne (metrics_per_sample, checkpoint_path) ou (None, None) si aucun
     checkpoint n'est disponible.
         metrics_per_sample : dict {nom_metrique: liste des valeurs par echantillon}
+
+    L'ensemble de la boucle d'inference est enveloppee par un
+    `TorchOpProfiler` (base sur torch.profiler, cf.
+    https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html)
+    afin de mesurer le temps et la memoire CPU/GPU consommes operateur par
+    operateur, en plus du temps total mesure par time.perf_counter().
     """
     data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
     if ckpt_path is None:
-        return None, None
+        return None, None, None
 
     original_model_arg = args.model
     args.model = model_name
@@ -193,7 +200,8 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
         progress_step = max(1, n_total // 10)
         elapsed_time = 0.0
 
-        with torch.no_grad():
+        mem_profiler = TorchOpProfiler(path_logs, tag=f"{model_name}_unrolling", device=device)
+        with torch.no_grad(), mem_profiler:
             for idx in range(n_total):
                 sample = dataset[idx]
                 xt, y = sample[0], sample[1]
@@ -219,24 +227,28 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][unrolling][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
 
-        return metrics_per_sample, ckpt_path, elapsed_time
+        return metrics_per_sample, ckpt_path, elapsed_time, mem_profiler.summary
 
     finally:
         args.model = original_model_arg
 
 
-def _evaluate_random_search_on_testset(model_name, args, dataset, device):
+def _evaluate_random_search_on_testset(model_name, args, dataset, device, path_logs=None):
     """Evalue un modele 'random_search' sur l'integralite du jeu de test.
 
     Retourne (metrics_per_sample, params_path, elapsed_time) ou
     (None, None, None) si aucun 'best_params.json' n'est disponible.
     elapsed_time est le temps total (en secondes) passe dans
     run_iterative_algo sur l'ensemble du jeu de test.
+
+    L'ensemble de la boucle d'inference est enveloppee par un
+    `TorchOpProfiler` (base sur torch.profiler) afin de mesurer le temps et
+    la memoire CPU/GPU consommes operateur par operateur.
     """
     data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     params_path = find_latest_best_params(model_name, 'random_search', data_folder)
     if params_path is None:
-        return None, None, None
+        return None, None, None, None
 
     original_model_arg = args.model
     args.model = model_name
@@ -253,7 +265,8 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device):
         print(f"[COMPARE][random_search][{model_name}] Debut evaluation : {n_total} signaux, "
               f"{args.algo_iters} iterations/signal.")
 
-        with torch.no_grad():
+        mem_profiler = TorchOpProfiler(path_logs, tag=f"{model_name}_random_search", device=device)
+        with torch.no_grad(), mem_profiler:
             for idx in range(n_total):
                 sample = dataset[idx]
                 xt, y = sample[0], sample[1]
@@ -281,24 +294,28 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device):
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][random_search][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
 
-        return metrics_per_sample, params_path, elapsed_time
+        return metrics_per_sample, params_path, elapsed_time, mem_profiler.summary
 
     finally:
         args.model = original_model_arg
 
 
-def _evaluate_dl_on_testset(model_name, args, dataset, device):
+def _evaluate_dl_on_testset(model_name, args, dataset, device, path_logs=None):
     """Evalue un modele deep learning pur sur l'integralite du jeu de test.
 
     Retourne (metrics_per_sample, checkpoint_path, elapsed_time) ou
     (None, None, None) si aucun checkpoint n'est disponible. Les modeles DL
     sont toujours entraines/charges sous la strategie 'unrolling'
     (entrainement par retropropagation).
+
+    L'ensemble de la boucle d'inference est enveloppee par un
+    `TorchOpProfiler` (base sur torch.profiler) afin de mesurer le temps et
+    la memoire CPU/GPU consommes operateur par operateur.
     """
     data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
     if ckpt_path is None:
-        return None, None, None
+        return None, None, None, None
 
     try:
         metrics_per_sample = {m: [] for m in REPORT_METRICS}
@@ -307,7 +324,8 @@ def _evaluate_dl_on_testset(model_name, args, dataset, device):
         progress_step = max(1, n_total // 10)
         elapsed_time = 0.0
 
-        with torch.no_grad():
+        mem_profiler = TorchOpProfiler(path_logs, tag=f"{model_name}_deep_learning", device=device)
+        with torch.no_grad(), mem_profiler:
             for idx in range(n_total):
                 sample = dataset[idx]
                 xt, y = sample[0], sample[1]
@@ -336,11 +354,11 @@ def _evaluate_dl_on_testset(model_name, args, dataset, device):
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][deep_learning][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
 
-        return metrics_per_sample, ckpt_path, elapsed_time
+        return metrics_per_sample, ckpt_path, elapsed_time, mem_profiler.summary
 
     except Exception as e:
         print(f"[COMPARE][deep_learning][{model_name}] Erreur lors de l'evaluation : {e}")
-        return None, None, None
+        return None, None, None, None
 
 
 def run(dataset, args, paths):
@@ -378,7 +396,7 @@ def run(dataset, args, paths):
     plot_idx = random.randint(0, len(dataset) - 1)
     plot_criterion = getattr(args, 'criterion', 'MSE')
 
-    def _record(model_name, strategy, metrics_per_sample, source_path, elapsed_time=None):
+    def _record(model_name, strategy, metrics_per_sample, source_path, elapsed_time=None, mem_summary=None):
         n_samples = len(metrics_per_sample['MSE'])
         row = {'model': model_name, 'strategy': strategy, 'data_folder': data_folder,
                'n_samples': n_samples, 'source': source_path}
@@ -390,15 +408,22 @@ def run(dataset, args, paths):
         row['avg_time_per_signal_sec'] = (
             float(elapsed_time) / n_samples if elapsed_time is not None and n_samples > 0 else None
         )
+        # Metriques memoire/temps issues du profiler torch.profiler (cf.
+        # TorchOpProfiler), agregees sur l'ensemble du jeu de test.
+        mem_summary = mem_summary or {}
+        row['cpu_self_time_total_ms'] = mem_summary.get('self_cpu_time_total_ms')
+        row['cuda_self_time_total_ms'] = mem_summary.get('self_cuda_time_total_ms')
+        row['cpu_memory_peak_MB'] = mem_summary.get('cpu_memory_peak_MB')
+        row['cuda_memory_peak_MB'] = mem_summary.get('cuda_memory_peak_MB')
         summary_rows.append(row)
 
     # --- Strategie 'unrolling' ---
     for model_name in UNROLLING_MODELS:
-        metrics_per_sample, ckpt_path, elapsed_time = _evaluate_unrolling_on_testset(model_name, args, dataset, device)
+        metrics_per_sample, ckpt_path, elapsed_time, mem_summary = _evaluate_unrolling_on_testset(model_name, args, dataset, device, path_logs=path_logs)
         if metrics_per_sample is None:
             print(f"[COMPARE][unrolling][{model_name}] Aucun checkpoint trouve, ignore.")
             continue
-        _record(model_name, 'unrolling', metrics_per_sample, ckpt_path, elapsed_time)
+        _record(model_name, 'unrolling', metrics_per_sample, ckpt_path, elapsed_time, mem_summary)
         print(f"[COMPARE][unrolling][{model_name}] MSE={summary_rows[-1]['mse_mean']:.4e} "
               f"SNR={summary_rows[-1]['snr_mean']:.4e} "
               f"Temps={summary_rows[-1]['total_time_sec']:.4f}s "
@@ -438,11 +463,11 @@ def run(dataset, args, paths):
 
     # --- Strategie 'random_search' ---
     for model_name in RANDOM_SEARCH_MODELS:
-        metrics_per_sample, params_path, elapsed_time = _evaluate_random_search_on_testset(model_name, args, dataset, device)
+        metrics_per_sample, params_path, elapsed_time, mem_summary = _evaluate_random_search_on_testset(model_name, args, dataset, device, path_logs=path_logs)
         if metrics_per_sample is None:
             print(f"[COMPARE][random_search][{model_name}] Aucun best_params.json trouve, ignore.")
             continue
-        _record(model_name, 'random_search', metrics_per_sample, params_path, elapsed_time)
+        _record(model_name, 'random_search', metrics_per_sample, params_path, elapsed_time, mem_summary)
         print(f"[COMPARE][random_search][{model_name}] MSE={summary_rows[-1]['mse_mean']:.4e} "
               f"SNR={summary_rows[-1]['snr_mean']:.4e} "
               f"Temps={summary_rows[-1]['total_time_sec']:.4f}s "
@@ -479,11 +504,11 @@ def run(dataset, args, paths):
 
     # --- Modeles deep learning purs ---
     for model_name in DL_MODELS:
-        metrics_per_sample, ckpt_path, elapsed_time = _evaluate_dl_on_testset(model_name, args, dataset, device)
+        metrics_per_sample, ckpt_path, elapsed_time, mem_summary = _evaluate_dl_on_testset(model_name, args, dataset, device, path_logs=path_logs)
         if metrics_per_sample is None:
             print(f"[COMPARE][deep_learning][{model_name}] Aucun checkpoint trouve, ignore.")
             continue
-        _record(model_name, 'deep_learning', metrics_per_sample, ckpt_path, elapsed_time)
+        _record(model_name, 'deep_learning', metrics_per_sample, ckpt_path, elapsed_time, mem_summary)
         print(f"[COMPARE][deep_learning][{model_name}] MSE={summary_rows[-1]['mse_mean']:.4e} "
               f"SNR={summary_rows[-1]['snr_mean']:.4e} "
               f"Temps={summary_rows[-1]['total_time_sec']:.4f}s "
@@ -611,11 +636,16 @@ def _save_report(summary_rows, path_logs, data_folder):
     Le CSV contient, pour chaque (modele, strategie) : le nombre
     d'echantillons evalues, la moyenne et l'ecart-type de la MSE et du SNR,
     le temps total (secondes) passe a parcourir le jeu de test ainsi que le
-    temps moyen par signal, et le chemin des poids/parametres utilises.
+    temps moyen par signal, le chemin des poids/parametres utilises, et les
+    metriques memoire/temps issues du profiler torch.profiler (temps self
+    CPU/CUDA total en ms, pic memoire CPU/CUDA en MB), agregees sur
+    l'ensemble du jeu de test pour la methode consideree.
     """
     fieldnames = ['model', 'strategy', 'data_folder', 'n_samples',
                   'mse_mean', 'mse_std', 'snr_mean', 'snr_std',
-                  'total_time_sec', 'avg_time_per_signal_sec', 'source']
+                  'total_time_sec', 'avg_time_per_signal_sec',
+                  'cpu_self_time_total_ms', 'cuda_self_time_total_ms',
+                  'cpu_memory_peak_MB', 'cuda_memory_peak_MB', 'source']
 
     sorted_rows = sorted(summary_rows, key=lambda r: r['mse_mean'])
 
@@ -646,6 +676,30 @@ def _save_report(summary_rows, path_logs, data_folder):
                      f"{row['mse_mean']:>12.4e} {row['mse_std']:>12.4e} "
                      f"{row['snr_mean']:>12.4e} {row['snr_std']:>12.4e} "
                      f"{total_time_str} {avg_time_str}\n")
+
+        # --- Resume memoire/temps par methode (torch.profiler), cf. TorchOpProfiler ---
+        f.write(f"\n\n=== Profil memoire/temps (torch.profiler) par methode | Data: {data_folder} ===\n\n")
+        mem_header = (f"{'model':<10s} {'strategy':<15s} {'cpu_self_ms':>14s} {'cuda_self_ms':>14s} "
+                       f"{'cpu_peak_MB':>13s} {'cuda_peak_MB':>13s}\n")
+        f.write(mem_header)
+        f.write('-' * len(mem_header) + '\n')
+
+        def _fmt(v, fmt):
+            return f"{v:{fmt}}" if v is not None else "N/A"
+
+        for row in sorted_rows:
+            f.write(
+                f"{row['model']:<10s} {row['strategy']:<15s} "
+                f"{_fmt(row.get('cpu_self_time_total_ms'), '>14.2f')} "
+                f"{_fmt(row.get('cuda_self_time_total_ms'), '>14.2f')} "
+                f"{_fmt(row.get('cpu_memory_peak_MB'), '>13.2f')} "
+                f"{_fmt(row.get('cuda_memory_peak_MB'), '>13.2f')}\n"
+            )
+        f.write(
+            "\nNote: profil detaille operateur par operateur disponible dans "
+            "'torch_profile_<model>_<strategy>.txt' (table triee par memoire) "
+            "et '.json' (trace Chrome), dans ce meme dossier de logs.\n"
+        )
 
     print(f"[COMPARE] Rapport CSV sauvegarde : {csv_path}")
     print(f"[COMPARE] Rapport JSON sauvegarde : {json_path}")

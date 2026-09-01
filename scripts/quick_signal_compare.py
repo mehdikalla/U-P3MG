@@ -95,16 +95,38 @@ def _get_test_dataset(args):
     return MyDataset(test_path, initial_x0=None, return_name=False)
 
 
+# Style graphique conforme aux recommandations NeurIPS (pas de titre, pas de
+# legende dans la figure, police et epaisseurs de trait sobres).
+plt.rcParams.update({
+    'font.size': 16,
+    'font.family': 'serif',
+    'axes.linewidth': 0.8,
+    'xtick.direction': 'in',
+    'ytick.direction': 'in',
+    'legend.frameon': False,
+})
+
+_Y_SCALE = 100.0  # facteur d'echelle applique a l'axe des y
+_Y_UNIT_LABEL = r"Amplitude ($\times 10^{-2}$)"
+
+
+def _style_axis(ax):
+    """Applique une apparence sobre, compatible avec un rendu NeurIPS."""
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.grid(True, linewidth=0.4, alpha=0.4)
+    ax.set_ylabel(_Y_UNIT_LABEL)
+    ax.set_xlabel("Echantillon")
+    ax.margins(x=0)
+
+
 def _save_signal_plot(xt_np, xh_np, title, metrics, out_path):
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(xt_np, label='True signal', color='black', linewidth=2)
-    ax.plot(xh_np, '--', label='Reconstruction', color='tab:orange')
-    metric_str = " | ".join(f"{k}={v:.4e}" for k, v in metrics.items())
-    ax.set_title(f"{title}\n{metric_str}")
-    ax.legend(fontsize=9)
-    ax.grid(True)
+    fig, ax = plt.subplots(figsize=(6, 3))
+    ax.plot(xt_np * _Y_SCALE, color='black', linewidth=1.2)
+    ax.plot(xh_np * _Y_SCALE, '--', color='tab:orange', linewidth=1.0)
+    _style_axis(ax)
     plt.tight_layout()
-    plt.savefig(out_path)
+    plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close(fig)
     print(f"[QUICK_COMPARE] Sauvegarde : {out_path}")
 
@@ -114,7 +136,7 @@ def run_unrolling(model_name, args, xt, y, x0, N_dim, M_dim, device, output_dir)
     ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
     if ckpt_path is None:
         print(f"[QUICK_COMPARE][unrolling][{model_name}] Aucun checkpoint trouve, ignore.")
-        return
+        return None
 
     original_model = args.model
     args.model = model_name
@@ -134,8 +156,10 @@ def run_unrolling(model_name, args, xt, y, x0, N_dim, M_dim, device, output_dir)
         title = f"{model_name.upper()} (unrolling) - poids: {os.path.basename(os.path.dirname(os.path.dirname(ckpt_path)))}"
         out_path = os.path.join(output_dir, f"{model_name}_unrolling.png")
         _save_signal_plot(xt.squeeze(0).cpu().numpy(), xp.squeeze(0).cpu().numpy(), title, metrics, out_path)
+        return {'method': model_name, 'strategy': 'unrolling', **metrics}
     except Exception as e:
         print(f"[QUICK_COMPARE][unrolling][{model_name}] Erreur : {e}")
+        return None
     finally:
         args.model = original_model
 
@@ -145,7 +169,7 @@ def run_random_search(model_name, args, xt, y, x0, N_dim, M_dim, device, output_
     params_path = find_latest_best_params(model_name, 'random_search', data_folder)
     if params_path is None:
         print(f"[QUICK_COMPARE][random_search][{model_name}] Aucun best_params.json trouve, ignore.")
-        return
+        return None
 
     original_model = args.model
     args.model = model_name
@@ -160,8 +184,10 @@ def run_random_search(model_name, args, xt, y, x0, N_dim, M_dim, device, output_
         title = f"{model_name.upper()} (random_search) - params: {os.path.basename(os.path.dirname(os.path.dirname(params_path)))}"
         out_path = os.path.join(output_dir, f"{model_name}_random_search.png")
         _save_signal_plot(xt.squeeze(0).cpu().numpy(), xh.squeeze(0).cpu().numpy(), title, metrics, out_path)
+        return {'method': model_name, 'strategy': 'random_search', **metrics}
     except Exception as e:
         print(f"[QUICK_COMPARE][random_search][{model_name}] Erreur : {e}")
+        return None
     finally:
         args.model = original_model
 
@@ -171,7 +197,7 @@ def run_deep_learning(model_name, args, xt, y, x0, N_dim, M_dim, device, output_
     ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
     if ckpt_path is None:
         print(f"[QUICK_COMPARE][deep_learning][{model_name}] Aucun checkpoint trouve, ignore.")
-        return
+        return None
 
     try:
         model = _build_dl_model(model_name, N_dim, M_dim).to(device).double()
@@ -186,8 +212,51 @@ def run_deep_learning(model_name, args, xt, y, x0, N_dim, M_dim, device, output_
         title = f"{model_name.upper()} (deep_learning) - poids: {os.path.basename(os.path.dirname(os.path.dirname(ckpt_path)))}"
         out_path = os.path.join(output_dir, f"{model_name}_deep_learning.png")
         _save_signal_plot(xt.squeeze(0).cpu().numpy(), xp.squeeze(0).cpu().numpy(), title, metrics, out_path)
+        return {'method': model_name, 'strategy': 'deep_learning', **metrics}
     except Exception as e:
         print(f"[QUICK_COMPARE][deep_learning][{model_name}] Erreur : {e}")
+        return None
+
+
+def _write_minireport(report_rows, idx, args, output_dir):
+    """Genere un mini-rapport tabulaire (SNR, MSE) pour chaque methode comparee.
+
+    Sauvegarde le rapport au format texte (report.txt) et CSV (report.csv)
+    dans output_dir, tries par SNR decroissant.
+    """
+    if not report_rows:
+        print("[QUICK_COMPARE] Aucune methode evaluee avec succes, pas de rapport genere.")
+        return
+
+    report_rows = sorted(report_rows, key=lambda r: r.get('SNR', float('-inf')), reverse=True)
+
+    header = f"{'Methode':<20}{'Strategie':<18}{'SNR (dB)':>12}{'MSE':>14}"
+    separator = "-" * len(header)
+    lines = [
+        f"Mini-rapport de comparaison - signal index {idx} (data_folder={args.data_folder})",
+        separator,
+        header,
+        separator,
+    ]
+    for row in report_rows:
+        lines.append(
+            f"{row['method']:<20}{row['strategy']:<18}{row['SNR']:>12.4f}{row['MSE']:>14.4e}"
+        )
+    lines.append(separator)
+    report_text = "\n".join(lines)
+
+    txt_path = os.path.join(output_dir, "report.txt")
+    with open(txt_path, 'w') as f:
+        f.write(report_text + "\n")
+
+    csv_path = os.path.join(output_dir, "report.csv")
+    with open(csv_path, 'w') as f:
+        f.write("method,strategy,SNR,MSE\n")
+        for row in report_rows:
+            f.write(f"{row['method']},{row['strategy']},{row['SNR']:.6f},{row['MSE']:.6e}\n")
+
+    print(report_text)
+    print(f"[QUICK_COMPARE] Mini-rapport sauvegarde : {txt_path} / {csv_path}")
 
 
 def main():
@@ -228,23 +297,32 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
     print(f"[QUICK_COMPARE] Resultats sauvegardes dans : {output_dir}")
 
+    report_rows = []
+
     for model_name in UNROLLING_MODELS:
-        run_unrolling(model_name, args, xt, y, x0, N_dim, M_dim, device, output_dir)
+        row = run_unrolling(model_name, args, xt, y, x0, N_dim, M_dim, device, output_dir)
+        if row is not None:
+            report_rows.append(row)
 
     for model_name in RANDOM_SEARCH_MODELS:
-        run_random_search(model_name, args, xt, y, x0, N_dim, M_dim, device, output_dir)
+        row = run_random_search(model_name, args, xt, y, x0, N_dim, M_dim, device, output_dir)
+        if row is not None:
+            report_rows.append(row)
 
     for model_name in DL_MODELS:
-        run_deep_learning(model_name, args, xt, y, x0, N_dim, M_dim, device, output_dir)
+        row = run_deep_learning(model_name, args, xt, y, x0, N_dim, M_dim, device, output_dir)
+        if row is not None:
+            report_rows.append(row)
 
-    # Sauvegarde du signal vrai seul, pour reference.
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(xt.squeeze(0).cpu().numpy(), color='black', linewidth=2)
-    ax.set_title(f"True signal - index {idx} ({args.data_folder})")
-    ax.grid(True)
+    # Sauvegarde du signal vrai seul, pour reference (sans titre ni legende).
+    fig, ax = plt.subplots(figsize=(6, 3))
+    ax.plot(xt.squeeze(0).cpu().numpy() * _Y_SCALE, color='black', linewidth=1.2)
+    _style_axis(ax)
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, "signal_reference.png"))
+    plt.savefig(os.path.join(output_dir, "signal_reference.png"), dpi=300, bbox_inches='tight')
     plt.close(fig)
+
+    _write_minireport(report_rows, idx, args, output_dir)
 
     print("[QUICK_COMPARE] Termine.")
 
