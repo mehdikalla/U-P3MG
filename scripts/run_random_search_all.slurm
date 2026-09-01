@@ -18,10 +18,10 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --time=16:00:00
+#SBATCH --time=24:00:00
 #SBATCH --output=logs/slurm-rs-%A_%a.out
 #SBATCH --error=logs/slurm-rs-%A_%a.err
-#SBATCH --array=0-9%3
+#SBATCH --array=0-9%4
 
 set -euo pipefail
 module purge

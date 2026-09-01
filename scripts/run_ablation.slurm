@@ -18,10 +18,10 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --time=20:00:00
+#SBATCH --time=48:00:00
 #SBATCH --output=logs/ablation-%A_%a.out
 #SBATCH --error=logs/ablation-%A_%a.err
-#SBATCH --array=0-28%4
+#SBATCH --array=0-28%3
 
 # -------------------------------------------------------------
 # 1. Environnement et Modules

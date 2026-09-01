@@ -15,14 +15,6 @@ class ISTA_layer(nn.Module):
     def forward(self, Hmat, x, y, L=None):
         gamma = self.softplus(self.gamma_param)
         lmbd = self.softplus(self.lmbd_param)
-
-        # Garde-fou de stabilité : ISTA converge uniquement si gamma <= 1/L
-        # (L = constante de Lipschitz du gradient). Sans cette contrainte,
-        # un pas d'Adam trop agressif peut pousser gamma au-dela de 1/L et
-        # faire diverger la couche, provoquant un sursaut brutal de la loss.
-        if L is not None:
-            gamma = tc.clamp(gamma, max=0.99 / (L + 1e-12))
-
         x_new = self.ista_algo.iter_ISTA(x, y, Hmat, gamma, lmbd)
         return x_new, lmbd
 
