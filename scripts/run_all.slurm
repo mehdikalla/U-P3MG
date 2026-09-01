@@ -44,12 +44,12 @@ mkdir -p logs
 # 1. Definition de l'espace de recherche
 # -----------------------------------------------------------------------------
 # Modeles algorithmiques (supportent 'unrolling' ET 'random_search')
-#ALGO_MODELS=(p3mg pmms ista hq pd)
+ALGO_MODELS=(ista)
 
 #p3mg pmms ista hq pd
 
 # Modeles purement deep-learning (supportent uniquement 'unrolling')
-DL_MODELS=(fcae fctn fcun resu)
+#DL_MODELS=(fcae fctn fcun resu)
 
 
 STRATEGIES=(unrolling random_search)

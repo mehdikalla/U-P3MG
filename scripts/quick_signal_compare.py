@@ -97,8 +97,8 @@ def _get_test_dataset(args):
 
 def _save_signal_plot(xt_np, xh_np, title, metrics, out_path):
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(xt_np, label='True signal', color='black', linewidth=2)
-    ax.plot(xh_np, '--', label='Reconstruction', color='tab:orange')
+    ax.plot(xt_np, color='black', linewidth=2)
+    ax.plot(xh_np, '--', color='tab:orange')
     metric_str = " | ".join(f"{k}={v:.4e}" for k, v in metrics.items())
     ax.set_title(f"{title}\n{metric_str}")
     ax.legend(fontsize=9)

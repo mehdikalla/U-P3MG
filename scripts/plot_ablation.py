@@ -60,16 +60,15 @@ def load_summary(csv_path, x_col):
     std = df["std"].fillna(0.0).to_numpy()
     return x, mean, std
 
-
 def plot_ablation(csv_path, x_col, xlabel, title, output_path, metric_name="Loss"):
-    """Genere et sauvegarde le graphe loss = f(x), avec bande d'ecart type."""
+    """Generates and saves the loss = f(x) plot, with a standard deviation band."""
     x, mean, std = load_summary(csv_path, x_col)
 
     plt.figure(figsize=(9, 6))
-    plt.plot(x, mean, "o-", color="tab:blue", label=f"{metric_name} (moyenne)")
+    plt.plot(x, mean, "o-", color="tab:blue", label=f"{metric_name} (mean)")
     plt.fill_between(
         x, mean - std, mean + std,
-        color="tab:blue", alpha=0.2, label="+/- 1 ecart type"
+        color="tab:blue", alpha=0.2, label="+/- 1 std dev"
     )
     plt.errorbar(x, mean, yerr=std, fmt="none", ecolor="tab:blue", elinewidth=1, capsize=3)
 
@@ -83,8 +82,7 @@ def plot_ablation(csv_path, x_col, xlabel, title, output_path, metric_name="Loss
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     plt.savefig(output_path, dpi=150)
     plt.close()
-    print(f"[plot_ablation] Graphe sauvegarde : {output_path}")
-
+    print(f"[plot_ablation] Plot saved: {output_path}")
 
 def main():
     parser = argparse.ArgumentParser(description="Trace la loss en fonction du parametre d'ablation.")

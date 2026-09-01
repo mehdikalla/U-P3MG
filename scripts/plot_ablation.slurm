@@ -55,14 +55,14 @@ echo "--- Consolidation et generation des graphes d'ablation pour le job array $
 
 declare -A X_COL=( [extern]="num_layers" [intern]="num_pd_layers" [mlp]="mlp_hidden" )
 declare -A XLABEL=(
-    [extern]="Nombre de couches externes (num_layers)"
-    [intern]="Nombre de couches internes (num_pd_layers)"
-    [mlp]="Profondeur du MLP interne"
+    [extern]="Number of external layers K"
+    [intern]="Number of internal layers J"
+    [mlp]="Internal MLP depth"
 )
 declare -A TITLE=(
-    [extern]="Ablation - Loss vs. nombre de couches externes"
-    [intern]="Ablation - Loss vs. nombre de couches internes"
-    [mlp]="Ablation - Loss vs. profondeur du MLP interne"
+    [extern]=" "
+    [intern]=" "
+    [mlp]=" "
 )
 
 STATUS=0

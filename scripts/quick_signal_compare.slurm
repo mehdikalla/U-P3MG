@@ -11,7 +11,7 @@
 # Usage:
 #   sbatch scripts/quick_signal_compare.slurm
 #   sbatch scripts/quick_signal_compare.slurm data_2       # data_folder custom
-#   sbatch scripts/quick_signal_compare.slurm data_1 42    # index de signal fixe
+#   sbatch scripts/quick_signal_compare.slurm data_1 0    # index de signal fixe
 # =============================================================================
 #SBATCH --job-name=UP3MG_QUICK_COMPARE
 #SBATCH --partition=opis
@@ -35,8 +35,8 @@ conda activate U-P3MG
 
 mkdir -p logs
 
-DATA_FOLDER="${1:-data_1}"
-SIGNAL_INDEX="${2:-}"
+DATA_FOLDER="${1:-data_0}"
+SIGNAL_INDEX="${2:-63}"
 
 echo "--- Job Slurm ID: ${SLURM_JOB_ID:-N/A} | Quick Compare | Data: ${DATA_FOLDER} ---"
 
