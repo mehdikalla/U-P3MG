@@ -24,6 +24,7 @@ import time
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -123,12 +124,12 @@ def _style_axis(ax):
         _Y_UNIT_LABEL, 
         rotation=0,       # Force le texte à l'horizontale
         ha='left',        # Aligne le texte à gauche
-        va='bottom',      # Aligne par le bas
+        va='top',         # Aligne par le haut
         fontsize=9        # Taille de police réduite (adapté pour NeurIPS)
     )
     
-    # Place le label exactement au-dessus de l'axe y
-    ax.yaxis.set_label_coords(0, 1.02)
+    # Place le label juste sous le haut de l'axe y
+    ax.yaxis.set_label_coords(0.04, 0.98)
     
     # Supprime les marges vides sur l'axe x
     ax.margins(x=0)
@@ -139,24 +140,49 @@ def _save_signal_plot(xt_np, xh_np, title, metrics, out_path):
         gridspec_kw={'height_ratios': [3, 1], 'hspace': 0.05},
     )
 
-    # Panneau principal : signal vrai vs reconstruction.
-    ax.plot(xt_np * _Y_SCALE, color='black', linewidth=1.2)
-    ax.plot(xh_np * _Y_SCALE, '--', color='tab:orange', linewidth=1.0)
+    # Panneau principal : signal vrai vs reconstruction (style NeurIPS).
+    # GT = ligne pleine epaisse en arriere-plan, reconstruction = tirets marques par-dessus.
+    ax.plot(xt_np * _Y_SCALE, color='#1b5e20', linewidth=2.6, alpha=0.85,
+            solid_capstyle='round', label='Ground truth', zorder=1)
+    ax.plot(xh_np * _Y_SCALE, color='#f4a460', linewidth=1.9, linestyle=(0, (5, 2)),
+            label='Reconstruction', zorder=2)
     _style_axis(ax)
+    ax.legend(loc='upper right', fontsize=8, handlelength=1.4,
+              borderaxespad=0.2, labelspacing=0.3,
+              frameon=True, fancybox=False, edgecolor='black', framealpha=0.9)
 
-    # Panneau du bas : residu (prediction - verite terrain).
+    # Panneau du bas : residu colore par magnitude (jet, degrade lisse).
     residual = (xh_np - xt_np) * _Y_SCALE
-    ax_res.plot(residual, color='tab:gray', linewidth=0.8)
-    ax_res.axhline(0.0, color='black', linewidth=0.6, alpha=0.6)
+    # Sur-echantillonnage pour un degrade de couleur continu (evite l'effet "escalier").
+    n_orig = residual.shape[0]
+    x_orig = np.arange(n_orig)
+    x_fine = np.linspace(0, n_orig - 1, n_orig * 20)
+    res_fine = np.interp(x_fine, x_orig, residual)
+    points = np.array([x_fine, res_fine]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    abs_seg = np.abs(0.5 * (res_fine[:-1] + res_fine[1:]))
+    # "Proche de zero" defini par la plage effective des magnitudes du residu.
+    vmin = float(abs_seg.min())
+    vmax = float(abs_seg.max()) or 1.0
+    ylim = float(np.abs(residual).max()) or 1.0
+    lc = LineCollection(
+        segments, cmap='jet',
+        norm=plt.Normalize(vmin, vmax), linewidth=0.8,
+    )
+    lc.set_array(abs_seg)
+    ax_res.add_collection(lc)
+    ax_res.set_xlim(x_orig.min(), x_orig.max())
+    ax_res.set_ylim(-ylim * 1.05, ylim * 1.05)
+    ax_res.axhline(0.0, color='black', linewidth=0.6)
     _style_axis(ax_res)
     ax_res.set_ylabel(
-        r"Residu " + _Y_UNIT_LABEL,
+        r"Residual " + _Y_UNIT_LABEL,
         rotation=0, ha='left', va='top', fontsize=9,
     )
     ax_res.yaxis.set_label_coords(0.04, 0.98)
 
-    plt.tight_layout()
-    plt.savefig(out_path, dpi=300, bbox_inches='tight')
+    plt.tight_layout(pad=0.2)
+    plt.savefig(out_path, dpi=300, bbox_inches='tight', pad_inches=0.01)
     plt.close(fig)
     print(f"[QUICK_COMPARE] Sauvegarde : {out_path}")
 
