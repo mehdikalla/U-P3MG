@@ -134,10 +134,27 @@ def _style_axis(ax):
     ax.margins(x=0)
 
 def _save_signal_plot(xt_np, xh_np, title, metrics, out_path):
-    fig, ax = plt.subplots(figsize=(6, 3))
+    fig, (ax, ax_res) = plt.subplots(
+        2, 1, figsize=(6, 3.6), sharex=True,
+        gridspec_kw={'height_ratios': [3, 1], 'hspace': 0.05},
+    )
+
+    # Panneau principal : signal vrai vs reconstruction.
     ax.plot(xt_np * _Y_SCALE, color='black', linewidth=1.2)
     ax.plot(xh_np * _Y_SCALE, '--', color='tab:orange', linewidth=1.0)
     _style_axis(ax)
+
+    # Panneau du bas : residu (prediction - verite terrain).
+    residual = (xh_np - xt_np) * _Y_SCALE
+    ax_res.plot(residual, color='tab:gray', linewidth=0.8)
+    ax_res.axhline(0.0, color='black', linewidth=0.6, alpha=0.6)
+    _style_axis(ax_res)
+    ax_res.set_ylabel(
+        r"Residu " + _Y_UNIT_LABEL,
+        rotation=0, ha='left', va='top', fontsize=9,
+    )
+    ax_res.yaxis.set_label_coords(0.04, 0.98)
+
     plt.tight_layout()
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close(fig)
@@ -338,6 +355,20 @@ def main():
     _write_minireport(report_rows, idx, args, output_dir)
 
     print("[QUICK_COMPARE] Termine.")
+
+
+def _quick_test():
+    """Test rapide autonome : deux gaussiennes vs version bruitee."""
+    n = 300
+    t = np.linspace(0, 1, n)
+    xt_np = (
+        np.exp(-((t - 0.3) ** 2) / (2 * 0.03 ** 2))
+        + 0.7 * np.exp(-((t - 0.7) ** 2) / (2 * 0.05 ** 2))
+    ) * 1e-2
+    rng = np.random.default_rng(0)
+    xh_np = xt_np + rng.normal(0.0, 0.05 * xt_np.max(), size=n)
+    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "quick_test_signal.png")
+    _save_signal_plot(xt_np, xh_np, "Quick test", {}, out_path)
 
 
 if __name__ == "__main__":
