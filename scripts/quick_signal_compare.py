@@ -107,18 +107,31 @@ plt.rcParams.update({
 })
 
 _Y_SCALE = 100.0  # facteur d'echelle applique a l'axe des y
-_Y_UNIT_LABEL = r"Amplitude ($\times 10^{-2}$)"
-
+_Y_UNIT_LABEL = r"($\times 10^{-2}$)"
 
 def _style_axis(ax):
     """Applique une apparence sobre, compatible avec un rendu NeurIPS."""
+    # Supprime les bordures en haut et à droite
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
+    
+    # Ajoute une grille discrète
     ax.grid(True, linewidth=0.4, alpha=0.4)
-    ax.set_ylabel(_Y_UNIT_LABEL)
-    ax.set_xlabel("Echantillon")
+    
+    # Configure le label de l'axe y (petit, horizontal, en haut)
+    ax.set_ylabel(
+        _Y_UNIT_LABEL, 
+        rotation=0,       # Force le texte à l'horizontale
+        ha='left',        # Aligne le texte à gauche
+        va='bottom',      # Aligne par le bas
+        fontsize=9        # Taille de police réduite (adapté pour NeurIPS)
+    )
+    
+    # Place le label exactement au-dessus de l'axe y
+    ax.yaxis.set_label_coords(0, 1.02)
+    
+    # Supprime les marges vides sur l'axe x
     ax.margins(x=0)
-
 
 def _save_signal_plot(xt_np, xh_np, title, metrics, out_path):
     fig, ax = plt.subplots(figsize=(6, 3))
