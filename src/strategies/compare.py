@@ -14,6 +14,7 @@ import os
 import csv
 import json
 import random
+import time
 import torch
 import torch.nn as nn
 import numpy as np
@@ -142,6 +143,16 @@ def _build_dl_model(model_name, N_dim, M_dim):
     return ModelClass(N_dim=N_dim, M_dim=M_dim)
 
 
+def _sync_device(device):
+    """Synchronise le device CUDA courant, si applicable, afin de garantir
+    des mesures de temps fiables (les appels CUDA sont asynchrones par defaut).
+    Accepte aussi bien une str ('cuda'/'cpu') qu'un torch.device.
+    """
+    device_type = device.type if isinstance(device, torch.device) else str(device).split(':')[0]
+    if device_type == 'cuda' and torch.cuda.is_available():
+        torch.cuda.synchronize()
+
+
 def _compute_all_metrics(xh, xt):
 
     """Calcule toutes les metriques de REPORT_METRICS entre xh et xt (batch=1).
@@ -180,6 +191,7 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
         static_params = None
         n_total = len(dataset)
         progress_step = max(1, n_total // 10)
+        elapsed_time = 0.0
 
         with torch.no_grad():
             for idx in range(n_total):
@@ -194,7 +206,11 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
 
                 x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
                 current_static = static_params if model_name in ('p3mg', 'pmms') else None
+
+                start_t = time.perf_counter()
                 xp, _, _ = model(current_static, None, x0, y)
+                _sync_device(device)
+                elapsed_time += time.perf_counter() - start_t
 
                 sample_metrics = _compute_all_metrics(xp, xt)
                 for m in REPORT_METRICS:
@@ -203,7 +219,7 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][unrolling][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
 
-        return metrics_per_sample, ckpt_path
+        return metrics_per_sample, ckpt_path, elapsed_time
 
     finally:
         args.model = original_model_arg
@@ -212,13 +228,15 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device):
 def _evaluate_random_search_on_testset(model_name, args, dataset, device):
     """Evalue un modele 'random_search' sur l'integralite du jeu de test.
 
-    Retourne (metrics_per_sample, params_path) ou (None, None) si aucun
-    'best_params.json' n'est disponible.
+    Retourne (metrics_per_sample, params_path, elapsed_time) ou
+    (None, None, None) si aucun 'best_params.json' n'est disponible.
+    elapsed_time est le temps total (en secondes) passe dans
+    run_iterative_algo sur l'ensemble du jeu de test.
     """
     data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     params_path = find_latest_best_params(model_name, 'random_search', data_folder)
     if params_path is None:
-        return None, None
+        return None, None, None
 
     original_model_arg = args.model
     args.model = model_name
@@ -230,6 +248,7 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device):
         algo, static = None, None
         n_total = len(dataset)
         progress_step = max(1, n_total // 10)
+        elapsed_time = 0.0
 
         print(f"[COMPARE][random_search][{model_name}] Debut evaluation : {n_total} signaux, "
               f"{args.algo_iters} iterations/signal.")
@@ -246,10 +265,14 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device):
                     algo, static = get_algo_and_static(args, N_dim, M_dim, device)
 
                 x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
+
+                start_t = time.perf_counter()
                 xh = run_iterative_algo(
                     model_name, algo, y, x0, static,
                     hp=best_params, max_iter=args.algo_iters
                 )
+                _sync_device(device)
+                elapsed_time += time.perf_counter() - start_t
 
                 sample_metrics = _compute_all_metrics(xh, xt)
                 for m in REPORT_METRICS:
@@ -258,7 +281,7 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device):
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][random_search][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
 
-        return metrics_per_sample, params_path
+        return metrics_per_sample, params_path, elapsed_time
 
     finally:
         args.model = original_model_arg
@@ -267,20 +290,22 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device):
 def _evaluate_dl_on_testset(model_name, args, dataset, device):
     """Evalue un modele deep learning pur sur l'integralite du jeu de test.
 
-    Retourne (metrics_per_sample, checkpoint_path) ou (None, None) si aucun
-    checkpoint n'est disponible. Les modeles DL sont toujours entraines/
-    charges sous la strategie 'unrolling' (entrainement par retropropagation).
+    Retourne (metrics_per_sample, checkpoint_path, elapsed_time) ou
+    (None, None, None) si aucun checkpoint n'est disponible. Les modeles DL
+    sont toujours entraines/charges sous la strategie 'unrolling'
+    (entrainement par retropropagation).
     """
     data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
     if ckpt_path is None:
-        return None, None
+        return None, None, None
 
     try:
         metrics_per_sample = {m: [] for m in REPORT_METRICS}
         model = None
         n_total = len(dataset)
         progress_step = max(1, n_total // 10)
+        elapsed_time = 0.0
 
         with torch.no_grad():
             for idx in range(n_total):
@@ -298,7 +323,11 @@ def _evaluate_dl_on_testset(model_name, args, dataset, device):
                     model.eval()
 
                 x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
+
+                start_t = time.perf_counter()
                 xp, _, _ = model(None, None, x0, y)
+                _sync_device(device)
+                elapsed_time += time.perf_counter() - start_t
 
                 sample_metrics = _compute_all_metrics(xp, xt)
                 for m in REPORT_METRICS:
@@ -307,11 +336,11 @@ def _evaluate_dl_on_testset(model_name, args, dataset, device):
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][deep_learning][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
 
-        return metrics_per_sample, ckpt_path
+        return metrics_per_sample, ckpt_path, elapsed_time
 
     except Exception as e:
         print(f"[COMPARE][deep_learning][{model_name}] Erreur lors de l'evaluation : {e}")
-        return None, None
+        return None, None, None
 
 
 def run(dataset, args, paths):
@@ -349,24 +378,31 @@ def run(dataset, args, paths):
     plot_idx = random.randint(0, len(dataset) - 1)
     plot_criterion = getattr(args, 'criterion', 'MSE')
 
-    def _record(model_name, strategy, metrics_per_sample, source_path):
+    def _record(model_name, strategy, metrics_per_sample, source_path, elapsed_time=None):
+        n_samples = len(metrics_per_sample['MSE'])
         row = {'model': model_name, 'strategy': strategy, 'data_folder': data_folder,
-               'n_samples': len(metrics_per_sample['MSE']), 'source': source_path}
+               'n_samples': n_samples, 'source': source_path}
         for m in REPORT_METRICS:
             values = np.array(metrics_per_sample[m])
             row[f'{m.lower()}_mean'] = float(np.mean(values))
             row[f'{m.lower()}_std'] = float(np.std(values))
+        row['total_time_sec'] = float(elapsed_time) if elapsed_time is not None else None
+        row['avg_time_per_signal_sec'] = (
+            float(elapsed_time) / n_samples if elapsed_time is not None and n_samples > 0 else None
+        )
         summary_rows.append(row)
 
     # --- Strategie 'unrolling' ---
     for model_name in UNROLLING_MODELS:
-        metrics_per_sample, ckpt_path = _evaluate_unrolling_on_testset(model_name, args, dataset, device)
+        metrics_per_sample, ckpt_path, elapsed_time = _evaluate_unrolling_on_testset(model_name, args, dataset, device)
         if metrics_per_sample is None:
             print(f"[COMPARE][unrolling][{model_name}] Aucun checkpoint trouve, ignore.")
             continue
-        _record(model_name, 'unrolling', metrics_per_sample, ckpt_path)
+        _record(model_name, 'unrolling', metrics_per_sample, ckpt_path, elapsed_time)
         print(f"[COMPARE][unrolling][{model_name}] MSE={summary_rows[-1]['mse_mean']:.4e} "
-              f"SNR={summary_rows[-1]['snr_mean']:.4e} (poids: {ckpt_path})")
+              f"SNR={summary_rows[-1]['snr_mean']:.4e} "
+              f"Temps={summary_rows[-1]['total_time_sec']:.4f}s "
+              f"({summary_rows[-1]['avg_time_per_signal_sec']:.4e}s/signal) (poids: {ckpt_path})")
 
         idx_pos = metrics_per_sample[plot_criterion]  # reuse loop below for plot signal
     # Recalcule le signal unique pour la visualisation qualitative (unrolling)
@@ -402,13 +438,15 @@ def run(dataset, args, paths):
 
     # --- Strategie 'random_search' ---
     for model_name in RANDOM_SEARCH_MODELS:
-        metrics_per_sample, params_path = _evaluate_random_search_on_testset(model_name, args, dataset, device)
+        metrics_per_sample, params_path, elapsed_time = _evaluate_random_search_on_testset(model_name, args, dataset, device)
         if metrics_per_sample is None:
             print(f"[COMPARE][random_search][{model_name}] Aucun best_params.json trouve, ignore.")
             continue
-        _record(model_name, 'random_search', metrics_per_sample, params_path)
+        _record(model_name, 'random_search', metrics_per_sample, params_path, elapsed_time)
         print(f"[COMPARE][random_search][{model_name}] MSE={summary_rows[-1]['mse_mean']:.4e} "
-              f"SNR={summary_rows[-1]['snr_mean']:.4e} (params: {params_path})")
+              f"SNR={summary_rows[-1]['snr_mean']:.4e} "
+              f"Temps={summary_rows[-1]['total_time_sec']:.4f}s "
+              f"({summary_rows[-1]['avg_time_per_signal_sec']:.4e}s/signal) (params: {params_path})")
 
     for model_name in RANDOM_SEARCH_MODELS:
         if not any(r['model'] == model_name and r['strategy'] == 'random_search' for r in summary_rows):
@@ -441,13 +479,15 @@ def run(dataset, args, paths):
 
     # --- Modeles deep learning purs ---
     for model_name in DL_MODELS:
-        metrics_per_sample, ckpt_path = _evaluate_dl_on_testset(model_name, args, dataset, device)
+        metrics_per_sample, ckpt_path, elapsed_time = _evaluate_dl_on_testset(model_name, args, dataset, device)
         if metrics_per_sample is None:
             print(f"[COMPARE][deep_learning][{model_name}] Aucun checkpoint trouve, ignore.")
             continue
-        _record(model_name, 'deep_learning', metrics_per_sample, ckpt_path)
+        _record(model_name, 'deep_learning', metrics_per_sample, ckpt_path, elapsed_time)
         print(f"[COMPARE][deep_learning][{model_name}] MSE={summary_rows[-1]['mse_mean']:.4e} "
-              f"SNR={summary_rows[-1]['snr_mean']:.4e} (poids: {ckpt_path})")
+              f"SNR={summary_rows[-1]['snr_mean']:.4e} "
+              f"Temps={summary_rows[-1]['total_time_sec']:.4f}s "
+              f"({summary_rows[-1]['avg_time_per_signal_sec']:.4e}s/signal) (poids: {ckpt_path})")
 
     for model_name in DL_MODELS:
         if not any(r['model'] == model_name and r['strategy'] == 'deep_learning' for r in summary_rows):
@@ -482,7 +522,40 @@ def run(dataset, args, paths):
     if signal_results:
         _plot_comparison(xt_plot, signal_results, plot_idx, plot_criterion, path_plots, data_folder)
 
+    _plot_timing_comparison(summary_rows, path_plots, data_folder)
+
     _save_report(summary_rows, path_logs, data_folder)
+
+
+def _plot_timing_comparison(summary_rows, path_plots, data_folder):
+    """Trace un graphe recapitulatif du temps moyen de parcours du jeu de
+    test (par signal) pour chaque combinaison (modele, strategie).
+
+    Les lignes sans temps mesure (elapsed_time indisponible) sont ignorees.
+    """
+    rows_with_time = [r for r in summary_rows if r.get('avg_time_per_signal_sec') is not None]
+    if not rows_with_time:
+        print("[COMPARE] Aucun temps mesure disponible, graphe de timing ignore.")
+        return
+
+    rows_with_time = sorted(rows_with_time, key=lambda r: r['avg_time_per_signal_sec'])
+    names = [f"{r['model']}_{r['strategy']}" for r in rows_with_time]
+    avg_times = [r['avg_time_per_signal_sec'] for r in rows_with_time]
+
+    fig, ax = plt.subplots(figsize=(12, 5))
+    ax.bar(range(len(names)), avg_times, color='indianred')
+    ax.set_xticks(range(len(names)))
+    ax.set_xticklabels(names, rotation=45, ha='right', fontsize=8)
+    ax.set_xlabel('Model / strategy')
+    ax.set_ylabel('Average time per signal (s)')
+    ax.set_yscale('log')
+    ax.set_title(f"Average inference time per signal by model/strategy ({data_folder})")
+    ax.grid(True, axis='y', which='both')
+    plt.tight_layout()
+    timing_path = os.path.join(path_plots, 'compare_timing.png')
+    plt.savefig(timing_path)
+    plt.close(fig)
+    print(f"[COMPARE] Graphique de temps sauvegarde : {timing_path}")
 
 
 def _plot_comparison(xt_np, results, idx, criterion_name, path_plots, data_folder):
@@ -537,10 +610,12 @@ def _save_report(summary_rows, path_logs, data_folder):
 
     Le CSV contient, pour chaque (modele, strategie) : le nombre
     d'echantillons evalues, la moyenne et l'ecart-type de la MSE et du SNR,
-    ainsi que le chemin des poids/parametres utilises.
+    le temps total (secondes) passe a parcourir le jeu de test ainsi que le
+    temps moyen par signal, et le chemin des poids/parametres utilises.
     """
     fieldnames = ['model', 'strategy', 'data_folder', 'n_samples',
-                  'mse_mean', 'mse_std', 'snr_mean', 'snr_std', 'source']
+                  'mse_mean', 'mse_std', 'snr_mean', 'snr_std',
+                  'total_time_sec', 'avg_time_per_signal_sec', 'source']
 
     sorted_rows = sorted(summary_rows, key=lambda r: r['mse_mean'])
 
@@ -549,7 +624,7 @@ def _save_report(summary_rows, path_logs, data_folder):
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for row in sorted_rows:
-            writer.writerow(row)
+            writer.writerow({k: row.get(k) for k in fieldnames})
 
     json_path = os.path.join(path_logs, 'compare_report.json')
     with open(json_path, 'w') as f:
@@ -558,13 +633,19 @@ def _save_report(summary_rows, path_logs, data_folder):
     txt_path = os.path.join(path_logs, 'compare_report.txt')
     with open(txt_path, 'w') as f:
         f.write(f"=== Comparaison complete du jeu de test | Data: {data_folder} ===\n\n")
-        header = f"{'model':<10s} {'strategy':<15s} {'n':>6s} {'mse_mean':>12s} {'mse_std':>12s} {'snr_mean':>12s} {'snr_std':>12s}\n"
+        header = (f"{'model':<10s} {'strategy':<15s} {'n':>6s} {'mse_mean':>12s} {'mse_std':>12s} "
+                   f"{'snr_mean':>12s} {'snr_std':>12s} {'total_time_s':>14s} {'avg_time_s/sig':>16s}\n")
         f.write(header)
         f.write('-' * len(header) + '\n')
         for row in sorted_rows:
+            total_time = row.get('total_time_sec')
+            avg_time = row.get('avg_time_per_signal_sec')
+            total_time_str = f"{total_time:>14.4f}" if total_time is not None else f"{'N/A':>14s}"
+            avg_time_str = f"{avg_time:>16.4e}" if avg_time is not None else f"{'N/A':>16s}"
             f.write(f"{row['model']:<10s} {row['strategy']:<15s} {row['n_samples']:>6d} "
                      f"{row['mse_mean']:>12.4e} {row['mse_std']:>12.4e} "
-                     f"{row['snr_mean']:>12.4e} {row['snr_std']:>12.4e}\n")
+                     f"{row['snr_mean']:>12.4e} {row['snr_std']:>12.4e} "
+                     f"{total_time_str} {avg_time_str}\n")
 
     print(f"[COMPARE] Rapport CSV sauvegarde : {csv_path}")
     print(f"[COMPARE] Rapport JSON sauvegarde : {json_path}")

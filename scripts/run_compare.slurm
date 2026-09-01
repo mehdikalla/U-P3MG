@@ -8,7 +8,10 @@
 # 'best_params.json' 'random_search' les plus recents disponibles dans
 # 'runs/'). Le critere de selection du signal qualitatif est fixe a SNR,
 # mais le rapport produit contient systematiquement la MSE ET le SNR
-# (moyenne + ecart-type) pour chaque combinaison (modele, strategie).
+# (moyenne + ecart-type), ainsi que le temps total et le temps moyen par
+# signal passe a parcourir le jeu de test, pour chaque combinaison
+# (modele, strategie) (voir 'compare_report.csv/.json/.txt' et le graphe
+# 'compare_timing.png' produits par src.strategies.compare).
 #
 # Structure de sortie (une soumission sbatch = un "run_set", identifie par
 # SLURM_JOB_ID, pour pouvoir relancer l'etude sans ecraser les resultats

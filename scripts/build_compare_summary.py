@@ -26,7 +26,8 @@ import sys
 
 
 FIELDNAMES = ['model', 'strategy', 'data_folder', 'n_samples',
-              'mse_mean', 'mse_std', 'snr_mean', 'snr_std', 'source']
+              'mse_mean', 'mse_std', 'snr_mean', 'snr_std',
+              'total_time_sec', 'avg_time_per_signal_sec', 'source']
 
 
 def find_compare_reports(run_set_dir):
