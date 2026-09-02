@@ -183,7 +183,7 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device, path_logs=
     data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
     if ckpt_path is None:
-        return None, None, None
+        return None, None, None, None
 
     original_model_arg = args.model
     args.model = model_name

@@ -58,15 +58,6 @@ class TorchOpProfiler:
         if self._use_cuda:
             activities.append(ProfilerActivity.CUDA)
 
-        # record_shapes=False : torch.profiler conserve sinon un enregistrement
-        # non agrege par appel d'operateur (avec la forme de chaque tenseur
-        # d'entree). Sur une boucle couvrant l'integralite du jeu de test
-        # (des dizaines de signaux x des dizaines de couches internes), le
-        # volume d'evenements non agreges accumules en RAM hote avant
-        # key_averages() sature la memoire systeme et provoque un 'Killed'
-        # (OOM). Desactiver record_shapes force l'agregation par nom
-        # d'operateur au fil de l'eau, sans perte sur les metriques agregees
-        # (temps/memoire self CPU/CUDA) exploitees par compare.py.
         self._profiler = profile(
             activities=activities,
             profile_memory=True,
