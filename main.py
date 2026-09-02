@@ -60,6 +60,10 @@ def parse_args():
     parser.add_argument('--num_pd_layers', type=int, default=10)
     parser.add_argument('--mlp_hidden', type=str, default=None,
                          help="Tailles des couches cachees du MLP interne P3MG (lambda), ex: '50,25,12'")
+    parser.add_argument('--use_fc_lambda', type=int, default=1, choices=[0, 1],
+                         help="Si 1 (defaut), lambda du P3MG est produit par un FC_block (MLP) "
+                              "dependant de y. Si 0, lambda est entraine directement comme un "
+                              "nn.Parameter scalaire par couche (initialise a 8e-5), a la maniere de tau.")
 
     parser.add_argument('--checkpoint', type=str, default=None)
     parser.add_argument('--n_trials', type=int, default=50)
@@ -276,7 +280,8 @@ def main():
             mlp_hidden = None
             if args.mlp_hidden:
                 mlp_hidden = [int(v.strip()) for v in str(args.mlp_hidden).split(',') if v.strip()]
-            model = ModelClass(num_layers=args.num_layers, num_pd_layers=args.num_pd_layers, mlp_hidden=mlp_hidden)
+            model = ModelClass(num_layers=args.num_layers, num_pd_layers=args.num_pd_layers,
+                                mlp_hidden=mlp_hidden, use_fc_lambda=bool(args.use_fc_lambda))
         elif model_key == 'hq':
             model = ModelClass(num_layers=args.num_layers, num_pd_layers=args.num_pd_layers)
 
