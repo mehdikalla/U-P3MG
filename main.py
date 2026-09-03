@@ -131,10 +131,6 @@ def setup_paths(args):
     run_tag = (args.run_tag or args.data_folder).strip().lower()
     run_group = getattr(args, 'run_group', None)
     if run_group:
-        # Racine dediee (ex: 'runs/ablation/...'), totalement separee de
-        # 'runs/<model>/<strategy>/...' (runs standard) et 'runs/compare/...'.
-        # Le segment '<strategy>' est omis : une etude d'ablation ne porte
-        # que sur le P3MG en mode unrolling, ce niveau est donc redondant.
         base_dir = os.path.join("runs", run_group.strip().lower(), args.model.strip().lower(), run_tag, run_name)
     elif args.mode == 'compare':
         base_dir = os.path.join("runs", "compare", run_tag, run_name)
@@ -160,8 +156,7 @@ def find_latest_checkpoint(model_name, strategy, data_folder=None, current_base_
     Recherche le checkpoint 'best_model.pt' le plus récent pour un modèle,
     une stratégie et un dossier de données donnés, en parcourant les dossiers
     'runs/<model>/<strategy>/<data_folder>/*' (ou 'runs/<run_group>/<model>/<strategy>/<data_folder>/*'
-    si run_group est fourni) triés par nom (les timestamps sont ordonnés
-    lexicographiquement).
+    si run_group est fourni)
 
     Le dossier 'current_base_dir' (run en cours) est exclu de la recherche
     puisqu'il vient d'être créé et ne contient encore aucun poids.

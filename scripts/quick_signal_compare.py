@@ -1,12 +1,5 @@
 """
 Script rapide de comparaison qualitative sur un unique signal.
-
-Tire un signal au hasard (ou un index precis) dans le jeu de test, applique
-toutes les methodes disponibles (unrolling, random_search, deep learning
-pur) avec les derniers poids/parametres calibres trouves dans 'runs/', puis
-sauvegarde un fichier .png par methode (signal vrai vs reconstruction) dans
-un dossier dedie.
-
 Usage:
     python scripts/quick_signal_compare.py --config config.yaml \
         --data_folder data_1 --output_dir quick_compare_results

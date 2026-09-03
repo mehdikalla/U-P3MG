@@ -1,10 +1,8 @@
 """
 Visualiseur interactif pour parcourir les signaux d'un dataset .pt.
 
-Ce script charge un fichier .pt (contenant les clés 'xtrue' et 'yblur', et
-optionnellement 'Hmat') et affiche une interface matplotlib permettant de
-naviguer entre les échantillons du dataset via un slider et des boutons
-Précédent/Suivant, ou directement au clavier (flèches gauche/droite).
+Ce script charge un fichier .pt  et affiche une interface matplotlib permettant de
+naviguer entre les échantillons du dataset.
 
 Usage:
     python Dataset/visualize_dataset.py --path Dataset/train.pt
@@ -21,14 +19,7 @@ from matplotlib.widgets import Slider, Button
 def load_dataset(path: str):
     """
     Charge un fichier .pt et retourne les tenseurs xtrue et yblur sous forme
-    de tableaux numpy, ainsi que le nombre total d'échantillons.
-
-    Args:
-        path: Chemin vers le fichier .pt à charger.
-
-    Returns:
-        Tuple (X, Y, num_samples) où X et Y sont des tableaux numpy de forme
-        (K, N) et (K, M) respectivement.
+    de tableaux numpy, ainsi que le nombre total d'échantillons.    
     """
     data = tc.load(path, map_location="cpu")
 

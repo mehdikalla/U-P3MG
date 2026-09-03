@@ -2,14 +2,6 @@
 """
 Fichier : scripts/build_ablation_summary.py
 
-Reconstruit le fichier summary.csv d'un volet d'ablation directement a
-partir des sous-runs presents sur disque (runs/ablation/p3mg/<study_tag>/
-run_set_<id>/*/), plutot que de s'appuyer sur une consolidation fragile
-effectuee ligne par ligne pendant l'execution du job array SLURM (parsing
-awk du tableau texte, ecriture concurrente protegee par flock, risque de
-desynchronisation entre la configuration reellement executee et celle
-supposee par le tableau CONFIGS du script bash).
-
 Pour chaque sous-run trouve, ce script lit :
   - logs/run_config.json  : configuration reelle utilisee (num_layers,
     num_pd_layers, mlp_hidden), ecrite par src.strategies.network.save_config

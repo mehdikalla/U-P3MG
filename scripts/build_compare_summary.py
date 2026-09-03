@@ -1,18 +1,7 @@
 #!/usr/bin/env python
 """
 Fichier : scripts/build_compare_summary.py
-
-Reconstruit le rapport CSV global d'un run_set de comparaison (mode
-'compare') directement a partir des sous-runs presents sur disque
-(runs/compare/run_set_<id>/<data_folder>/*/), plutot que via une
-concatenation bash (head/tail) fragile executee inline dans
-run_compare.slurm.
-
-Meme architecture que scripts/build_ablation_summary.py pour l'etude
-d'ablation : chaque sous-run est lu directement depuis son fichier
-logs/compare_report.csv (source de verite, ecrite par
-src.strategies.compare._save_report), sans dependre de l'ordre
-d'execution ni d'une variable bash intermediaire.
+Reconstruit le fichier compare_report.csv global d'un run_set de comparaison
 
 Usage:
     python scripts/build_compare_summary.py \
