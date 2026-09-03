@@ -20,23 +20,30 @@ import torch.nn as nn
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.models import NET_ARCHITECTURES, FULLY_LEARNED_MODELS
+from src.models import NET_ARCHITECTURES
 from src.strategies.network import init_static_params
 from src.strategies.random_search import get_algo_and_static, run_iterative_algo
 from src.utils.torch_profiler_utils import TorchOpProfiler
 
-# Modeles algorithmiques disponibles pour chaque strategie.
-UNROLLING_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms']
-RANDOM_SEARCH_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms']
+# Modeles algorithmiques disponibles pour chaque strategie. Restreint aux
+# combinaisons pertinentes pour l'etude de comparaison (cf. demande) : tous
+# les modeles itteratifs pour 'random_search', mais seulement HQ et P3MG
+# pour 'unrolling'.
+UNROLLING_MODELS = ['p3mg', 'hq']
+RANDOM_SEARCH_MODELS = ['p3mg', 'ista', 'hq', 'pd']
 
 # Modeles purement deep learning (pas d'algorithme itteratif statique),
 # evalues uniquement en strategie 'unrolling' (entrainement par gradient).
-DL_MODELS = sorted(FULLY_LEARNED_MODELS)
+# Restreint a FCAE, FCUN, FCTN (ResU exclu de la comparaison).
+DL_MODELS = ['fcae', 'fcun', 'fctn']
 
 
 # Metriques systematiquement calculees en inference, independamment du
 # critere utilise a l'entrainement/a la calibration.
 REPORT_METRICS = ['MSE', 'SNR']
+
+# Nombre maximal de signaux profiles via `torch.profiler` 
+PROFILE_MAX_SAMPLES = 10
 
 
 def _list_run_dirs(model_name, strategy, data_folder):
@@ -200,30 +207,44 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device, path_logs=
         progress_step = max(1, n_total // 10)
         elapsed_time = 0.0
 
+        n_profiled = min(PROFILE_MAX_SAMPLES, n_total)
         mem_profiler = TorchOpProfiler(path_logs, tag=f"{model_name}_unrolling", device=device)
-        with torch.no_grad(), mem_profiler:
-            for idx in range(n_total):
-                sample = dataset[idx]
-                xt, y = sample[0], sample[1]
-                xt = xt.to(device).double().unsqueeze(0)
-                y = y.to(device).double().unsqueeze(0)
-                N_dim, M_dim = xt.shape[1], y.shape[1]
 
-                if static_params is None:
-                    static_params, _ = init_static_params(args, N_dim, M_dim, device)
+        def _run_one(idx):
+            nonlocal static_params, elapsed_time
+            sample = dataset[idx]
+            xt, y = sample[0], sample[1]
+            xt = xt.to(device).double().unsqueeze(0)
+            y = y.to(device).double().unsqueeze(0)
+            N_dim, M_dim = xt.shape[1], y.shape[1]
 
-                x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
-                current_static = static_params if model_name in ('p3mg', 'pmms') else None
+            if static_params is None:
+                static_params, _ = init_static_params(args, N_dim, M_dim, device)
 
-                start_t = time.perf_counter()
-                xp, _, _ = model(current_static, None, x0, y)
-                _sync_device(device)
-                elapsed_time += time.perf_counter() - start_t
+            x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
+            current_static = static_params if model_name in ('p3mg', 'pmms') else None
 
-                sample_metrics = _compute_all_metrics(xp, xt)
-                for m in REPORT_METRICS:
-                    metrics_per_sample[m].append(sample_metrics[m])
+            start_t = time.perf_counter()
+            xp, _, _ = model(current_static, None, x0, y)
+            _sync_device(device)
+            elapsed_time += time.perf_counter() - start_t
 
+            sample_metrics = _compute_all_metrics(xp, xt)
+            for m in REPORT_METRICS:
+                metrics_per_sample[m].append(sample_metrics[m])
+
+        # N'active le profiler `torch.profiler` (accumulation memoire non
+        # bornee, cf. PROFILE_MAX_SAMPLES) que sur un echantillon reduit de
+        # signaux, afin d'evitre un OOM sur l'integralite du jeu de test.
+        with torch.no_grad():
+            with mem_profiler:
+                for idx in range(n_profiled):
+                    _run_one(idx)
+                    if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
+                        print(f"[COMPARE][unrolling][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
+
+            for idx in range(n_profiled, n_total):
+                _run_one(idx)
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][unrolling][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
 
@@ -265,32 +286,48 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device, path_l
         print(f"[COMPARE][random_search][{model_name}] Debut evaluation : {n_total} signaux, "
               f"{args.algo_iters} iterations/signal.")
 
+        n_profiled = min(PROFILE_MAX_SAMPLES, n_total)
         mem_profiler = TorchOpProfiler(path_logs, tag=f"{model_name}_random_search", device=device)
-        with torch.no_grad(), mem_profiler:
-            for idx in range(n_total):
-                sample = dataset[idx]
-                xt, y = sample[0], sample[1]
-                xt = xt.to(device).double().unsqueeze(0)
-                y = y.to(device).double().unsqueeze(0)
-                N_dim, M_dim = xt.shape[1], y.shape[1]
 
-                if algo is None:
-                    algo, static = get_algo_and_static(args, N_dim, M_dim, device)
+        def _run_one(idx):
+            nonlocal algo, static, elapsed_time
+            sample = dataset[idx]
+            xt, y = sample[0], sample[1]
+            xt = xt.to(device).double().unsqueeze(0)
+            y = y.to(device).double().unsqueeze(0)
+            N_dim, M_dim = xt.shape[1], y.shape[1]
 
-                x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
+            if algo is None:
+                algo, static = get_algo_and_static(args, N_dim, M_dim, device)
 
-                start_t = time.perf_counter()
-                xh = run_iterative_algo(
-                    model_name, algo, y, x0, static,
-                    hp=best_params, max_iter=args.algo_iters
-                )
-                _sync_device(device)
-                elapsed_time += time.perf_counter() - start_t
+            x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
 
-                sample_metrics = _compute_all_metrics(xh, xt)
-                for m in REPORT_METRICS:
-                    metrics_per_sample[m].append(sample_metrics[m])
+            start_t = time.perf_counter()
+            xh = run_iterative_algo(
+                model_name, algo, y, x0, static,
+                hp=best_params, max_iter=args.algo_iters
+            )
+            _sync_device(device)
+            elapsed_time += time.perf_counter() - start_t
 
+            sample_metrics = _compute_all_metrics(xh, xt)
+            for m in REPORT_METRICS:
+                metrics_per_sample[m].append(sample_metrics[m])
+
+        # N'active le profiler `torch.profiler` (accumulation memoire non
+        # bornee, cf. PROFILE_MAX_SAMPLES) que sur un echantillon reduit de
+        # signaux : avec algo_iters potentiellement eleve (milliers
+        # d'iterations/signal), profiler l'integralite du jeu de test
+        # provoque un OOM (processus 'Killed').
+        with torch.no_grad():
+            with mem_profiler:
+                for idx in range(n_profiled):
+                    _run_one(idx)
+                    if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
+                        print(f"[COMPARE][random_search][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
+
+            for idx in range(n_profiled, n_total):
+                _run_one(idx)
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][random_search][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
 
@@ -324,33 +361,47 @@ def _evaluate_dl_on_testset(model_name, args, dataset, device, path_logs=None):
         progress_step = max(1, n_total // 10)
         elapsed_time = 0.0
 
+        n_profiled = min(PROFILE_MAX_SAMPLES, n_total)
         mem_profiler = TorchOpProfiler(path_logs, tag=f"{model_name}_deep_learning", device=device)
-        with torch.no_grad(), mem_profiler:
-            for idx in range(n_total):
-                sample = dataset[idx]
-                xt, y = sample[0], sample[1]
-                xt = xt.to(device).double().unsqueeze(0)
-                y = y.to(device).double().unsqueeze(0)
-                N_dim, M_dim = xt.shape[1], y.shape[1]
 
-                if model is None:
-                    model = _build_dl_model(model_name, N_dim, M_dim).to(device).double()
-                    ckpt = torch.load(ckpt_path, map_location=device)
-                    sd = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
-                    model.load_state_dict(sd, strict=False)
-                    model.eval()
+        def _run_one(idx):
+            nonlocal model, elapsed_time
+            sample = dataset[idx]
+            xt, y = sample[0], sample[1]
+            xt = xt.to(device).double().unsqueeze(0)
+            y = y.to(device).double().unsqueeze(0)
+            N_dim, M_dim = xt.shape[1], y.shape[1]
 
-                x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
+            if model is None:
+                model = _build_dl_model(model_name, N_dim, M_dim).to(device).double()
+                ckpt = torch.load(ckpt_path, map_location=device)
+                sd = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
+                model.load_state_dict(sd, strict=False)
+                model.eval()
 
-                start_t = time.perf_counter()
-                xp, _, _ = model(None, None, x0, y)
-                _sync_device(device)
-                elapsed_time += time.perf_counter() - start_t
+            x0 = y.sum(1, keepdim=True).repeat(1, N_dim) / (M_dim * N_dim)
 
-                sample_metrics = _compute_all_metrics(xp, xt)
-                for m in REPORT_METRICS:
-                    metrics_per_sample[m].append(sample_metrics[m])
+            start_t = time.perf_counter()
+            xp, _, _ = model(None, None, x0, y)
+            _sync_device(device)
+            elapsed_time += time.perf_counter() - start_t
 
+            sample_metrics = _compute_all_metrics(xp, xt)
+            for m in REPORT_METRICS:
+                metrics_per_sample[m].append(sample_metrics[m])
+
+        # N'active le profiler `torch.profiler` (accumulation memoire non
+        # bornee, cf. PROFILE_MAX_SAMPLES) que sur un echantillon reduit de
+        # signaux, afin d'eviter un OOM sur l'integralite du jeu de test.
+        with torch.no_grad():
+            with mem_profiler:
+                for idx in range(n_profiled):
+                    _run_one(idx)
+                    if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
+                        print(f"[COMPARE][deep_learning][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
+
+            for idx in range(n_profiled, n_total):
+                _run_one(idx)
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][deep_learning][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
 
@@ -695,11 +746,6 @@ def _save_report(summary_rows, path_logs, data_folder):
                 f"{_fmt(row.get('cpu_memory_peak_MB'), '>13.2f')} "
                 f"{_fmt(row.get('cuda_memory_peak_MB'), '>13.2f')}\n"
             )
-        f.write(
-            "\nNote: profil detaille operateur par operateur disponible dans "
-            "'torch_profile_<model>_<strategy>.txt' (table triee par memoire) "
-            "et '.json' (trace Chrome), dans ce meme dossier de logs.\n"
-        )
 
     print(f"[COMPARE] Rapport CSV sauvegarde : {csv_path}")
     print(f"[COMPARE] Rapport JSON sauvegarde : {json_path}")

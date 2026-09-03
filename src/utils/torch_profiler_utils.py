@@ -44,11 +44,12 @@ class TorchOpProfiler:
             agregees (temps CPU/CUDA total, pic memoire CPU/CUDA).
     """
 
-    def __init__(self, path_logs, tag="model", device="cpu", row_limit=30, verbose=True):
+    def __init__(self, path_logs, tag="model", device="cpu", row_limit=30, verbose=True, save_report=False):
         self.path_logs = path_logs
         self.tag = tag
         self.row_limit = row_limit
         self.verbose = verbose
+        self.save_report = save_report
         self.summary = {}
 
         device_type = device.type if isinstance(device, torch.device) else str(device).split(':')[0]
@@ -73,7 +74,8 @@ class TorchOpProfiler:
 
         key_averages = self._profiler.key_averages()
         self.summary = self._build_summary(key_averages)
-        self._save_report(key_averages)
+        if self.save_report:
+            self._save_report(key_averages)
 
         if self.verbose:
             self._print_summary()
