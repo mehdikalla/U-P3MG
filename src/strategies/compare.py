@@ -15,6 +15,7 @@ import csv
 import json
 import random
 import time
+import contextlib
 import torch
 import torch.nn as nn
 import numpy as np
@@ -24,6 +25,32 @@ from src.models import NET_ARCHITECTURES
 from src.strategies.network import init_static_params
 from src.strategies.random_search import get_algo_and_static, run_iterative_algo
 from src.utils.torch_profiler_utils import TorchOpProfiler
+
+
+class _NullProfiler:
+    """Profiler factice (no-op) utilise quand `--profiler` n'est pas active.
+
+    Expose la meme interface minimale que `TorchOpProfiler` (gestionnaire
+    de contexte + attribut `summary`), sans aucun cout ni instrumentation
+    `torch.profiler`, afin d'eviter les instabilites/bugs constates avec
+    le profiler lors des runs 'compare' traditionnels.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.summary = {}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return False
+
+
+def _make_profiler(path_logs, tag, device, args):
+    """Instancie le profiler adequat selon `args.profiler` (defaut : desactive)."""
+    if getattr(args, 'profiler', False):
+        return TorchOpProfiler(path_logs, tag=tag, device=device)
+    return _NullProfiler()
 
 
 UNROLLING_MODELS = ['p3mg', 'hq']
@@ -168,7 +195,7 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device, path_logs=
         elapsed_time = 0.0
 
         n_profiled = min(PROFILE_MAX_SAMPLES, n_total)
-        mem_profiler = TorchOpProfiler(path_logs, tag=f"{model_name}_unrolling", device=device)
+        mem_profiler = _make_profiler(path_logs, f"{model_name}_unrolling", device, args)
 
         def _run_one(idx):
             nonlocal static_params, elapsed_time
@@ -238,7 +265,7 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device, path_l
               f"{args.algo_iters} iterations/signal.")
 
         n_profiled = min(PROFILE_MAX_SAMPLES, n_total)
-        mem_profiler = TorchOpProfiler(path_logs, tag=f"{model_name}_random_search", device=device)
+        mem_profiler = _make_profiler(path_logs, f"{model_name}_random_search", device, args)
 
         def _run_one(idx):
             nonlocal algo, static, elapsed_time
@@ -304,7 +331,7 @@ def _evaluate_dl_on_testset(model_name, args, dataset, device, path_logs=None):
         elapsed_time = 0.0
 
         n_profiled = min(PROFILE_MAX_SAMPLES, n_total)
-        mem_profiler = TorchOpProfiler(path_logs, tag=f"{model_name}_deep_learning", device=device)
+        mem_profiler = _make_profiler(path_logs, f"{model_name}_deep_learning", device, args)
 
         def _run_one(idx):
             nonlocal model, elapsed_time

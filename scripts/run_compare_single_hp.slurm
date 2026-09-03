@@ -114,7 +114,8 @@ for DATA_FOLDER in "${DATA_FOLDERS[@]}"; do
         --data_folder "${DATA_FOLDER}" \
         --run_tag "${RUN_SET_TAG}/${DATA_FOLDER}" \
         --criterion "${CRITERION}" \
-        --epochs 30 || echo "[AVERTISSEMENT] Echec de 'compare' pour ${DATA_FOLDER}, poursuite avec les datasets restants."
+        --epochs 30 \
+        --profiler || echo "[AVERTISSEMENT] Echec de 'compare' pour ${DATA_FOLDER}, poursuite avec les datasets restants."
 done
 
 echo "--- Runs bruts consolides sous : runs/compare/${RUN_SET_TAG}/ ---"

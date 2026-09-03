@@ -54,6 +54,12 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=42)
     parser.add_argument('--batch_size', type=int, default=4)
     parser.add_argument('--criterion', type=str, default='MSE', choices=['MSE', 'SNR', 'TSNR'])
+    parser.add_argument('--profiler', action='store_true', default=False,
+                         help="Active le profilage memoire/temps via `torch.profiler` (cf. "
+                              "src.utils.torch_profiler_utils.TorchOpProfiler) durant le mode "
+                              "'compare'. Desactive par defaut (le profiler est instable/bugue "
+                              "sur certaines configurations) ; active-le explicitement pour les "
+                              "runs 'compare_single_hp' (cf. scripts/run_compare_single_hp.slurm).")
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--num_layers', type=int, default=25)
