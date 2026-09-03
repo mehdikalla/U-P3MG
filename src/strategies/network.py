@@ -113,10 +113,6 @@ def train(model, train_loader, val_loader, args, paths):
         scheduler = None
         print("[INFO] Aucun paramètre apprenable détecté. Évaluation sans rétropropagation.")
 
-    # Garde-fou anti-sursaut : sauvegarde du dernier état stable des poids
-    # et de l'optimiseur, avec restauration automatique si la loss d'une
-    # époque explose au-delà d'un facteur toléré par rapport à la moyenne
-    # glissante récente.
     grad_clip_norm = getattr(args, 'grad_clip_norm', 1.0)
     loss_spike_factor = getattr(args, 'loss_spike_factor', 2.0)
     stable_state = None
@@ -177,7 +173,6 @@ def train(model, train_loader, val_loader, args, paths):
                     return # Arrêtez l'entraînement
                 loss.backward()
                 # Clip du gradient : évite qu'un batch difficile ne produise
-                # un pas d'optimisation démesuré responsable d'un sursaut de loss.
                 torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip_norm)
                 optimizer.step()
                 
@@ -201,11 +196,7 @@ def train(model, train_loader, val_loader, args, paths):
         
         ep_val_loss = val_loss / len(val_loader)
 
-        # Détection et rejet des sursauts de loss (spikes) : si la loss de
-        # validation dépasse d'un facteur `loss_spike_factor` la moyenne
-        # glissante des dernières époques stables, on rejette la mise à jour
-        # en restaurant le dernier état stable connu, plutôt que de laisser
-        # le modèle diverger.
+        # Détection et rejet des sursauts de loss (spikes)
         window = val_losses[-5:] if len(val_losses) >= 1 else []
         recent_mean = float(np.mean(window)) if window else None
         is_spike = (

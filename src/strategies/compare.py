@@ -25,23 +25,11 @@ from src.strategies.network import init_static_params
 from src.strategies.random_search import get_algo_and_static, run_iterative_algo
 from src.utils.torch_profiler_utils import TorchOpProfiler
 
-# Modeles algorithmiques disponibles pour chaque strategie. Restreint aux
-# combinaisons pertinentes pour l'etude de comparaison (cf. demande) : tous
-# les modeles itteratifs pour 'random_search', mais seulement HQ et P3MG
-# pour 'unrolling'.
+
 UNROLLING_MODELS = ['p3mg', 'hq']
 RANDOM_SEARCH_MODELS = ['p3mg', 'ista', 'hq', 'pd']
-
-# Modeles purement deep learning (pas d'algorithme itteratif statique),
-# evalues uniquement en strategie 'unrolling' (entrainement par gradient).
-# Restreint a FCAE, FCUN, FCTN (ResU exclu de la comparaison).
 DL_MODELS = ['fcae', 'fcun', 'fctn']
-
-
-# Metriques systematiquement calculees en inference, independamment du
-# critere utilise a l'entrainement/a la calibration.
 REPORT_METRICS = ['MSE', 'SNR']
-
 # Nombre maximal de signaux profiles via `torch.profiler` 
 PROFILE_MAX_SAMPLES = 10
 
@@ -50,9 +38,7 @@ def _list_run_dirs(model_name, strategy, data_folder):
     """Retourne (liste des dossiers de run tries du plus recent au plus ancien,
     chemin du dossier de strategie) ou (None, None) si absent.
 
-    Le dossier est cherche sous 'runs/<model>/<strategy>/<data_folder>' afin
-    de garantir que la comparaison ne porte que sur des runs entraines/
-    calibres sur le meme jeu de donnees.
+    Le dossier est cherche sous 'runs/<model>/<strategy>/<data_folder>' 
     """
     strategy_dir = os.path.join("runs", model_name, strategy, data_folder.strip().lower())
     if not os.path.isdir(strategy_dir):
@@ -90,13 +76,6 @@ def find_latest_best_params(model_name, strategy, data_folder):
 
 def _load_ckpt_arch_config(ckpt_path):
     """Recupere (num_layers, num_pd_layers) reellement utilises a l'entrainement.
-
-    Le fichier 'logs/run_config.json', ecrit par src.strategies.network.save_config
-    au lancement de l'entrainement, est la source de verite pour l'architecture du
-    modele associe a un checkpoint (cf. scripts/build_ablation_summary.py, qui
-    applique deja ce meme principe). A defaut, retombe sur (None, None), auquel
-    cas l'appelant doit utiliser les valeurs courantes de 'args' (au risque d'un
-    'size mismatch' si l'architecture a change depuis l'entrainement).
     """
     run_dir = os.path.dirname(os.path.dirname(ckpt_path))  # .../checkpoints/best_model.pt -> run_dir
     config_path = os.path.join(run_dir, 'logs', 'run_config.json')
@@ -116,15 +95,6 @@ def _load_ckpt_arch_config(ckpt_path):
 
 def _build_unrolled_model(model_name, args, M_dim=None, ckpt_path=None):
     """Instancie l'architecture unrolled correspondant a model_name.
-
-    Le parametre M_dim est requis pour HQ afin de dimensionner correctement
-    les couches lineaires internes (fc_cvx/fc_ncvx), sous peine de charger un
-    state_dict incompatible en silence (strict=False).
-
-    Si ckpt_path est fourni, num_layers/num_pd_layers sont lus depuis le
-    'run_config.json' du run d'origine plutot que depuis 'args', afin d'eviter
-    tout 'size mismatch' lorsque l'architecture courante (config.yaml/CLI) a
-    change depuis l'entrainement du checkpoint charge.
     """
     ModelClass = NET_ARCHITECTURES[model_name]
     num_layers, num_pd_layers = args.num_layers, args.num_pd_layers
@@ -176,16 +146,6 @@ def _compute_all_metrics(xh, xt):
 
 def _evaluate_unrolling_on_testset(model_name, args, dataset, device, path_logs=None):
     """Evalue un modele 'unrolling' sur l'integralite du jeu de test.
-
-    Retourne (metrics_per_sample, checkpoint_path) ou (None, None) si aucun
-    checkpoint n'est disponible.
-        metrics_per_sample : dict {nom_metrique: liste des valeurs par echantillon}
-
-    L'ensemble de la boucle d'inference est enveloppee par un
-    `TorchOpProfiler` (base sur torch.profiler, cf.
-    https://docs.pytorch.org/tutorials/recipes/recipes/profiler_recipe.html)
-    afin de mesurer le temps et la memoire CPU/GPU consommes operateur par
-    operateur, en plus du temps total mesure par time.perf_counter().
     """
     data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
@@ -256,15 +216,6 @@ def _evaluate_unrolling_on_testset(model_name, args, dataset, device, path_logs=
 
 def _evaluate_random_search_on_testset(model_name, args, dataset, device, path_logs=None):
     """Evalue un modele 'random_search' sur l'integralite du jeu de test.
-
-    Retourne (metrics_per_sample, params_path, elapsed_time) ou
-    (None, None, None) si aucun 'best_params.json' n'est disponible.
-    elapsed_time est le temps total (en secondes) passe dans
-    run_iterative_algo sur l'ensemble du jeu de test.
-
-    L'ensemble de la boucle d'inference est enveloppee par un
-    `TorchOpProfiler` (base sur torch.profiler) afin de mesurer le temps et
-    la memoire CPU/GPU consommes operateur par operateur.
     """
     data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     params_path = find_latest_best_params(model_name, 'random_search', data_folder)
@@ -339,15 +290,6 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device, path_l
 
 def _evaluate_dl_on_testset(model_name, args, dataset, device, path_logs=None):
     """Evalue un modele deep learning pur sur l'integralite du jeu de test.
-
-    Retourne (metrics_per_sample, checkpoint_path, elapsed_time) ou
-    (None, None, None) si aucun checkpoint n'est disponible. Les modeles DL
-    sont toujours entraines/charges sous la strategie 'unrolling'
-    (entrainement par retropropagation).
-
-    L'ensemble de la boucle d'inference est enveloppee par un
-    `TorchOpProfiler` (base sur torch.profiler) afin de mesurer le temps et
-    la memoire CPU/GPU consommes operateur par operateur.
     """
     data_folder = getattr(args, 'data_folder', 'data_1').strip().lower()
     ckpt_path = find_latest_checkpoint(model_name, 'unrolling', data_folder)
@@ -416,14 +358,6 @@ def run(dataset, args, paths):
 
     """
     Point d'entree du mode 'compare'.
-
-    Evalue tous les modeles algorithmiques (unrolling + random_search) sur
-    l'integralite du jeu de test fourni, en calculant simultanement la MSE et
-    le SNR (en inference uniquement, avec les poids/parametres deja
-    calibres). Produit :
-      - un rapport CSV/JSON avec moyenne et ecart-type par (modele, strategie)
-      - une visualisation qualitative sur un signal tire aleatoirement.
-
     Args:
         dataset : instance de MyDataset (typiquement le split de test).
         args    : namespace argparse contenant la configuration.
@@ -683,14 +617,6 @@ def _plot_comparison(xt_np, results, idx, criterion_name, path_plots, data_folde
 
 def _save_report(summary_rows, path_logs, data_folder):
     """Sauvegarde le rapport comparatif complet en CSV et JSON.
-
-    Le CSV contient, pour chaque (modele, strategie) : le nombre
-    d'echantillons evalues, la moyenne et l'ecart-type de la MSE et du SNR,
-    le temps total (secondes) passe a parcourir le jeu de test ainsi que le
-    temps moyen par signal, le chemin des poids/parametres utilises, et les
-    metriques memoire/temps issues du profiler torch.profiler (temps self
-    CPU/CUDA total en ms, pic memoire CPU/CUDA en MB), agregees sur
-    l'ensemble du jeu de test pour la methode consideree.
     """
     fieldnames = ['model', 'strategy', 'data_folder', 'n_samples',
                   'mse_mean', 'mse_std', 'snr_mean', 'snr_std',
