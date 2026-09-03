@@ -140,7 +140,7 @@ def _compute_all_metrics(xh, xt):
     mse = torch.mean((xh - xt) ** 2).item()
     noise = torch.mean((xt - xh) ** 2)
     sig = torch.mean(xt ** 2)
-    snr = (-10 * torch.log10(sig / (noise + 1e-12))).item()
+    snr = (-20 * torch.log10(sig / (noise + 1e-12))).item()
     return {'MSE': mse, 'SNR': snr}
 
 
