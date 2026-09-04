@@ -59,6 +59,13 @@ DL_MODELS = ['fcae', 'fcun', 'fctn']
 REPORT_METRICS = ['MSE', 'SNR']
 # Nombre maximal de signaux profiles via `torch.profiler` 
 PROFILE_MAX_SAMPLES = 10
+# Nombre maximal d'iterations de l'algorithme profilees via `torch.profiler`
+# (independant de `args.algo_iters`, qui peut atteindre plusieurs milliers
+# d'iterations/signal, cf. config.yaml). Sans cette borne, le profiler
+# accumule les statistiques memoire/temps de chaque iteration en RAM et
+# provoque un OOM (processus tue par le noyau, "Killed") des que
+# `algo_iters` est eleve, meme avec PROFILE_MAX_SAMPLES restreint.
+PROFILE_MAX_ITERS = 50
 
 
 def _list_run_dirs(model_name, strategy, data_folder):
@@ -265,9 +272,15 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device, path_l
               f"{args.algo_iters} iterations/signal.")
 
         n_profiled = min(PROFILE_MAX_SAMPLES, n_total)
+        # Le profiler `torch.profiler` est execute separement, sur un nombre
+        # d'iterations borne (PROFILE_MAX_ITERS), independamment du calcul
+        # des metriques qui utilise systematiquement `args.algo_iters`
+        # complet. Ceci evite l'OOM ("Killed") lie a l'accumulation memoire
+        # du profiler sur des dizaines de milliers d'iterations tensorielles.
+        profiled_iters = min(args.algo_iters, PROFILE_MAX_ITERS)
         mem_profiler = _make_profiler(path_logs, f"{model_name}_random_search", device, args)
 
-        def _run_one(idx):
+        def _run_one(idx, profiler_ctx=None):
             nonlocal algo, static, elapsed_time
             sample = dataset[idx]
             xt, y = sample[0], sample[1]
@@ -292,19 +305,30 @@ def _evaluate_random_search_on_testset(model_name, args, dataset, device, path_l
             for m in REPORT_METRICS:
                 metrics_per_sample[m].append(sample_metrics[m])
 
-        # N'active le profiler `torch.profiler` (accumulation memoire non
-        # bornee, cf. PROFILE_MAX_SAMPLES) que sur un echantillon reduit de
-        # signaux : avec algo_iters potentiellement eleve (milliers
-        # d'iterations/signal), profiler l'integralite du jeu de test
-        # provoque un OOM (processus 'Killed').
-        with torch.no_grad():
-            with mem_profiler:
-                for idx in range(n_profiled):
-                    _run_one(idx)
-                    if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
-                        print(f"[COMPARE][random_search][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
+        # Profilage memoire/temps : execute sur un nombre restreint de
+        # signaux ET d'iterations (profiled_iters), sur un run additionnel
+        # distinct du calcul des metriques, afin de ne jamais laisser le
+        # profiler tracer les `args.algo_iters` iterations completes.
+        if getattr(args, 'profiler', False) and n_profiled > 0:
+            with torch.no_grad():
+                algo_p, static_p = None, None
+                with mem_profiler:
+                    for idx in range(n_profiled):
+                        sample = dataset[idx]
+                        xt_p, y_p = sample[0], sample[1]
+                        xt_p = xt_p.to(device).double().unsqueeze(0)
+                        y_p = y_p.to(device).double().unsqueeze(0)
+                        N_dim_p, M_dim_p = xt_p.shape[1], y_p.shape[1]
+                        if algo_p is None:
+                            algo_p, static_p = get_algo_and_static(args, N_dim_p, M_dim_p, device)
+                        x0_p = y_p.sum(1, keepdim=True).repeat(1, N_dim_p) / (M_dim_p * N_dim_p)
+                        run_iterative_algo(
+                            model_name, algo_p, y_p, x0_p, static_p,
+                            hp=best_params, max_iter=profiled_iters
+                        )
 
-            for idx in range(n_profiled, n_total):
+        with torch.no_grad():
+            for idx in range(n_total):
                 _run_one(idx)
                 if (idx + 1) % progress_step == 0 or (idx + 1) == n_total:
                     print(f"[COMPARE][random_search][{model_name}] Progression : {idx + 1}/{n_total} signaux evalues.")
