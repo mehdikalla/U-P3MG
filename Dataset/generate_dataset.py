@@ -22,7 +22,16 @@ def get_next_generation_dir(base_dir):
     return generation_dir
 
 
-def generate_dosy_dataset(num_samples, N=800, M=100, noise_std=0.01, seed=42, number=2):
+def generate_dosy_dataset(num_samples, N=800, M=100, noise_std=0.01, seed=42, number=2,
+                           skew=False, beta=2.0, beta_min=1.5, beta_max=3.0):
+    """Génère un dataset RMN DOSY simulé.
+
+    Le paramètre de forme `beta` de chaque gaussienne généralisée est fixé à
+    la valeur `beta` si `skew` est désactivé, ou tiré uniformément dans
+    l'intervalle `[beta_min, beta_max]` (par pic, à chaque échantillon) si
+    `skew` est activé. C'est ce paramètre `beta` qui contrôle l'asymétrie
+    ("skew") de la forme des pics.
+    """
     np.random.seed(seed)
     torch.manual_seed(seed)
 
@@ -41,13 +50,15 @@ def generate_dosy_dataset(num_samples, N=800, M=100, noise_std=0.01, seed=42, nu
         A_1 = np.random.uniform(0.6, 0.8)
         mu_1 = np.random.uniform(0.45, 0.55) * N
         sigma_1 = np.random.uniform(8.0, 12.0)
-        beta_1 = np.random.uniform(1.5, 3.0)
+        beta_1 = np.random.uniform(0.75, 1.8) if np.random.rand() < 1.3 / 3.1 else np.random.uniform(2.2, 3.5)
+
 
         # Paramètres pour le pic 2
         A_2 = np.random.uniform(0.9, 1.1)
         mu_2 = np.random.uniform(0.15, 0.25) * N
         sigma_2 = np.random.uniform(4.0, 6.0)
-        beta_2 = np.random.uniform(1.5, 3.0)
+        beta_2 = np.random.uniform(0.75, 1.8) if np.random.rand() < 1.3 / 3.1 else np.random.uniform(2.2, 3.5)
+
 
         # Génération des signaux de base
         x1 = A_1 * np.exp(-0.5 * (np.abs((n - mu_1) / sigma_1)) ** beta_1)
@@ -60,8 +71,9 @@ def generate_dosy_dataset(num_samples, N=800, M=100, noise_std=0.01, seed=42, nu
             A_3 = np.random.uniform(0.4, 0.6)
             mu_3 = np.random.uniform(0.75, 0.85) * N
             sigma_3 = np.random.uniform(16.0, 24.0)
-            beta_3 = np.random.uniform(1.5, 3.0)
-            
+            beta_3 = np.random.uniform(0.75, 1.8) if np.random.rand() < 1.3 / 3.1 else np.random.uniform(2.2, 3.5)
+
+
             x3 = A_3 * np.exp(-0.5 * (np.abs((n - mu_3) / sigma_3)) ** beta_3)
             xtrue += x3
 
@@ -121,9 +133,13 @@ if __name__ == "__main__":
     # Remplacement de num_peaks par number pour correspondre au script Bash
     parser.add_argument("--number", type=int, default=2, choices=[2, 3])
     
-    # Arguments maintenus pour éviter l'erreur "unrecognized arguments" du wrapper
+    # --skew active la variation aléatoire du paramètre de forme beta
+    # (entre --beta_min et --beta_max) pour chaque pic, à la place de la
+    # valeur fixe --beta.
     parser.add_argument("--skew", action="store_true", default=False)
     parser.add_argument("--beta", type=float, default=2.0)
+    parser.add_argument("--beta_min", type=float, default=1.5)
+    parser.add_argument("--beta_max", type=float, default=3.0)
     
     args = parser.parse_args()
 
@@ -134,7 +150,11 @@ if __name__ == "__main__":
     X_all, Y_all, Hmat = generate_dosy_dataset(
         num_samples=args.total_samples,
         noise_std=args.noise,
-        number=args.number
+        number=args.number,
+        skew=args.skew,
+        beta=args.beta,
+        beta_min=args.beta_min,
+        beta_max=args.beta_max
     )
 
     num_train = int(0.8 * args.total_samples)

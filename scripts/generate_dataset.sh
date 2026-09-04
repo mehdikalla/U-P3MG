@@ -10,6 +10,8 @@
 #   --skew                Active la gaussienne généralisée asymétrique (défaut: désactivé)
 #   --number <int>        Nombre de gaussiennes fondamentales sommées (défaut: 2)
 #   --beta <float>        Paramètre de forme de la gaussienne généralisée (défaut: 2.0)
+#   --beta_min <float>    Borne inférieure du paramètre beta tiré aléatoirement quand --skew est actif (défaut: 1.5)
+#   --beta_max <float>    Borne supérieure du paramètre beta tiré aléatoirement quand --skew est actif (défaut: 3.0)
 #   --noise <float>       Écart-type du bruit gaussien additif (défaut: 0.01)
 #   --total_samples <int> Nombre total d'échantillons à générer (défaut: 1000)
 #   --out_dir <path>      Dossier de sauvegarde (défaut: ./Dataset)
@@ -36,6 +38,14 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         --beta)
             ARGS+=("--beta" "$2")
+            shift 2
+            ;;
+        --beta_min)
+            ARGS+=("--beta_min" "$2")
+            shift 2
+            ;;
+        --beta_max)
+            ARGS+=("--beta_max" "$2")
             shift 2
             ;;
         --noise)

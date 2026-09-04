@@ -47,9 +47,9 @@ echo "[SUITE] ================================================"
 "$SCRIPT_DIR/generate_dataset.sh" --number 2 "${COMMON_ARGS[@]}"
 
 echo "[SUITE] ================================================"
-echo "[SUITE] Génération 2/3 : 2 pics (-> data_1)"
+echo "[SUITE] Génération 2/3 : 2 pics avec beta (skew) variable entre 1.5 et 3.0 (-> data_1)"
 echo "[SUITE] ================================================"
-"$SCRIPT_DIR/generate_dataset.sh" --number 2 "${COMMON_ARGS[@]}"
+"$SCRIPT_DIR/generate_dataset.sh" --number 2 --skew --beta_min 1.5 --beta_max 3.0 "${COMMON_ARGS[@]}"
 
 echo "[SUITE] ================================================"
 echo "[SUITE] Génération 3/3 : 3 pics (-> data_2)"
