@@ -30,7 +30,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Framework de Reconstruction")
 
     parser.add_argument('--config', type=str, default=None, help="Chemin vers le fichier YAML de configuration")
-    parser.add_argument('--model', type=str, default='p3mg', choices=['p3mg', 'ista', 'hq', 'pmms', 'pd', 'fcae', 'fctn', 'fcun', 'resu'])
+    parser.add_argument('--model', type=str, default='p3mg', choices=['p3mg', 'ista', 'hq', 'pmms', 'ipiano', 'vmfb', 'pd', 'fcae', 'fctn', 'fcun', 'resu'])
 
     parser.add_argument('--dataset_dir', type=str, default='./Dataset', help="Dossier racine contenant les générations de datasets")
     parser.add_argument('--data_folder', type=str, default='data_1', help="Sous-dossier de génération à utiliser (ex: data_0, data_1, ...)")
@@ -99,9 +99,9 @@ def parse_args():
 
     parser.add_argument('--nu_min', type=float, default=1e-6,
 
-                         help="Borne inferieure pour la recherche de nu (PMMS uniquement)")
+                         help="Borne inferieure pour la recherche de nu (PMMS/iPiano/VMFB)")
     parser.add_argument('--nu_max', type=float, default=1e-3,
-                         help="Borne superieure pour la recherche de nu (PMMS uniquement)")
+                         help="Borne superieure pour la recherche de nu (PMMS/iPiano/VMFB)")
 
     parser.add_argument('--lambda_tau_min', type=float, default=None,
                          help="Borne inferieure pour lambda_tau (regularisation du modele PD standalone). Si non fourni, retombe sur --lmbd_min.")

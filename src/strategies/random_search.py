@@ -57,6 +57,24 @@ def get_algo_and_static(args, N_dim, M_dim, device):
         beta = getattr(args, 'beta', 1e-5)
         static = (eta, sigma, beta)
         return algo, static
+
+    elif model_name == 'ipiano':
+        from src.models.ipiano.algo import IPIANO_algo
+        algo = IPIANO_algo().to(device).double()
+        eta = getattr(args, 'eta', 1e-2)
+        sigma = getattr(args, 'sigma', 1e-5)
+        beta = getattr(args, 'beta', 1e-5)
+        static = (eta, sigma, beta)
+        return algo, static
+
+    elif model_name == 'vmfb':
+        from src.models.vmfb.algo import VMFB_algo
+        algo = VMFB_algo().to(device).double()
+        eta = getattr(args, 'eta', 1e-2)
+        sigma = getattr(args, 'sigma', 1e-5)
+        beta = getattr(args, 'beta', 1e-5)
+        static = (eta, sigma, beta)
+        return algo, static
         
     elif model_name == 'ista':
         from src.models.ista.algo import ISTA_algo
@@ -106,6 +124,24 @@ def run_iterative_algo(model_name, algo, y, x0, static, hp, max_iter=100):
         x = x0
         for _ in range(max_iter):
             x, dyn = algo.iter_PMMS(static_pmms, dyn, x, y, nu)
+        return x
+
+    elif model_name == 'ipiano':
+        nu = float(hp['nu'])
+        eta, sigma, beta = static
+        static_ipiano, dyn = algo.init_IPIANO(x0, y, sigma=sigma, beta=beta, eta=eta)
+        x = x0
+        for _ in range(max_iter):
+            x, dyn = algo.iter_IPIANO(static_ipiano, dyn, x, y, nu)
+        return x
+
+    elif model_name == 'vmfb':
+        nu = float(hp['nu'])
+        eta, sigma, beta = static
+        static_vmfb, dyn = algo.init_VMFB(x0, y, sigma=sigma, beta=beta, eta=eta)
+        x = x0
+        for _ in range(max_iter):
+            x, dyn = algo.iter_VMFB(static_vmfb, dyn, x, y, nu)
         return x
         
     elif model_name == 'ista':
@@ -183,7 +219,7 @@ def train(loader, args, paths):
             hp['lmbd_cvx'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['lmbd_ncvx'] = 10 ** random.uniform(log_l_min, log_l_max)
             hp['gamma'] = random.uniform(float(tau_min), float(tau_max))
-        elif model_name == 'pmms':
+        elif model_name in ('pmms', 'ipiano', 'vmfb'):
             if i == 0:
                 hp['nu'] = 8.0e-5
             else:
@@ -293,7 +329,7 @@ def test(loader, args, paths):
         # Fallback explicite
         if model_name == 'hq':
             best_params = {'lmbd_cvx': 1.0, 'lmbd_ncvx': 1.0, 'gamma': 1.0}
-        elif model_name == 'pmms':
+        elif model_name in ('pmms', 'ipiano', 'vmfb'):
             best_params = {'nu': 8.0e-5}
         elif model_name == 'ista':
             best_params = {'lmbd': 1.0}

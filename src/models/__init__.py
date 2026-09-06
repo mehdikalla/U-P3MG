@@ -16,9 +16,14 @@ from src.models.hq.algo import HQ_algo
 from src.models.pd.net import PD_Standalone_model
 from src.models.pd.algo import PD_Standalone_algo
 
-# --- Modèle 5 : PMMS ---
-from src.models.pmms.net import PMMS_model
+# --- Modèle 5 : PMMS (algorithme itératif uniquement, pas d'unrolling) ---
 from src.models.pmms.algo import PMMS_algo
+
+# --- Modèle 5bis : iPiano (algorithme itératif uniquement, pas d'unrolling) ---
+from src.models.ipiano.algo import IPIANO_algo
+
+# --- Modèle 5ter : VMFB (algorithme itératif uniquement, pas d'unrolling) ---
+from src.models.vmfb.algo import VMFB_algo
 
 # --- Modèle 6 : FCAE (Fully Connected Autoencoder) ---
 from src.models.fcae.net import FCAE_model
@@ -41,7 +46,6 @@ NET_ARCHITECTURES = {
     'ista': ISTA_model,
     'hq': HQ_model,
     'pd': PD_Standalone_model,
-    'pmms': PMMS_model,
     'fcae': FCAE_model,
     'fctn': FCTN_model,
     'fcun': FCUN_model,
@@ -55,6 +59,8 @@ ALGORITHMS = {
     'hq': HQ_algo,
     'pd': PD_Standalone_algo,
     'pmms': PMMS_algo,
+    'ipiano': IPIANO_algo,
+    'vmfb': VMFB_algo,
 }
 
 # Modèles purement "deep learning" ne reposant sur aucun algorithme itératif

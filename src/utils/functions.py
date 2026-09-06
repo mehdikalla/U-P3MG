@@ -171,6 +171,48 @@ def Criterion(x, Hmat, y, sigma, beta, eta, nu):
     crit = fid + l1l2
     return crit
 
+def proj_weighted_simplex(z: tc.Tensor, weight: tc.Tensor, n_iter_bisect: int = 60) -> tc.Tensor:
+    """Projection ponderee (batchee) sur le simplexe de probabilite.
+
+    Resout, independamment pour chaque ligne du batch :
+        min_x  sum_i weight_i/2 * (x_i - z_i)^2
+        s.c.   sum_i x_i = 1,  x_i >= 0
+
+    Utilise pour la projection metrique de VMFB (`projection_metric_simplex`
+    dans `runVMFBalgorithm.m`), ou `weight` est la majorante diagonale
+    (divisee par le pas de relaxation `gamma`) de la Hessienne locale.
+
+    Le multiplicateur de Lagrange associe a la contrainte d'egalite est
+    determine par bissection (`n_iter_bisect` iterations, precision
+    largement suffisante en double precision), la solution ayant la forme
+    fermee x_i = max(z_i - tau/weight_i, 0) pour tau bien choisi (KKT).
+
+    Args:
+        z: point a projeter, shape (P, N).
+        weight: poids strictement positifs de la metrique diagonale,
+            shape (P, N).
+        n_iter_bisect: nombre d'iterations de bissection.
+
+    Returns:
+        Tenseur projete, shape (P, N).
+    """
+    zw = z * weight
+    # Bissection sur tau : f(tau) = sum_i max(z_i - tau/weight_i, 0) - 1 est
+    # decroissante en tau. Bornes garanties valides (cf. docstring interne
+    # du depot : f(lo) >= 1 et f(hi) <= 1).
+    lo = zw.amin(dim=1, keepdim=True) - weight.amax(dim=1, keepdim=True)
+    hi = zw.amax(dim=1, keepdim=True)
+
+    for _ in range(n_iter_bisect):
+        mid = 0.5 * (lo + hi)
+        x = tc.clamp(z - mid / weight, min=0.0)
+        sum_ge_one = x.sum(dim=1, keepdim=True) >= 1.0
+        lo = tc.where(sum_ge_one, mid, lo)
+        hi = tc.where(sum_ge_one, hi, mid)
+
+    tau = 0.5 * (lo + hi)
+    return tc.clamp(z - tau / weight, min=0.0)
+
 def signal_noise(x, xtrue):
     norm1 = tc.sum(tc.abs(x - xtrue), dim=1, keepdim=True) / xtrue.shape[1]
     norm2 = tc.sqrt(tc.sum((x - xtrue)**2, dim=1, keepdim=True) / xtrue.shape[1])

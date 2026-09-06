@@ -3,7 +3,7 @@
 # ==============================================================================
 
 # --- 1. Paramètres généraux et stratégie ---
-model: "p3mg"               # Choix de l'architecture : 'p3mg', 'ista', 'hq', 'pmms', 'pd'
+model: "p3mg"               # Choix de l'architecture : 'p3mg', 'ista', 'hq', 'pmms', 'ipiano', 'vmfb', 'pd'
 strategy: "unrolling"       # Stratégie de résolution : 'unrolling' ou 'random_search'
 seed: 42                    # Graine aléatoire pour la reproductibilité
 
@@ -56,8 +56,8 @@ tau_max: 2.0               # Borne supérieure pour la recherche de Tau (P3MG, P
 tau_pd_min: 1e-9           # Borne inférieure spécifique pour la recherche de Tau du modèle PD standalone (par défaut = tau_min)
 tau_pd_max: 10            # Borne supérieure spécifique pour la recherche de Tau du modèle PD standalone (par défaut = tau_max)
 
-nu_min: 1.0e-9              # Borne inférieure pour la recherche de nu (PMMS uniquement)
-nu_max: 1.1              # Borne supérieure pour la recherche de nu (PMMS uniquement)
+nu_min: 1.0e-9              # Borne inférieure pour la recherche de nu (PMMS/iPiano/VMFB)
+nu_max: 1.1              # Borne supérieure pour la recherche de nu (PMMS/iPiano/VMFB)
 
 # --- 7. Sauvegarde et chargement ---
 
