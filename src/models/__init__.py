@@ -25,6 +25,9 @@ from src.models.ipiano.algo import IPIANO_algo
 # --- Modèle 5ter : VMFB (algorithme itératif uniquement, pas d'unrolling) ---
 from src.models.vmfb.algo import VMFB_algo
 
+# --- Modèle 5quater : FISTA (algorithme itératif uniquement, pas d'unrolling) ---
+from src.models.fista.algo import FISTA_algo
+
 # --- Modèle 6 : FCAE (Fully Connected Autoencoder) ---
 from src.models.fcae.net import FCAE_model
 
@@ -61,6 +64,7 @@ ALGORITHMS = {
     'pmms': PMMS_algo,
     'ipiano': IPIANO_algo,
     'vmfb': VMFB_algo,
+    'fista': FISTA_algo,
 }
 
 # Modèles purement "deep learning" ne reposant sur aucun algorithme itératif

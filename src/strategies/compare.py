@@ -54,7 +54,7 @@ def _make_profiler(path_logs, tag, device, args):
 
 
 UNROLLING_MODELS = ['p3mg', 'hq']
-RANDOM_SEARCH_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms', 'ipiano', 'vmfb']
+RANDOM_SEARCH_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms', 'ipiano', 'vmfb', 'fista']
 DL_MODELS = ['fcae', 'fcun', 'fctn']
 REPORT_METRICS = ['MSE', 'SNR']
 # Nombre maximal de signaux profiles via `torch.profiler` 
