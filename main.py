@@ -108,6 +108,19 @@ def parse_args():
     parser.add_argument('--lambda_tau_max', type=float, default=None,
                          help="Borne superieure pour lambda_tau (regularisation du modele PD standalone). Si non fourni, retombe sur --lmbd_max.")
 
+    parser.add_argument('--compare_unrolling_models', type=str, default=None,
+                         help="Liste separee par des virgules des modeles a evaluer en strategie "
+                              "'unrolling' lors du mode 'compare' (ex: 'hq,ista,p3mg'). Si non fourni, "
+                              "retombe sur src.strategies.compare.UNROLLING_MODELS (par defaut : p3mg,hq).")
+    parser.add_argument('--compare_random_search_models', type=str, default=None,
+                         help="Liste separee par des virgules des modeles a evaluer en strategie "
+                              "'random_search' lors du mode 'compare' (ex: 'pd,hq,ista,p3mg'). Si non "
+                              "fourni, retombe sur src.strategies.compare.RANDOM_SEARCH_MODELS.")
+    parser.add_argument('--compare_dl_models', type=str, default=None,
+                         help="Liste separee par des virgules des modeles purement deep-learning a "
+                              "evaluer lors du mode 'compare' (ex: 'fcun,fcae'). Si non fourni, retombe "
+                              "sur src.strategies.compare.DL_MODELS.")
+
 
 
     args = parser.parse_args()

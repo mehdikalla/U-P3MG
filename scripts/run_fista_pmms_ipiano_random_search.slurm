@@ -1,7 +1,19 @@
 #!/bin/bash
 # =============================================================================
-# Configuration SLURM - Random Search FISTA / PMMS / iPiano (separement)
+# Configuration SLURM (ETAPE 1/3 : CALIBRATION) - Random Search FISTA / PMMS /
+# iPiano (separement)
 # =============================================================================
+# Ce script est le job d'ENTRAINEMENT/CALIBRATION uniquement (mode 'full').
+# Il ne produit AUCUN rapport de comparaison : il ecrit seulement les
+# 'best_params.json' dans 'runs/<model>/random_search/<data_folder>/'. Le
+# rapport comparatif final (compare_report.csv/.json/.txt + graphes, via
+# src.strategies.compare) est produit par l'ETAPE 2
+# (scripts/run_fista_pmms_ipiano_random_search_report.slurm), suivie de
+# l'ETAPE 3 de consolidation (scripts/build_compare_summary.slurm). Ne pas
+# soumettre ce script isolement si un rapport 'compare' est attendu :
+# utiliser scripts/submit_fista_pmms_ipiano_random_search.sh qui enchaine
+# les 3 etapes pour chacun des trois datasets.
+#
 # Lance le mode 'full' (train + test) en strategie 'random_search' pour les
 # trois algorithmes purement iteratifs FISTA, PMMS et iPiano (aucun n'a
 # d'unrolling, cf. src/models/<model>/algo.py sans net.py associe), sur les
@@ -9,14 +21,16 @@
 # array {modele x dataset}. Chaque modele est traite separement (pas de
 # combinaison croisee autre que modele x dataset).
 #
-# Usage:
+# Usage (etape isolee, sans rapport) :
 #   sbatch scripts/run_fista_pmms_ipiano_random_search.slurm
+# Usage recommande (3 etapes enchainees + rapport) :
+#   ./scripts/submit_fista_pmms_ipiano_random_search.sh
 #
 # Pour ne lancer qu'un sous-ensemble des taches (ex: seulement FISTA, les
 # 3 premiers indices) :
 #   sbatch --array=0-2 scripts/run_fista_pmms_ipiano_random_search.slurm
 # =============================================================================
-#SBATCH --job-name=UP3MG_FISTA_PMMS_IPIANO_RS
+#SBATCH --job-name=UP3MG_FISTA_PMMS_IPIANO_RS_TRAIN
 #SBATCH --partition=opis
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4

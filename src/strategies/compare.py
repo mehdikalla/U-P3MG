@@ -425,6 +425,30 @@ def run(dataset, args, paths):
 
     print(f"--- [COMPARE] Evaluation complete du jeu de test ({len(dataset)} signaux) | Data: {data_folder} ---")
 
+    # Les trois listes de modeles a evaluer sont normalement fixees par les
+    # constantes de module UNROLLING_MODELS / RANDOM_SEARCH_MODELS / DL_MODELS
+    # ci-dessus. Elles peuvent etre restreintes ponctuellement via les
+    # arguments CLI --compare_unrolling_models / --compare_random_search_models
+    # / --compare_dl_models (cf. main.py::parse_args), afin de produire un
+    # rapport 'compare' cible sur un sous-ensemble de modeles (ex: etudes
+    # comparatives dediees) sans modifier le code de ce module.
+    def _resolve_models(arg_value, default_models):
+        if not arg_value:
+            return default_models
+        if str(arg_value).strip().lower() == 'none':
+            # Sentinel explicite pour exclure entierement une categorie
+            # (ex: --compare_unrolling_models none), une chaine vide seule
+            # etant "falsy" et retombant donc sur default_models ci-dessus.
+            return []
+        # Le filtre CLI liste explicitement les modeles souhaites : il n'est
+        # PAS restreint a default_models (ex: --compare_unrolling_models
+        # peut inclure 'ista', absent de UNROLLING_MODELS par defaut).
+        return [m.strip().lower() for m in str(arg_value).split(',') if m.strip()]
+
+    unrolling_models = _resolve_models(getattr(args, 'compare_unrolling_models', None), UNROLLING_MODELS)
+    random_search_models = _resolve_models(getattr(args, 'compare_random_search_models', None), RANDOM_SEARCH_MODELS)
+    dl_models = _resolve_models(getattr(args, 'compare_dl_models', None), DL_MODELS)
+
     summary_rows = []   # lignes destinees au CSV final
     signal_results = {}  # cle -> (xh_numpy, loss_scalaire) pour le graphique qualitatif
 
@@ -454,7 +478,7 @@ def run(dataset, args, paths):
         summary_rows.append(row)
 
     # --- Strategie 'unrolling' ---
-    for model_name in UNROLLING_MODELS:
+    for model_name in unrolling_models:
         metrics_per_sample, ckpt_path, elapsed_time, mem_summary = _evaluate_unrolling_on_testset(model_name, args, dataset, device, path_logs=path_logs)
         if metrics_per_sample is None:
             print(f"[COMPARE][unrolling][{model_name}] Aucun checkpoint trouve, ignore.")
@@ -467,7 +491,7 @@ def run(dataset, args, paths):
 
         idx_pos = metrics_per_sample[plot_criterion]  # reuse loop below for plot signal
     # Recalcule le signal unique pour la visualisation qualitative (unrolling)
-    for model_name in UNROLLING_MODELS:
+    for model_name in unrolling_models:
         if not any(r['model'] == model_name and r['strategy'] == 'unrolling' for r in summary_rows):
             continue
         try:
@@ -498,7 +522,7 @@ def run(dataset, args, paths):
             print(f"[COMPARE][unrolling][{model_name}] Erreur lors du rendu qualitatif : {e}")
 
     # --- Strategie 'random_search' ---
-    for model_name in RANDOM_SEARCH_MODELS:
+    for model_name in random_search_models:
         metrics_per_sample, params_path, elapsed_time, mem_summary = _evaluate_random_search_on_testset(model_name, args, dataset, device, path_logs=path_logs)
         if metrics_per_sample is None:
             print(f"[COMPARE][random_search][{model_name}] Aucun best_params.json trouve, ignore.")
@@ -509,7 +533,7 @@ def run(dataset, args, paths):
               f"Temps={summary_rows[-1]['total_time_sec']:.4f}s "
               f"({summary_rows[-1]['avg_time_per_signal_sec']:.4e}s/signal) (params: {params_path})")
 
-    for model_name in RANDOM_SEARCH_MODELS:
+    for model_name in random_search_models:
         if not any(r['model'] == model_name and r['strategy'] == 'random_search' for r in summary_rows):
             continue
         try:
@@ -539,7 +563,7 @@ def run(dataset, args, paths):
             print(f"[COMPARE][random_search][{model_name}] Erreur lors du rendu qualitatif : {e}")
 
     # --- Modeles deep learning purs ---
-    for model_name in DL_MODELS:
+    for model_name in dl_models:
         metrics_per_sample, ckpt_path, elapsed_time, mem_summary = _evaluate_dl_on_testset(model_name, args, dataset, device, path_logs=path_logs)
         if metrics_per_sample is None:
             print(f"[COMPARE][deep_learning][{model_name}] Aucun checkpoint trouve, ignore.")
@@ -550,7 +574,7 @@ def run(dataset, args, paths):
               f"Temps={summary_rows[-1]['total_time_sec']:.4f}s "
               f"({summary_rows[-1]['avg_time_per_signal_sec']:.4e}s/signal) (poids: {ckpt_path})")
 
-    for model_name in DL_MODELS:
+    for model_name in dl_models:
         if not any(r['model'] == model_name and r['strategy'] == 'deep_learning' for r in summary_rows):
             continue
         try:

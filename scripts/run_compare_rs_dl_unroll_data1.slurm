@@ -1,8 +1,20 @@
 #!/bin/bash
 # =============================================================================
-# Configuration SLURM - Comparaison PD/HQ/ISTA/P3MG (random_search) +
-# FCUN/FCAE (deep learning) + U-HQ/U-ISTA/U-P3MG (unrolling), data_1 uniquement
+# Configuration SLURM (ETAPE 1/3 : CALIBRATION) - PD/HQ/ISTA/P3MG
+# (random_search) + FCUN/FCAE (deep learning) + U-HQ/U-ISTA/U-P3MG
+# (unrolling), data_1 uniquement
 # =============================================================================
+# Ce script est le job d'ENTRAINEMENT/CALIBRATION uniquement (mode 'full').
+# Il ne produit AUCUN rapport de comparaison : il se contente d'ecrire les
+# checkpoints ('best_model.pt') et parametres ('best_params.json') dans
+# 'runs/<model>/<strategy>/data_1/'. Le rapport comparatif final
+# (compare_report.csv/.json/.txt + graphes, via src.strategies.compare) est
+# produit par l'ETAPE 2 (scripts/run_compare_rs_dl_unroll_data1_report.slurm),
+# elle-meme suivie de l'ETAPE 3 de consolidation
+# (scripts/build_compare_summary.slurm). Ne pas soumettre ce script isolement
+# si un rapport 'compare' est attendu : utiliser
+# scripts/submit_compare_rs_dl_unroll_data1.sh qui enchaine les 3 etapes.
+#
 # Lance, via un unique job array {modele x strategie}, l'etude comparative
 # demandee sur le seul jeu de donnees 'data_1' :
 #   - Strategie 'random_search'  : PD, HQ, ISTA, P3MG (4 modeles)
@@ -11,13 +23,15 @@
 #                                   cf. demande : seul PD en random_search)
 #   - Deep learning pur (strategie 'unrolling' sans algo.py) : FCUN, FCAE
 #
-# Usage:
+# Usage (etape isolee, sans rapport) :
 #   sbatch scripts/run_compare_rs_dl_unroll_data1.slurm
+# Usage recommande (3 etapes enchainees + rapport) :
+#   ./scripts/submit_compare_rs_dl_unroll_data1.sh
 #
 # Pour ne lancer qu'un sous-ensemble des taches :
 #   sbatch --array=0-3 scripts/run_compare_rs_dl_unroll_data1.slurm
 # =============================================================================
-#SBATCH --job-name=UP3MG_COMPARE_D1
+#SBATCH --job-name=UP3MG_COMPARE_D1_TRAIN
 #SBATCH --partition=opis
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
