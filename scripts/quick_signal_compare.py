@@ -130,7 +130,7 @@ def _style_axis(ax):
 def _save_signal_plot(xt_np, xh_np, title, metrics, out_path):
     fig, (ax, ax_res) = plt.subplots(
         2, 1, figsize=(6, 3.6), sharex=True,
-        gridspec_kw={'height_ratios': [3, 1], 'hspace': 0.05},
+        gridspec_kw={'height_ratios': [3, 1], 'hspace': 0.08},
     )
 
     # Panneau principal : signal vrai vs reconstruction (style NeurIPS).
@@ -165,8 +165,8 @@ def _save_signal_plot(xt_np, xh_np, title, metrics, out_path):
     lc.set_array(abs_seg)
     ax_res.add_collection(lc)
     ax_res.set_xlim(x_orig.min(), x_orig.max())
-    ax_res.set_ylim(-3, 3)
-    ax_res.set_yticks([-3, 0, 3])
+    ax_res.set_ylim(-4, 4)
+    ax_res.set_yticks([-4, 0, 4])
     ax_res.axhline(0.0, color='black', linewidth=0.6)
     _style_axis(ax_res)
     ax_res.set_ylabel(
