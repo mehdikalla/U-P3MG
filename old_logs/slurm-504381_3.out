@@ -1,0 +1,48 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 6 ---
+--- Job Slurm ID: 504408 | Tache: 3/6 ---
+--- Modele: ista | Strategie: random_search | Dataset: data_1 | Mode: full ---
+--- Arguments specifiques : --num_layers 50 --algo_iters 5000 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : ISTA | Stratégie : RANDOM_SEARCH | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ista/random_search/data_1/20260827-141532_full
+--- [TRAIN] ISTA (RANDOM_SEARCH) | Trials: 100 | Loss: MSE ---
+   [1/100] New Best! lmbd=1.2200e+00 | Loss=2.2110e-05
+   [2/100] New Best! lmbd=1.1028e-01 | Loss=2.0037e-05
+   [20/100] New Best! lmbd=1.0257e-01 | Loss=1.9953e-05
+[RESULT] Best Params: {'lmbd': np.float64(0.10257492255869069)}
+--- [TRAIN] Terminé en 0.52 min ---
+--- [TEST] ISTA (RANDOM_SEARCH) | Metric: MSE | Samples: 100 ---
+[INFO] Paramètres chargés depuis runs/ista/random_search/data_1/20260827-141532_full/checkpoints/best_params.json : {'lmbd': 0.10257492255869069}
+[INFO] Application sur 10 batchs avec lmbd=1.0257e-01...
+[RESULT] Mean MSE: 1.9180e-05 | Median: 1.8931e-05 | Std: 3.7986e-06 | Best: 1.1320e-05 | Worst: 2.7724e-05
+
+=== Exécution Terminée ===
+--- Tache 3 (ista/random_search/data_1) terminee ---

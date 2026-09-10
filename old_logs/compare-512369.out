@@ -1,0 +1,268 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Job Slurm ID: 512369 | Mode: compare | Critere: SNR | run_set: run_set_512369 ---
+=== [COMPARE] Dataset: data_0 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/compare/run_set_512369/data_0/20260901-121652_compare
+--- [COMPARE] Evaluation complete du jeu de test (100 signaux) | Data: data_0 ---
+[COMPARE][unrolling][p3mg] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] p3mg_unrolling | CPU self time: 70471.41 ms | CPU mem peak: 184.02 MB | CUDA self time: 22339.52 ms | CUDA mem peak: 57248.54 MB
+[COMPARE][unrolling][p3mg] MSE=9.8918e-06 SNR=-4.7461e+00 Temps=87.9238s (8.7924e-01s/signal) (poids: runs/p3mg/unrolling/data_0/20260826-154236_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][ista] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] ista_unrolling | CPU self time: 4266.50 ms | CPU mem peak: 0.69 MB | CUDA self time: 3758.29 ms | CUDA mem peak: 128.27 MB
+[COMPARE][unrolling][ista] MSE=2.3379e-05 SNR=-4.9579e-01 Temps=4.7329s (4.7329e-02s/signal) (poids: runs/ista/unrolling/data_0/20260827-141437_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][hq] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] hq_unrolling | CPU self time: 6927.64 ms | CPU mem peak: 0.01 MB | CUDA self time: 3427.09 ms | CUDA mem peak: 3892.09 MB
+[COMPARE][unrolling][hq] MSE=1.8946e-05 SNR=-1.4813e+00 Temps=8.1689s (8.1689e-02s/signal) (poids: runs/hq/unrolling/data_0/20260826-162333_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pd] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] pd_unrolling | CPU self time: 8491.98 ms | CPU mem peak: 0.73 MB | CUDA self time: 5164.24 ms | CUDA mem peak: 213.77 MB
+[COMPARE][unrolling][pd] MSE=1.9281e-05 SNR=-1.3645e+00 Temps=10.4775s (1.0478e-01s/signal) (poids: runs/pd/unrolling/data_0/20260826-163239_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pmms] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] pmms_unrolling | CPU self time: 10521.91 ms | CPU mem peak: 0.04 MB | CUDA self time: 3532.66 ms | CUDA mem peak: 28869.48 MB
+[COMPARE][unrolling][pmms] MSE=2.2360e-05 SNR=-6.9514e-01 Temps=12.9690s (1.2969e-01s/signal) (poids: runs/pmms/unrolling/data_0/20260826-154241_full/checkpoints/best_model.pt)
+[COMPARE][random_search][p3mg] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][p3mg] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][p3mg] Progression : 20/100 signaux evalues.
+[AVERTISSEMENT] Echec de 'compare' pour data_0, poursuite avec les datasets restants.
+=== [COMPARE] Dataset: data_1 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/compare/run_set_512369/data_1/20260901-181423_compare
+--- [COMPARE] Evaluation complete du jeu de test (100 signaux) | Data: data_1 ---
+[COMPARE][unrolling][p3mg] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] p3mg_unrolling | CPU self time: 71943.08 ms | CPU mem peak: 184.02 MB | CUDA self time: 22319.29 ms | CUDA mem peak: 57248.54 MB
+[COMPARE][unrolling][p3mg] MSE=9.5552e-06 SNR=-4.9605e+00 Temps=88.0366s (8.8037e-01s/signal) (poids: runs/p3mg/unrolling/data_1/20260826-171040_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][ista] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] ista_unrolling | CPU self time: 4190.37 ms | CPU mem peak: 0.69 MB | CUDA self time: 3608.30 ms | CUDA mem peak: 128.27 MB
+[COMPARE][unrolling][ista] MSE=2.3389e-05 SNR=-4.9396e-01 Temps=4.5884s (4.5884e-02s/signal) (poids: runs/ista/unrolling/data_1/20260827-141532_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][hq] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] hq_unrolling | CPU self time: 6513.48 ms | CPU mem peak: 0.01 MB | CUDA self time: 3422.25 ms | CUDA mem peak: 3892.09 MB
+[COMPARE][unrolling][hq] MSE=1.8946e-05 SNR=-1.4813e+00 Temps=7.6691s (7.6691e-02s/signal) (poids: runs/hq/unrolling/data_1/20260826-220323_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pd] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] pd_unrolling | CPU self time: 8067.27 ms | CPU mem peak: 0.73 MB | CUDA self time: 5149.30 ms | CUDA mem peak: 213.77 MB
+[COMPARE][unrolling][pd] MSE=1.9281e-05 SNR=-1.3645e+00 Temps=9.7189s (9.7189e-02s/signal) (poids: runs/pd/unrolling/data_1/20260826-221120_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pmms] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] pmms_unrolling | CPU self time: 9251.80 ms | CPU mem peak: 0.04 MB | CUDA self time: 3526.04 ms | CUDA mem peak: 28869.48 MB
+[COMPARE][unrolling][pmms] MSE=2.2355e-05 SNR=-6.9604e-01 Temps=11.3042s (1.1304e-01s/signal) (poids: runs/pmms/unrolling/data_1/20260826-203437_full/checkpoints/best_model.pt)
+[COMPARE][random_search][p3mg] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][p3mg] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][p3mg] Progression : 20/100 signaux evalues.
+[AVERTISSEMENT] Echec de 'compare' pour data_1, poursuite avec les datasets restants.
+=== [COMPARE] Dataset: data_2 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/compare/run_set_512369/data_2/20260902-003326_compare
+--- [COMPARE] Evaluation complete du jeu de test (100 signaux) | Data: data_2 ---
+[COMPARE][unrolling][p3mg] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] p3mg_unrolling | CPU self time: 70940.03 ms | CPU mem peak: 184.02 MB | CUDA self time: 22284.44 ms | CUDA mem peak: 57248.54 MB
+[COMPARE][unrolling][p3mg] MSE=8.4314e-06 SNR=-1.4232e+00 Temps=88.0283s (8.8028e-01s/signal) (poids: runs/p3mg/unrolling/data_2/20260826-224854_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][ista] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] ista_unrolling | CPU self time: 4195.10 ms | CPU mem peak: 0.69 MB | CUDA self time: 3659.22 ms | CUDA mem peak: 128.27 MB
+[COMPARE][unrolling][ista] MSE=9.8899e-06 SNR=-6.9642e-01 Temps=4.5858s (4.5858e-02s/signal) (poids: runs/ista/unrolling/data_2/20260827-141611_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][hq] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] hq_unrolling | CPU self time: 6597.42 ms | CPU mem peak: 0.01 MB | CUDA self time: 3421.14 ms | CUDA mem peak: 3892.09 MB
+[COMPARE][unrolling][hq] MSE=8.9645e-06 SNR=-1.1341e+00 Temps=7.7911s (7.7911e-02s/signal) (poids: runs/hq/unrolling/data_2/20260827-011452_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pd] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] pd_unrolling | CPU self time: 7875.17 ms | CPU mem peak: 0.73 MB | CUDA self time: 5149.29 ms | CUDA mem peak: 213.77 MB
+[COMPARE][unrolling][pd] MSE=9.1029e-06 SNR=-1.0630e+00 Temps=9.4879s (9.4879e-02s/signal) (poids: runs/pd/unrolling/data_2/20260827-012301_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pmms] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 100/100 signaux evalues.
+[TORCH-PROFILE] pmms_unrolling | CPU self time: 9501.96 ms | CPU mem peak: 0.04 MB | CUDA self time: 3527.63 ms | CUDA mem peak: 28869.48 MB
+[COMPARE][unrolling][pmms] MSE=9.5700e-06 SNR=-8.4258e-01 Temps=11.6395s (1.1639e-01s/signal) (poids: runs/pmms/unrolling/data_2/20260826-234301_full/checkpoints/best_model.pt)
+[COMPARE][random_search][p3mg] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][p3mg] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][p3mg] Progression : 20/100 signaux evalues.
+[AVERTISSEMENT] Echec de 'compare' pour data_2, poursuite avec les datasets restants.
+--- Runs bruts consolides sous : runs/compare/run_set_512369/ ---
+--- Job de comparaison termine ---

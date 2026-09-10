@@ -20,4 +20,5 @@ __pycache__/*
 /Dataset/data_2
 .vscode
 old_runs/
+old_logs/
 quick_compare_results/

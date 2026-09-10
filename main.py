@@ -30,10 +30,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Framework de Reconstruction")
 
     parser.add_argument('--config', type=str, default=None, help="Chemin vers le fichier YAML de configuration")
-    parser.add_argument('--model', type=str, default='p3mg', choices=['p3mg', 'ista', 'hq', 'pmms', 'ipiano', 'vmfb', 'fista', 'pd', 'fcae', 'fctn', 'fcun', 'resu'])
+    parser.add_argument('--model', type=str, default='pd', choices=['p3mg', 'ista', 'hq', 'pmms', 'ipiano', 'vmfb', 'fista', 'pd', 'fcae', 'fctn', 'fcun', 'resu'])
 
     parser.add_argument('--dataset_dir', type=str, default='./Dataset', help="Dossier racine contenant les générations de datasets")
-    parser.add_argument('--data_folder', type=str, default='data_1', help="Sous-dossier de génération à utiliser (ex: data_0, data_1, ...)")
+    parser.add_argument('--data_folder', type=str, default='data_0', help="Sous-dossier de génération à utiliser (ex: data_0, data_1, ...)")
     parser.add_argument('--run_tag', type=str, default=None,
                          help="Espace de nommage isole pour 'runs/<model>/<strategy>/<run_tag>' et la "
                               "recherche de checkpoints. Par defaut, egal a --data_folder. Permet de "

@@ -1,0 +1,50 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de datasets definis : 3 ---
+--- Job Slurm ID: 548932 | Tache: 0/3 ---
+--- Modele: vmfb | Strategie: random_search | Dataset: data_0 | Mode: full ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : VMFB | Stratégie : RANDOM_SEARCH | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/vmfb/random_search/data_0/20260907-115117_full
+--- [TRAIN] VMFB (RANDOM_SEARCH) | Trials: 100 | Loss: MSE ---
+   [1/100] New Best! nu=8.0000e-05 | Loss=1.9107e-05
+   [2/100] New Best! nu=6.0438e-04 | Loss=1.9083e-05
+   [6/100] New Best! nu=4.5575e-03 | Loss=1.8895e-05
+   [8/100] New Best! nu=1.1656e-01 | Loss=1.1264e-05
+   [78/100] New Best! nu=1.8569e-01 | Loss=9.3662e-06
+[MEM-PROFILE] train_vmfb_random_search | Duree: 4036.3s | CPU peak: 0.02 MB | GPU peak alloc: 16.91 MB | GPU peak reserve: 24.00 MB
+[RESULT] Best Params: {'nu': np.float64(0.18568802118145597)}
+--- [TRAIN] Terminé en 67.27 min ---
+--- [TEST] VMFB (RANDOM_SEARCH) | Metric: MSE | Samples: 100 ---
+[INFO] Paramètres chargés depuis runs/vmfb/random_search/data_0/20260907-115117_full/checkpoints/best_params.json : {'nu': 0.18568802118145597}
+[INFO] Application sur 10 batchs avec nu=1.8569e-01...
+[RESULT] Mean MSE: 7.8206e-06 | Median: 5.1697e-06 | Std: 7.6697e-06 | Best: 4.5488e-07 | Worst: 3.5555e-05
+
+=== Exécution Terminée ===
+--- Tache 0 (vmfb/random_search/data_0) terminee ---

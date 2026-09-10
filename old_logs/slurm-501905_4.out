@@ -1,0 +1,194 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 30 ---
+--- Job Slurm ID: 501921 | Tache: 4/30 ---
+--- Modele: ista | Strategie: unrolling | Dataset: data_0 | Mode: full ---
+--- Arguments specifiques : --num_layers 50 --epochs 150 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : ISTA | Stratégie : UNROLLING | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ista/unrolling/data_0/20260826-161039_full
+[INFO] Modèle ISTA instancié.
+--- [TRAIN] ISTA (UNROLLING) | Epochs: 150 | Loss: MSE ---
+Ep 1/150 | Tr: 2.4139e-05 | Val: 2.3084e-05 | T: 4.9s
+Ep 2/150 | Tr: 2.3417e-05 | Val: 2.2708e-05 | T: 4.5s
+Ep 3/150 | Tr: 2.3216e-05 | Val: 2.2595e-05 | T: 4.4s
+Ep 4/150 | Tr: 2.3125e-05 | Val: 2.2516e-05 | T: 4.5s
+Ep 5/150 | Tr: 2.3049e-05 | Val: 2.2439e-05 | T: 4.6s
+Ep 6/150 | Tr: 2.2966e-05 | Val: 2.2343e-05 | T: 4.4s
+Ep 7/150 | Tr: 2.2892e-05 | Val: 2.2282e-05 | T: 4.5s
+Ep 8/150 | Tr: 2.2834e-05 | Val: 2.2210e-05 | T: 4.4s
+Ep 9/150 | Tr: 2.2814e-05 | Val: 2.2204e-05 | T: 4.7s
+Ep 10/150 | Tr: 2.2723e-05 | Val: 2.2088e-05 | T: 4.7s
+Ep 11/150 | Tr: 2.2655e-05 | Val: 2.2027e-05 | T: 4.4s
+Ep 12/150 | Tr: 2.2585e-05 | Val: 2.1956e-05 | T: 4.5s
+Ep 13/150 | Tr: 2.2493e-05 | Val: 2.1892e-05 | T: 4.6s
+Ep 14/150 | Tr: 2.2349e-05 | Val: 2.1630e-05 | T: 4.5s
+Ep 15/150 | Tr: 2.2016e-05 | Val: 2.1366e-05 | T: 4.4s
+Ep 16/150 | Tr: 2.1620e-05 | Val: 2.0940e-05 | T: 4.5s
+Ep 17/150 | Tr: 2.1290e-05 | Val: 2.0746e-05 | T: 4.5s
+Ep 18/150 | Tr: 2.1170e-05 | Val: 2.0960e-05 | T: 4.5s
+Ep 19/150 | Tr: 2.1030e-05 | Val: 2.0712e-05 | T: 4.5s
+Ep 20/150 | Tr: 2.0676e-05 | Val: 2.0146e-05 | T: 4.7s
+Ep 21/150 | Tr: 2.0292e-05 | Val: 1.9584e-05 | T: 4.4s
+Ep 22/150 | Tr: 2.0036e-05 | Val: 1.9450e-05 | T: 3.9s
+Ep 23/150 | Tr: 1.9688e-05 | Val: 1.9195e-05 | T: 4.4s
+Ep 24/150 | Tr: 1.9344e-05 | Val: 1.9682e-05 | T: 4.4s
+Ep 25/150 | Tr: 1.8900e-05 | Val: 1.8382e-05 | T: 4.5s
+Ep 26/150 | Tr: 1.8630e-05 | Val: 1.8356e-05 | T: 3.9s
+Ep 27/150 | Tr: 1.8138e-05 | Val: 1.7766e-05 | T: 4.1s
+Ep 28/150 | Tr: 1.7639e-05 | Val: 1.7426e-05 | T: 4.4s
+Ep 29/150 | Tr: 1.7388e-05 | Val: 1.6961e-05 | T: 4.4s
+Ep 30/150 | Tr: 1.7211e-05 | Val: 1.7173e-05 | T: 4.2s
+Ep 31/150 | Tr: 1.7301e-05 | Val: 1.7084e-05 | T: 4.6s
+Ep 32/150 | Tr: 1.7590e-05 | Val: 1.7289e-05 | T: 4.6s
+Ep 33/150 | Tr: 1.6933e-05 | Val: 1.6436e-05 | T: 4.4s
+Ep 34/150 | Tr: 1.6895e-05 | Val: 1.6875e-05 | T: 4.5s
+Ep 35/150 | Tr: 1.6695e-05 | Val: 1.6912e-05 | T: 4.0s
+Ep 36/150 | Tr: 1.7023e-05 | Val: 1.6401e-05 | T: 4.0s
+Ep 37/150 | Tr: 2.4378e-05 | Val: 2.5204e-05 | T: 4.3s
+Ep 38/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.2s
+Ep 39/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 40/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 41/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 42/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 43/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 44/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.1s
+Ep 45/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 46/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 47/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 48/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.0s
+Ep 49/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 50/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 51/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 52/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.3s
+Ep 53/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.0s
+Ep 54/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 55/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 56/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 57/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 58/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 59/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 60/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 61/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 62/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 63/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 64/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 65/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 66/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 67/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 68/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 69/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 70/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 71/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 72/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 73/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 74/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 75/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 76/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.7s
+Ep 77/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 78/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 79/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 80/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 81/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 82/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 83/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.1s
+Ep 84/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 85/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 86/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 87/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.2s
+Ep 88/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 89/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 90/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 91/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 92/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 93/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.0s
+Ep 94/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 95/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 96/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 97/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 98/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 99/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 100/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.1s
+Ep 101/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 102/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 103/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 104/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 105/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 106/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.7s
+Ep 107/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 108/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.1s
+Ep 109/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.8s
+Ep 110/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 111/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 112/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 113/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 114/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 115/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 116/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 117/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 118/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 119/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 120/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 121/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 122/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.2s
+Ep 123/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 124/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 125/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 126/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 127/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 128/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.1s
+Ep 129/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 130/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 131/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 132/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 133/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.0s
+Ep 134/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.0s
+Ep 135/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 136/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 137/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.2s
+Ep 138/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 139/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 140/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 141/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 142/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 143/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.1s
+Ep 144/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.4s
+Ep 145/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 146/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 147/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 3.9s
+Ep 148/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.6s
+Ep 149/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+Ep 150/150 | Tr: 2.5736e-05 | Val: 2.5204e-05 | T: 4.5s
+--- [TRAIN] Terminé en 11.52 min ---
+--- [TEST] ISTA (UNROLLING) | Metric: MSE | Samples: 100 ---
+[INFO] Chargement des poids depuis : runs/ista/unrolling/data_0/20260826-161039_full/checkpoints/best_model.pt
+[RESULT] Mean MSE: 1.7774e-05 | Median: 1.6860e-05 | Std: 4.6459e-06 | Best: 9.3199e-06 | Worst: 3.2420e-05
+
+=== Exécution Terminée ===
+--- Tache 4 (ista/unrolling/data_0) terminee ---

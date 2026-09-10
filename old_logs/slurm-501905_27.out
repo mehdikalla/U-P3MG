@@ -1,0 +1,50 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 30 ---
+--- Job Slurm ID: 502665 | Tache: 27/30 ---
+--- Modele: hq | Strategie: random_search | Dataset: data_2 | Mode: full ---
+--- Arguments specifiques : --num_layers 30 --num_pd_layers 10 --algo_iters 5000 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : HQ | Stratégie : RANDOM_SEARCH | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/hq/random_search/data_2/20260827-012250_full
+--- [TRAIN] HQ (RANDOM_SEARCH) | Trials: 100 | Loss: MSE ---
+   [1/100] New Best! lmbd_cvx=6.0438e-04 lmbd_ncvx=1.6832e-09 gamma=0.5573 | Loss=9.1657e-06
+   [8/100] New Best! lmbd_cvx=2.0519e-03 lmbd_ncvx=1.1922e-06 gamma=0.3194 | Loss=9.0028e-06
+   [22/100] New Best! lmbd_cvx=1.5483e-03 lmbd_ncvx=4.1740e-02 gamma=1.5542 | Loss=8.9934e-06
+   [26/100] New Best! lmbd_cvx=3.7763e-06 lmbd_ncvx=1.8569e-01 gamma=0.9231 | Loss=8.9666e-06
+   [55/100] New Best! lmbd_cvx=1.1748e-07 lmbd_ncvx=1.5355e-01 gamma=1.7207 | Loss=8.9535e-06
+[RESULT] Best Params: {'lmbd_cvx': np.float64(1.1747692480771392e-07), 'lmbd_ncvx': np.float64(0.1535528503757831), 'gamma': 1.7206744465049555}
+--- [TRAIN] Terminé en 10.51 min ---
+--- [TEST] HQ (RANDOM_SEARCH) | Metric: MSE | Samples: 100 ---
+[INFO] Paramètres chargés depuis runs/hq/random_search/data_2/20260827-012250_full/checkpoints/best_params.json : {'lmbd_cvx': 1.1747692480771392e-07, 'lmbd_ncvx': 0.1535528503757831, 'gamma': 1.7206744465049555}
+[INFO] Application sur 10 batchs avec lmbd_cvx=1.1748e-07 lmbd_ncvx=1.5355e-01 gamma=1.7207...
+[RESULT] Mean MSE: 8.9616e-06 | Median: 8.8246e-06 | Std: 1.3430e-06 | Best: 5.8028e-06 | Worst: 1.2913e-05
+
+=== Exécution Terminée ===
+--- Tache 27 (hq/random_search/data_2) terminee ---

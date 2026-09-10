@@ -39,7 +39,7 @@
 #SBATCH --time=12:00:00
 #SBATCH --output=logs/slurm-compare-d1-%A_%a.out
 #SBATCH --error=logs/slurm-compare-d1-%A_%a.err
-#SBATCH --array=0-8%4
+#SBATCH --array=0-3%4
 # ^ Borne exacte = nb modeles random_search (4: pd hq ista p3mg)
 #   + nb modeles unrolling (3: hq ista p3mg) + nb modeles DL (2: fcun fcae)
 #   = 4 + 3 + 2 = 9 taches (indices 0-8). A recalculer si RS_MODELS/
@@ -64,16 +64,16 @@ mkdir -p logs
 # 1. Definition de l'espace de recherche
 # -----------------------------------------------------------------------------
 # Modeles algorithmiques compares en strategie 'random_search' (PD HQ ISTA P3MG)
-RS_MODELS=(pd hq ista p3mg)
+#RS_MODELS=(pd hq ista p3mg)
 
 # Modeles algorithmiques compares en strategie 'unrolling' (U-HQ U-ISTA U-P3MG),
 # PD volontairement exclu (cf. demande : PD uniquement en random_search).
-UNROLLING_MODELS=(hq ista p3mg)
+UNROLLING_MODELS=(pd)
 
 # Modeles purement deep-learning (supportent uniquement 'unrolling')
-DL_MODELS=(fcun fcae)
+#DL_MODELS=(fcun fcae)
 
-DATA_FOLDER="data_1"
+DATA_FOLDER=(data_0 data_1 data_2)
 MODE="full"
 CONFIG="config.yaml"
 

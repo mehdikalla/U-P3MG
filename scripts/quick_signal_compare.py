@@ -160,7 +160,7 @@ def _save_signal_plot(xt_np, xh_np, title, metrics, out_path):
     ylim = float(np.abs(residual).max()) or 1.0
     lc = LineCollection(
         segments, cmap='jet',
-        norm=plt.Normalize(vmin, vmax), linewidth=0.8,
+        norm=plt.Normalize(vmin, vmax), linewidth=1.5,
     )
     lc.set_array(abs_seg)
     ax_res.add_collection(lc)

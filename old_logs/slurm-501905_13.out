@@ -1,0 +1,48 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 30 ---
+--- Job Slurm ID: 502523 | Tache: 13/30 ---
+--- Modele: pmms | Strategie: random_search | Dataset: data_1 | Mode: full ---
+--- Arguments specifiques : --num_layers 30 --algo_iters 5000 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : PMMS | Stratégie : RANDOM_SEARCH | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/pmms/random_search/data_1/20260826-210156_full
+--- [TRAIN] PMMS (RANDOM_SEARCH) | Trials: 100 | Loss: MSE ---
+   [1/100] New Best! nu=8.0000e-05 | Loss=2.2794e-05
+   [3/100] New Best! nu=1.6832e-09 | Loss=2.2793e-05
+   [11/100] New Best! nu=1.8596e-09 | Loss=2.2793e-05
+[RESULT] Best Params: {'nu': np.float64(1.8595521477612968e-09)}
+--- [TRAIN] Terminé en 45.58 min ---
+--- [TEST] PMMS (RANDOM_SEARCH) | Metric: MSE | Samples: 100 ---
+[INFO] Paramètres chargés depuis runs/pmms/random_search/data_1/20260826-210156_full/checkpoints/best_params.json : {'nu': 1.8595521477612968e-09}
+[INFO] Application sur 10 batchs avec nu=1.8596e-09...
+[RESULT] Mean MSE: 2.1958e-05 | Median: 2.2108e-05 | Std: 3.6699e-06 | Best: 1.4756e-05 | Worst: 3.0905e-05
+
+=== Exécution Terminée ===
+--- Tache 13 (pmms/random_search/data_1) terminee ---

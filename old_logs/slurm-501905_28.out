@@ -1,0 +1,94 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 30 ---
+--- Job Slurm ID: 502666 | Tache: 28/30 ---
+--- Modele: pd | Strategie: unrolling | Dataset: data_2 | Mode: full ---
+--- Arguments specifiques : --num_layers 50 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : PD | Stratégie : UNROLLING | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/pd/unrolling/data_2/20260827-012301_full
+[INFO] Modèle PD instancié.
+--- [TRAIN] PD (UNROLLING) | Epochs: 50 | Loss: MSE ---
+Ep 1/50 | Tr: 9.3513e-06 | Val: 9.2930e-06 | T: 53.8s
+Ep 2/50 | Tr: 9.3191e-06 | Val: 9.2629e-06 | T: 52.1s
+Ep 3/50 | Tr: 9.2931e-06 | Val: 9.2377e-06 | T: 53.2s
+Ep 4/50 | Tr: 9.2713e-06 | Val: 9.2161e-06 | T: 53.2s
+Ep 5/50 | Tr: 9.2526e-06 | Val: 9.1968e-06 | T: 52.6s
+Ep 6/50 | Tr: 9.2361e-06 | Val: 9.1799e-06 | T: 53.2s
+Ep 7/50 | Tr: 9.2213e-06 | Val: 9.1644e-06 | T: 52.6s
+Ep 8/50 | Tr: 9.2080e-06 | Val: 9.1502e-06 | T: 52.8s
+Ep 9/50 | Tr: 9.1960e-06 | Val: 9.1372e-06 | T: 52.6s
+Ep 10/50 | Tr: 9.1850e-06 | Val: 9.1252e-06 | T: 52.1s
+Ep 11/50 | Tr: 9.1751e-06 | Val: 9.1143e-06 | T: 52.8s
+Ep 12/50 | Tr: 9.1660e-06 | Val: 9.1044e-06 | T: 53.1s
+Ep 13/50 | Tr: 9.1577e-06 | Val: 9.0953e-06 | T: 52.5s
+Ep 14/50 | Tr: 9.1500e-06 | Val: 9.0870e-06 | T: 53.1s
+Ep 15/50 | Tr: 9.1430e-06 | Val: 9.0793e-06 | T: 53.1s
+Ep 16/50 | Tr: 9.1366e-06 | Val: 9.0724e-06 | T: 52.9s
+Ep 17/50 | Tr: 9.1307e-06 | Val: 9.0660e-06 | T: 53.0s
+Ep 18/50 | Tr: 9.1252e-06 | Val: 9.0600e-06 | T: 53.0s
+Ep 19/50 | Tr: 9.1202e-06 | Val: 9.0545e-06 | T: 53.2s
+Ep 20/50 | Tr: 9.1155e-06 | Val: 9.0494e-06 | T: 53.3s
+Ep 21/50 | Tr: 9.1112e-06 | Val: 9.0447e-06 | T: 53.2s
+Ep 22/50 | Tr: 9.1072e-06 | Val: 9.0404e-06 | T: 52.6s
+Ep 23/50 | Tr: 9.1034e-06 | Val: 9.0363e-06 | T: 52.9s
+Ep 24/50 | Tr: 9.1000e-06 | Val: 9.0325e-06 | T: 53.2s
+Ep 25/50 | Tr: 9.0967e-06 | Val: 9.0289e-06 | T: 53.4s
+Ep 26/50 | Tr: 9.0937e-06 | Val: 9.0256e-06 | T: 53.3s
+Ep 27/50 | Tr: 9.0909e-06 | Val: 9.0224e-06 | T: 53.0s
+Ep 28/50 | Tr: 9.0882e-06 | Val: 9.0195e-06 | T: 53.0s
+Ep 29/50 | Tr: 9.0857e-06 | Val: 9.0167e-06 | T: 51.5s
+Ep 30/50 | Tr: 9.0834e-06 | Val: 9.0142e-06 | T: 43.9s
+Ep 31/50 | Tr: 9.0812e-06 | Val: 9.0117e-06 | T: 43.9s
+Ep 32/50 | Tr: 9.0791e-06 | Val: 9.0094e-06 | T: 43.6s
+Ep 33/50 | Tr: 9.0772e-06 | Val: 9.0072e-06 | T: 44.3s
+Ep 34/50 | Tr: 9.0754e-06 | Val: 9.0052e-06 | T: 44.4s
+Ep 35/50 | Tr: 9.0736e-06 | Val: 9.0033e-06 | T: 44.1s
+Ep 36/50 | Tr: 9.0720e-06 | Val: 9.0014e-06 | T: 44.4s
+Ep 37/50 | Tr: 9.0705e-06 | Val: 8.9997e-06 | T: 43.3s
+Ep 38/50 | Tr: 9.0689e-06 | Val: 8.9980e-06 | T: 44.2s
+Ep 39/50 | Tr: 9.0675e-06 | Val: 8.9965e-06 | T: 44.0s
+Ep 40/50 | Tr: 9.0662e-06 | Val: 8.9949e-06 | T: 44.1s
+Ep 41/50 | Tr: 9.0650e-06 | Val: 8.9935e-06 | T: 43.9s
+Ep 42/50 | Tr: 9.0637e-06 | Val: 8.9922e-06 | T: 44.2s
+Ep 43/50 | Tr: 9.0626e-06 | Val: 8.9909e-06 | T: 44.0s
+Ep 44/50 | Tr: 9.0615e-06 | Val: 8.9896e-06 | T: 44.2s
+Ep 45/50 | Tr: 9.0604e-06 | Val: 8.9884e-06 | T: 44.2s
+Ep 46/50 | Tr: 9.0594e-06 | Val: 8.9873e-06 | T: 44.1s
+Ep 47/50 | Tr: 9.0584e-06 | Val: 8.9862e-06 | T: 44.3s
+Ep 48/50 | Tr: 9.0575e-06 | Val: 8.9852e-06 | T: 44.2s
+Ep 49/50 | Tr: 9.0566e-06 | Val: 8.9842e-06 | T: 44.1s
+Ep 50/50 | Tr: 9.0558e-06 | Val: 8.9833e-06 | T: 44.2s
+--- [TRAIN] Terminé en 41.57 min ---
+--- [TEST] PD (UNROLLING) | Metric: MSE | Samples: 100 ---
+[INFO] Chargement des poids depuis : runs/pd/unrolling/data_2/20260827-012301_full/checkpoints/best_model.pt
+[RESULT] Mean MSE: 9.1029e-06 | Median: 8.9893e-06 | Std: 1.2904e-06 | Best: 5.6880e-06 | Worst: 1.2938e-05
+
+=== Exécution Terminée ===
+--- Tache 28 (pd/unrolling/data_2) terminee ---

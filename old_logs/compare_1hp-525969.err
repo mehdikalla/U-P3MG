@@ -1,0 +1,3 @@
+./scripts/run.sh: line 40: 4098931 Killed                  python main.py "${ARGS[@]}"
+./scripts/run.sh: line 40: 4099997 Killed                  python main.py "${ARGS[@]}"
+./scripts/run.sh: line 40: 4101016 Killed                  python main.py "${ARGS[@]}"

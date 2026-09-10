@@ -1,0 +1,95 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 9 ---
+--- Job Slurm ID: 550148 | Tache: 4/9 ---
+--- Modele: hq | Strategie: unrolling | Dataset: data_1 | Mode: full ---
+--- Arguments specifiques : --num_layers 30 --num_pd_layers 10 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : HQ | Stratégie : UNROLLING | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/hq/unrolling/data_1/20260907-162151_full
+[INFO] Modèle HQ instancié.
+--- [TRAIN] HQ (UNROLLING) | Epochs: 50 | Loss: MSE ---
+Ep 1/50 | Tr: 1.9554e-05 | Val: 1.8948e-05 | T: 18.7s
+Ep 2/50 | Tr: 1.9172e-05 | Val: 1.8396e-05 | T: 18.4s
+Ep 3/50 | Tr: 1.8575e-05 | Val: 1.7780e-05 | T: 18.4s
+Ep 4/50 | Tr: 1.8040e-05 | Val: 1.7325e-05 | T: 18.3s
+Ep 5/50 | Tr: 1.7674e-05 | Val: 1.6988e-05 | T: 18.4s
+Ep 6/50 | Tr: 1.7358e-05 | Val: 1.6620e-05 | T: 18.6s
+Ep 7/50 | Tr: 1.6955e-05 | Val: 1.6076e-05 | T: 18.6s
+Ep 8/50 | Tr: 1.6403e-05 | Val: 1.5493e-05 | T: 18.5s
+Ep 9/50 | Tr: 1.6094e-05 | Val: 1.5328e-05 | T: 18.5s
+Ep 10/50 | Tr: 1.6047e-05 | Val: 1.5300e-05 | T: 18.6s
+Ep 11/50 | Tr: 1.6035e-05 | Val: 1.5282e-05 | T: 18.6s
+Ep 12/50 | Tr: 1.6018e-05 | Val: 1.5266e-05 | T: 18.5s
+Ep 13/50 | Tr: 1.5999e-05 | Val: 1.5245e-05 | T: 18.6s
+Ep 14/50 | Tr: 1.5976e-05 | Val: 1.5216e-05 | T: 18.6s
+Ep 15/50 | Tr: 1.5955e-05 | Val: 1.5196e-05 | T: 18.6s
+Ep 16/50 | Tr: 1.5936e-05 | Val: 1.5178e-05 | T: 18.5s
+Ep 17/50 | Tr: 1.5920e-05 | Val: 1.5161e-05 | T: 18.5s
+Ep 18/50 | Tr: 1.5907e-05 | Val: 1.5151e-05 | T: 18.6s
+Ep 19/50 | Tr: 1.5896e-05 | Val: 1.5147e-05 | T: 18.6s
+Ep 20/50 | Tr: 1.5884e-05 | Val: 1.5130e-05 | T: 18.6s
+Ep 21/50 | Tr: 1.5875e-05 | Val: 1.5120e-05 | T: 18.7s
+Ep 22/50 | Tr: 1.5867e-05 | Val: 1.5113e-05 | T: 18.6s
+Ep 23/50 | Tr: 1.5859e-05 | Val: 1.5103e-05 | T: 18.6s
+Ep 24/50 | Tr: 1.5851e-05 | Val: 1.5101e-05 | T: 18.6s
+Ep 25/50 | Tr: 1.5844e-05 | Val: 1.5084e-05 | T: 18.6s
+Ep 26/50 | Tr: 1.5838e-05 | Val: 1.5082e-05 | T: 18.6s
+Ep 27/50 | Tr: 1.5830e-05 | Val: 1.5073e-05 | T: 18.6s
+Ep 28/50 | Tr: 1.5822e-05 | Val: 1.5063e-05 | T: 18.6s
+Ep 29/50 | Tr: 1.5810e-05 | Val: 1.5045e-05 | T: 18.6s
+Ep 30/50 | Tr: 1.5794e-05 | Val: 1.5017e-05 | T: 18.6s
+Ep 31/50 | Tr: 1.5767e-05 | Val: 1.4983e-05 | T: 18.6s
+Ep 32/50 | Tr: 1.5708e-05 | Val: 1.4888e-05 | T: 18.6s
+Ep 33/50 | Tr: 1.5626e-05 | Val: 1.4787e-05 | T: 18.6s
+Ep 34/50 | Tr: 1.5552e-05 | Val: 1.4710e-05 | T: 18.6s
+Ep 35/50 | Tr: 1.5504e-05 | Val: 1.4681e-05 | T: 18.7s
+Ep 36/50 | Tr: 1.5480e-05 | Val: 1.4662e-05 | T: 18.6s
+Ep 37/50 | Tr: 1.5473e-05 | Val: 1.4653e-05 | T: 18.6s
+Ep 38/50 | Tr: 1.5467e-05 | Val: 1.4648e-05 | T: 18.7s
+Ep 39/50 | Tr: 1.5461e-05 | Val: 1.4640e-05 | T: 18.7s
+Ep 40/50 | Tr: 1.5460e-05 | Val: 1.4636e-05 | T: 18.6s
+Ep 41/50 | Tr: 1.5455e-05 | Val: 1.4639e-05 | T: 18.6s
+Ep 42/50 | Tr: 1.5453e-05 | Val: 1.4629e-05 | T: 18.5s
+Ep 43/50 | Tr: 1.5450e-05 | Val: 1.4627e-05 | T: 18.6s
+Ep 44/50 | Tr: 1.5451e-05 | Val: 1.4623e-05 | T: 18.6s
+Ep 45/50 | Tr: 1.5445e-05 | Val: 1.4622e-05 | T: 18.6s
+Ep 46/50 | Tr: 1.5446e-05 | Val: 1.4619e-05 | T: 18.6s
+Ep 47/50 | Tr: 1.5445e-05 | Val: 1.4617e-05 | T: 18.6s
+Ep 48/50 | Tr: 1.5444e-05 | Val: 1.4625e-05 | T: 18.6s
+Ep 49/50 | Tr: 1.5443e-05 | Val: 1.4620e-05 | T: 18.6s
+Ep 50/50 | Tr: 1.5440e-05 | Val: 1.4622e-05 | T: 18.6s
+[MEM-PROFILE] train_hq_unrolling | Duree: 987.9s | CPU peak: 13.39 MB | GPU peak alloc: 121.10 MB | GPU peak reserve: 134.00 MB
+--- [TRAIN] Terminé en 16.47 min ---
+--- [TEST] HQ (UNROLLING) | Metric: MSE | Samples: 100 ---
+[INFO] Chargement des poids depuis : runs/hq/unrolling/data_1/20260907-162151_full/checkpoints/best_model.pt
+[RESULT] Mean MSE: 1.4478e-05 | Median: 1.4158e-05 | Std: 6.8479e-06 | Best: 2.0255e-06 | Worst: 3.1816e-05
+
+=== Exécution Terminée ===
+--- Tache 4 (hq/unrolling/data_1) terminee ---

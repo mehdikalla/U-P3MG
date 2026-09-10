@@ -1,0 +1,72 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Job Slurm ID: 505463_8 ---
+--- Volet: extern | num_layers=45 | num_pd_layers=10 | mlp_hidden= | run_tag=ablation_extern/run_set_505463 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ablation/p3mg/ablation_extern/run_set_505463/20260828-154754_full
+[INFO] Modèle P3MG instancié.
+--- [TRAIN] P3MG (UNROLLING) | Epochs: 30 | Loss: MSE ---
+Ep 1/30 | Tr: 2.2608e-05 | Val: 1.8803e-05 | T: 522.5s
+Ep 2/30 | Tr: 1.7410e-05 | Val: 1.6081e-05 | T: 515.7s
+Ep 3/30 | Tr: 1.6761e-05 | Val: 1.4727e-05 | T: 525.3s
+Ep 4/30 | Tr: 1.4700e-05 | Val: 1.3323e-05 | T: 523.4s
+Ep 5/30 | Tr: 1.4007e-05 | Val: 1.2502e-05 | T: 523.8s
+Ep 6/30 | Tr: 1.2692e-05 | Val: 1.1710e-05 | T: 524.5s
+Ep 7/30 | Tr: 1.2287e-05 | Val: 1.1538e-05 | T: 526.7s
+Ep 8/30 | Tr: 1.1770e-05 | Val: 1.0538e-05 | T: 525.8s
+Ep 9/30 | Tr: 1.1736e-05 | Val: 1.0255e-05 | T: 527.0s
+Ep 10/30 | Tr: 1.1679e-05 | Val: 1.0874e-05 | T: 526.0s
+Ep 11/30 | Tr: 1.1442e-05 | Val: 1.1115e-05 | T: 526.6s
+Ep 12/30 | Tr: 1.8717e-05 | Val: 1.4308e-05 | T: 524.4s
+Ep 13/30 | Tr: 1.3733e-05 | Val: 1.2394e-05 | T: 525.5s
+Ep 14/30 | Tr: 1.2223e-05 | Val: 1.0363e-05 | T: 524.0s
+[SPIKE] Ep 15: Val 8.9520e-05 >> 2.0x moyenne récente (1.1811e-05). Restauration de l'état stable et réduction du LR.
+Ep 16/30 | Tr: 1.2049e-05 | Val: 1.0392e-05 | T: 527.3s
+Ep 17/30 | Tr: 1.1094e-05 | Val: 1.0213e-05 | T: 526.1s
+Ep 18/30 | Tr: 1.1032e-05 | Val: 1.0265e-05 | T: 525.1s
+Ep 19/30 | Tr: 1.1001e-05 | Val: 1.0189e-05 | T: 524.2s
+Ep 20/30 | Tr: 1.1299e-05 | Val: 1.0205e-05 | T: 525.1s
+Ep 21/30 | Tr: 1.0974e-05 | Val: 1.0165e-05 | T: 524.8s
+Ep 22/30 | Tr: 1.0873e-05 | Val: 1.0095e-05 | T: 525.3s
+Ep 23/30 | Tr: 1.0777e-05 | Val: 1.0145e-05 | T: 525.8s
+Ep 24/30 | Tr: 1.0678e-05 | Val: 9.9916e-06 | T: 524.3s
+Ep 25/30 | Tr: 1.0644e-05 | Val: 9.8847e-06 | T: 525.9s
+Ep 26/30 | Tr: 1.0647e-05 | Val: 9.8093e-06 | T: 525.1s
+Ep 27/30 | Tr: 1.0596e-05 | Val: 9.7865e-06 | T: 523.2s
+Ep 28/30 | Tr: 1.0543e-05 | Val: 9.7101e-06 | T: 526.0s
+Ep 29/30 | Tr: 1.0454e-05 | Val: 9.4964e-06 | T: 527.3s
+Ep 30/30 | Tr: 1.0253e-05 | Val: 9.3546e-06 | T: 527.7s
+--- [TRAIN] Terminé en 264.97 min ---
+--- [TEST] P3MG (UNROLLING) | Metric: MSE | Samples: 100 ---
+[INFO] Chargement des poids depuis : runs/ablation/p3mg/ablation_extern/run_set_505463/20260828-154754_full/checkpoints/best_model.pt
+[RESULT] Mean MSE: 1.1287e-05 | Median: 1.1178e-05 | Std: 5.3485e-06 | Best: 2.3550e-06 | Worst: 3.0560e-05
+
+=== Exécution Terminée ===
+--- Tache 8 terminee (volet: extern) ---

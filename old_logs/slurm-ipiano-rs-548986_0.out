@@ -1,0 +1,51 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de datasets definis : 3 ---
+--- Job Slurm ID: 548987 | Tache: 0/3 ---
+--- Modele: ipiano | Strategie: random_search | Dataset: data_0 | Mode: full ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : IPIANO | Stratégie : RANDOM_SEARCH | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ipiano/random_search/data_0/20260907-130307_full
+--- [TRAIN] IPIANO (RANDOM_SEARCH) | Trials: 100 | Loss: MSE ---
+   [1/100] New Best! nu=8.0000e-05 | Loss=2.4400e-05
+   [2/100] New Best! nu=6.0438e-04 | Loss=2.4400e-05
+   [6/100] New Best! nu=4.5575e-03 | Loss=2.4400e-05
+   [8/100] New Best! nu=1.1656e-01 | Loss=2.4393e-05
+   [26/100] New Best! nu=4.5138e-01 | Loss=2.4073e-05
+   [35/100] New Best! nu=6.2852e-01 | Loss=2.3931e-05
+[MEM-PROFILE] train_ipiano_random_search | Duree: 3321.0s | CPU peak: 0.03 MB | GPU peak alloc: 10.22 MB | GPU peak reserve: 24.00 MB
+[RESULT] Best Params: {'nu': np.float64(0.6285238328629029)}
+--- [TRAIN] Terminé en 55.35 min ---
+--- [TEST] IPIANO (RANDOM_SEARCH) | Metric: MSE | Samples: 100 ---
+[INFO] Paramètres chargés depuis runs/ipiano/random_search/data_0/20260907-130307_full/checkpoints/best_params.json : {'nu': 0.6285238328629029}
+[INFO] Application sur 10 batchs avec nu=6.2852e-01...
+[RESULT] Mean MSE: 2.3028e-05 | Median: 2.2957e-05 | Std: 3.6149e-06 | Best: 1.6252e-05 | Worst: 3.1854e-05
+
+=== Exécution Terminée ===
+--- Tache 0 (ipiano/random_search/data_0) terminee ---

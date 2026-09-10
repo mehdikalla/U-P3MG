@@ -1,0 +1,407 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Job Slurm ID: 504197 | Mode: compare | Critere: SNR | run_set: run_set_504197 ---
+=== [COMPARE] Dataset: data_0 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/compare/run_set_504197/data_0/20260827-120739_compare
+--- [COMPARE] Evaluation complete du jeu de test (100 signaux) | Data: data_0 ---
+[COMPARE][unrolling][p3mg] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][p3mg] MSE=9.8918e-06 SNR=-4.7461e+00 (poids: runs/p3mg/unrolling/data_0/20260826-154236_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][ista] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][ista] MSE=2.3460e-05 SNR=-4.8060e-01 (poids: runs/ista/unrolling/data_0/20260826-161039_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][hq] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][hq] MSE=1.8946e-05 SNR=-1.4813e+00 (poids: runs/hq/unrolling/data_0/20260826-162333_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pd] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][pd] MSE=1.9281e-05 SNR=-1.3645e+00 (poids: runs/pd/unrolling/data_0/20260826-163239_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pmms] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][pmms] MSE=2.2360e-05 SNR=-6.9514e-01 (poids: runs/pmms/unrolling/data_0/20260826-154241_full/checkpoints/best_model.pt)
+[COMPARE][random_search][p3mg] Aucun best_params.json trouve, ignore.
+[COMPARE][random_search][ista] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][ista] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 20/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 30/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 40/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 50/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 60/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 70/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 80/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 90/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 100/100 signaux evalues.
+[COMPARE][random_search][ista] MSE=1.8251e-05 SNR=-1.6192e+00 (params: runs/ista/random_search/data_0/20260826-162217_full/checkpoints/best_params.json)
+[COMPARE][random_search][hq] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][hq] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 20/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 30/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 40/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 50/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 60/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 70/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 80/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 90/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 100/100 signaux evalues.
+[COMPARE][random_search][hq] MSE=6.5831e-05 SNR=-2.8950e-01 (params: runs/hq/random_search/data_0/20260826-163149_full/checkpoints/best_params.json)
+[COMPARE][random_search][pd] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][pd] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 20/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 30/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 40/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 50/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 60/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 70/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 80/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 90/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 100/100 signaux evalues.
+[COMPARE][random_search][pd] MSE=1.0736e-05 SNR=-4.4372e+00 (params: runs/pd/random_search/data_0/20260826-164331_full/checkpoints/best_params.json)
+[COMPARE][random_search][pmms] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][pmms] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 20/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 30/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 40/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 50/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 60/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 70/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 80/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 90/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 100/100 signaux evalues.
+[COMPARE][random_search][pmms] MSE=2.1949e-05 SNR=-7.7862e-01 (params: runs/pmms/random_search/data_0/20260826-154236_full/checkpoints/best_params.json)
+[COMPARE][deep_learning][fcae] Progression : 10/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 20/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 30/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 40/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 50/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 60/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 70/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 80/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 90/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 100/100 signaux evalues.
+[COMPARE][deep_learning][fcae] MSE=1.5212e-05 SNR=-2.5436e+00 (poids: runs/fcae/unrolling/data_0/20260827-120142_full/checkpoints/best_model.pt)
+[COMPARE][deep_learning][fctn] Progression : 10/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 20/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 30/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 40/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 50/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 60/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 70/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 80/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 90/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 100/100 signaux evalues.
+[COMPARE][deep_learning][fctn] MSE=1.9310e-05 SNR=-1.3699e+00 (poids: runs/fctn/unrolling/data_0/20260827-120142_full/checkpoints/best_model.pt)
+[COMPARE][deep_learning][fcun] Progression : 10/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 20/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 30/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 40/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 50/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 60/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 70/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 80/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 90/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 100/100 signaux evalues.
+[COMPARE][deep_learning][fcun] MSE=1.0681e-05 SNR=-4.1312e+00 (poids: runs/fcun/unrolling/data_0/20260827-120142_full/checkpoints/best_model.pt)
+[COMPARE][deep_learning][resu] Progression : 10/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 20/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 30/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 40/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 50/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 60/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 70/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 80/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 90/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 100/100 signaux evalues.
+[COMPARE][deep_learning][resu] MSE=2.6123e-05 SNR=-3.6658e-03 (poids: runs/resu/unrolling/data_0/20260827-120142_full/checkpoints/best_model.pt)
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_p3mg_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_ista_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_hq_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_pd_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_pmms_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_ista_random_search.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_hq_random_search.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_pd_random_search.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_pmms_random_search.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_fcae_deep_learning.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_fctn_deep_learning.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_fcun_deep_learning.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/signals/compare_signal_81_resu_deep_learning.png
+[COMPARE] Graphique recapitulatif sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/plots/compare_summary_81.png
+[COMPARE] Rapport CSV sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/logs/compare_report.csv
+[COMPARE] Rapport JSON sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/logs/compare_report.json
+[COMPARE] Rapport texte sauvegarde : runs/compare/run_set_504197/data_0/20260827-120739_compare/logs/compare_report.txt
+
+=== Exécution Terminée ===
+=== [COMPARE] Dataset: data_1 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/compare/run_set_504197/data_1/20260827-130606_compare
+--- [COMPARE] Evaluation complete du jeu de test (100 signaux) | Data: data_1 ---
+[COMPARE][unrolling][p3mg] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][p3mg] MSE=9.5552e-06 SNR=-4.9605e+00 (poids: runs/p3mg/unrolling/data_1/20260826-171040_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][ista] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][ista] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][ista] MSE=2.3525e-05 SNR=-4.6817e-01 (poids: runs/ista/unrolling/data_1/20260826-215207_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][hq] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][hq] MSE=1.8946e-05 SNR=-1.4813e+00 (poids: runs/hq/unrolling/data_1/20260826-220323_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pd] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pd] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][pd] MSE=1.9281e-05 SNR=-1.3645e+00 (poids: runs/pd/unrolling/data_1/20260826-221120_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][pmms] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][pmms] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][pmms] MSE=2.2355e-05 SNR=-6.9604e-01 (poids: runs/pmms/unrolling/data_1/20260826-203437_full/checkpoints/best_model.pt)
+[COMPARE][random_search][p3mg] Aucun best_params.json trouve, ignore.
+[COMPARE][random_search][ista] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][ista] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 20/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 30/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 40/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 50/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 60/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 70/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 80/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 90/100 signaux evalues.
+[COMPARE][random_search][ista] Progression : 100/100 signaux evalues.
+[COMPARE][random_search][ista] MSE=1.8251e-05 SNR=-1.6192e+00 (params: runs/ista/random_search/data_1/20260826-220205_full/checkpoints/best_params.json)
+[COMPARE][random_search][hq] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][hq] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 20/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 30/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 40/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 50/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 60/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 70/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 80/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 90/100 signaux evalues.
+[COMPARE][random_search][hq] Progression : 100/100 signaux evalues.
+[COMPARE][random_search][hq] MSE=6.5831e-05 SNR=-2.8950e-01 (params: runs/hq/random_search/data_1/20260826-220358_full/checkpoints/best_params.json)
+[COMPARE][random_search][pd] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][pd] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 20/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 30/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 40/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 50/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 60/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 70/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 80/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 90/100 signaux evalues.
+[COMPARE][random_search][pd] Progression : 100/100 signaux evalues.
+[COMPARE][random_search][pd] MSE=1.0736e-05 SNR=-4.4372e+00 (params: runs/pd/random_search/data_1/20260826-221705_full/checkpoints/best_params.json)
+[COMPARE][random_search][pmms] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][pmms] Progression : 10/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 20/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 30/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 40/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 50/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 60/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 70/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 80/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 90/100 signaux evalues.
+[COMPARE][random_search][pmms] Progression : 100/100 signaux evalues.
+[COMPARE][random_search][pmms] MSE=2.1949e-05 SNR=-7.7862e-01 (params: runs/pmms/random_search/data_1/20260826-210156_full/checkpoints/best_params.json)
+[COMPARE][deep_learning][fcae] Progression : 10/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 20/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 30/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 40/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 50/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 60/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 70/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 80/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 90/100 signaux evalues.
+[COMPARE][deep_learning][fcae] Progression : 100/100 signaux evalues.
+[COMPARE][deep_learning][fcae] MSE=1.5212e-05 SNR=-2.5436e+00 (poids: runs/fcae/unrolling/data_1/20260827-120221_full/checkpoints/best_model.pt)
+[COMPARE][deep_learning][fctn] Progression : 10/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 20/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 30/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 40/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 50/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 60/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 70/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 80/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 90/100 signaux evalues.
+[COMPARE][deep_learning][fctn] Progression : 100/100 signaux evalues.
+[COMPARE][deep_learning][fctn] MSE=1.9310e-05 SNR=-1.3699e+00 (poids: runs/fctn/unrolling/data_1/20260827-120230_full/checkpoints/best_model.pt)
+[COMPARE][deep_learning][fcun] Progression : 10/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 20/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 30/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 40/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 50/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 60/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 70/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 80/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 90/100 signaux evalues.
+[COMPARE][deep_learning][fcun] Progression : 100/100 signaux evalues.
+[COMPARE][deep_learning][fcun] MSE=1.0681e-05 SNR=-4.1312e+00 (poids: runs/fcun/unrolling/data_1/20260827-120235_full/checkpoints/best_model.pt)
+[COMPARE][deep_learning][resu] Progression : 10/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 20/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 30/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 40/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 50/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 60/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 70/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 80/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 90/100 signaux evalues.
+[COMPARE][deep_learning][resu] Progression : 100/100 signaux evalues.
+[COMPARE][deep_learning][resu] MSE=2.6123e-05 SNR=-3.6658e-03 (poids: runs/resu/unrolling/data_1/20260827-120300_full/checkpoints/best_model.pt)
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_p3mg_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_ista_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_hq_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_pd_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_pmms_unrolling.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_ista_random_search.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_hq_random_search.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_pd_random_search.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_pmms_random_search.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_fcae_deep_learning.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_fctn_deep_learning.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_fcun_deep_learning.png
+[COMPARE] Graphique sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/signals/compare_signal_81_resu_deep_learning.png
+[COMPARE] Graphique recapitulatif sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/plots/compare_summary_81.png
+[COMPARE] Rapport CSV sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/logs/compare_report.csv
+[COMPARE] Rapport JSON sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/logs/compare_report.json
+[COMPARE] Rapport texte sauvegarde : runs/compare/run_set_504197/data_1/20260827-130606_compare/logs/compare_report.txt
+
+=== Exécution Terminée ===
+=== [COMPARE] Dataset: data_2 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[AVERTISSEMENT] Dossier de génération './Dataset/data_2' introuvable, utilisation de './Dataset' directement.
+[AVERTISSEMENT] Echec de 'compare' pour data_2, poursuite avec les datasets restants.
+--- Runs bruts consolides sous : runs/compare/run_set_504197/ ---
+--- Job de comparaison termine ---

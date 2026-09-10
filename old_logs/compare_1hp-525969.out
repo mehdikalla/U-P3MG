@@ -1,0 +1,469 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Job Slurm ID: 525969 | Mode: compare (1 hyperparametre) | Critere: SNR | run_set: run_set_525969 ---
+=== [CALIBRATION 1-TRIAL] Modele: p3mg | Dataset: data_0 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/p3mg/random_search/data_0/20260903-191429_train
+--- [TRAIN] P3MG (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! lmbd=6.0438e-04 tau=0.0598 | Loss=-4.4303e+00
+[MEM-PROFILE] train_p3mg_random_search | Duree: 749.6s | CPU peak: 0.12 MB | GPU peak alloc: 15.79 MB | GPU peak reserve: 24.00 MB
+[RESULT] Best Params: {'lmbd': np.float64(0.0006043781824375978), 'tau': 0.05977140289310721}
+--- [TRAIN] Terminé en 12.49 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: ista | Dataset: data_0 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : ISTA | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ista/random_search/data_0/20260903-192715_train
+--- [TRAIN] ISTA (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! lmbd=1.2200e+00 | Loss=-1.0444e+00
+[MEM-PROFILE] train_ista_random_search | Duree: 1.6s | CPU peak: 0.00 MB | GPU peak alloc: 9.32 MB | GPU peak reserve: 22.00 MB
+[RESULT] Best Params: {'lmbd': np.float64(1.220020000984611)}
+--- [TRAIN] Terminé en 0.03 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: hq | Dataset: data_0 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : HQ | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/hq/random_search/data_0/20260903-192720_train
+--- [TRAIN] HQ (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! lmbd_cvx=6.0438e-04 lmbd_ncvx=1.6832e-09 gamma=0.5573 | Loss=-1.3259e+00
+[MEM-PROFILE] train_hq_random_search | Duree: 14.9s | CPU peak: 0.00 MB | GPU peak alloc: 25.45 MB | GPU peak reserve: 28.00 MB
+[RESULT] Best Params: {'lmbd_cvx': np.float64(0.0006043781824375978), 'lmbd_ncvx': np.float64(1.6831858027361139e-09), 'gamma': 0.5573083435545473}
+--- [TRAIN] Terminé en 0.25 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: pd | Dataset: data_0 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : PD | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/pd/random_search/data_0/20260903-192737_train
+--- [TRAIN] PD (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! tau=1.0000 lambda_tau=6.0438e-04 | Loss=-4.5171e+00
+[MEM-PROFILE] train_pd_random_search | Duree: 55.0s | CPU peak: 0.02 MB | GPU peak alloc: 17.47 MB | GPU peak reserve: 24.00 MB
+[RESULT] Best Params: {'tau': 1.0, 'lambda_tau': np.float64(0.0006043781824375978)}
+--- [TRAIN] Terminé en 0.92 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: p3mg | Dataset: data_1 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/p3mg/random_search/data_1/20260903-192835_train
+--- [TRAIN] P3MG (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! lmbd=6.0438e-04 tau=0.0598 | Loss=-4.4303e+00
+[MEM-PROFILE] train_p3mg_random_search | Duree: 749.4s | CPU peak: 0.12 MB | GPU peak alloc: 15.79 MB | GPU peak reserve: 24.00 MB
+[RESULT] Best Params: {'lmbd': np.float64(0.0006043781824375978), 'tau': 0.05977140289310721}
+--- [TRAIN] Terminé en 12.49 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: ista | Dataset: data_1 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : ISTA | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ista/random_search/data_1/20260903-194108_train
+--- [TRAIN] ISTA (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! lmbd=1.2200e+00 | Loss=-1.0444e+00
+[MEM-PROFILE] train_ista_random_search | Duree: 1.6s | CPU peak: 0.00 MB | GPU peak alloc: 9.32 MB | GPU peak reserve: 22.00 MB
+[RESULT] Best Params: {'lmbd': np.float64(1.220020000984611)}
+--- [TRAIN] Terminé en 0.03 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: hq | Dataset: data_1 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : HQ | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/hq/random_search/data_1/20260903-194112_train
+--- [TRAIN] HQ (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! lmbd_cvx=6.0438e-04 lmbd_ncvx=1.6832e-09 gamma=0.5573 | Loss=-1.3259e+00
+[MEM-PROFILE] train_hq_random_search | Duree: 14.3s | CPU peak: 0.00 MB | GPU peak alloc: 25.45 MB | GPU peak reserve: 28.00 MB
+[RESULT] Best Params: {'lmbd_cvx': np.float64(0.0006043781824375978), 'lmbd_ncvx': np.float64(1.6831858027361139e-09), 'gamma': 0.5573083435545473}
+--- [TRAIN] Terminé en 0.24 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: pd | Dataset: data_1 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : PD | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/pd/random_search/data_1/20260903-194129_train
+--- [TRAIN] PD (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! tau=1.0000 lambda_tau=6.0438e-04 | Loss=-4.5171e+00
+[MEM-PROFILE] train_pd_random_search | Duree: 55.9s | CPU peak: 0.02 MB | GPU peak alloc: 17.47 MB | GPU peak reserve: 24.00 MB
+[RESULT] Best Params: {'tau': 1.0, 'lambda_tau': np.float64(0.0006043781824375978)}
+--- [TRAIN] Terminé en 0.93 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: p3mg | Dataset: data_2 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/p3mg/random_search/data_2/20260903-194228_train
+--- [TRAIN] P3MG (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! lmbd=6.0438e-04 tau=0.0598 | Loss=-1.3148e+00
+[MEM-PROFILE] train_p3mg_random_search | Duree: 764.1s | CPU peak: 0.12 MB | GPU peak alloc: 15.79 MB | GPU peak reserve: 24.00 MB
+[RESULT] Best Params: {'lmbd': np.float64(0.0006043781824375978), 'tau': 0.05977140289310721}
+--- [TRAIN] Terminé en 12.73 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: ista | Dataset: data_2 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : ISTA | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ista/random_search/data_2/20260903-195515_train
+--- [TRAIN] ISTA (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! lmbd=1.2200e+00 | Loss=-2.9961e-01
+[MEM-PROFILE] train_ista_random_search | Duree: 1.6s | CPU peak: 0.00 MB | GPU peak alloc: 9.32 MB | GPU peak reserve: 22.00 MB
+[RESULT] Best Params: {'lmbd': np.float64(1.220020000984611)}
+--- [TRAIN] Terminé en 0.03 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: hq | Dataset: data_2 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : HQ | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/hq/random_search/data_2/20260903-195519_train
+--- [TRAIN] HQ (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! lmbd_cvx=6.0438e-04 lmbd_ncvx=1.6832e-09 gamma=0.5573 | Loss=-1.0617e+00
+[MEM-PROFILE] train_hq_random_search | Duree: 14.6s | CPU peak: 0.00 MB | GPU peak alloc: 25.45 MB | GPU peak reserve: 28.00 MB
+[RESULT] Best Params: {'lmbd_cvx': np.float64(0.0006043781824375978), 'lmbd_ncvx': np.float64(1.6831858027361139e-09), 'gamma': 0.5573083435545473}
+--- [TRAIN] Terminé en 0.24 min ---
+
+=== Exécution Terminée ===
+=== [CALIBRATION 1-TRIAL] Modele: pd | Dataset: data_2 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : PD | Stratégie : RANDOM_SEARCH | Mode : TRAIN ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/pd/random_search/data_2/20260903-195536_train
+--- [TRAIN] PD (RANDOM_SEARCH) | Trials: 1 | Loss: SNR ---
+   [1/1] New Best! tau=1.0000 lambda_tau=6.0438e-04 | Loss=-9.8922e-01
+[MEM-PROFILE] train_pd_random_search | Duree: 56.6s | CPU peak: 0.02 MB | GPU peak alloc: 17.47 MB | GPU peak reserve: 24.00 MB
+[RESULT] Best Params: {'tau': 1.0, 'lambda_tau': np.float64(0.0006043781824375978)}
+--- [TRAIN] Terminé en 0.94 min ---
+
+=== Exécution Terminée ===
+=== [COMPARE 1-HP] Dataset: data_0 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/compare/run_set_525969/data_0/20260903-195636_compare
+--- [COMPARE] Evaluation complete du jeu de test (100 signaux) | Data: data_0 ---
+[COMPARE][unrolling][p3mg] Progression : 10/100 signaux evalues.
+[TORCH-PROFILE] p3mg_unrolling | CPU self time: 7138.92 ms | CPU mem peak: 18.98 MB | CUDA self time: 2225.37 ms | CUDA mem peak: 5724.85 MB
+[COMPARE][unrolling][p3mg] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][p3mg] MSE=9.8918e-06 SNR=-9.4923e+00 Temps=58.1961s (5.8196e-01s/signal) (poids: runs/p3mg/unrolling/data_0/20260826-154236_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][hq] Progression : 10/100 signaux evalues.
+[TORCH-PROFILE] hq_unrolling | CPU self time: 649.88 ms | CPU mem peak: 0.01 MB | CUDA self time: 343.61 ms | CUDA mem peak: 389.21 MB
+[COMPARE][unrolling][hq] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][hq] MSE=1.8946e-05 SNR=-2.9627e+00 Temps=5.3279s (5.3279e-02s/signal) (poids: runs/hq/unrolling/data_0/20260826-162333_full/checkpoints/best_model.pt)
+[COMPARE][random_search][p3mg] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][p3mg] Progression : 10/100 signaux evalues.
+[AVERTISSEMENT] Echec de 'compare' pour data_0, poursuite avec les datasets restants.
+=== [COMPARE 1-HP] Dataset: data_1 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/compare/run_set_525969/data_1/20260903-205513_compare
+--- [COMPARE] Evaluation complete du jeu de test (100 signaux) | Data: data_1 ---
+[COMPARE][unrolling][p3mg] Progression : 10/100 signaux evalues.
+[TORCH-PROFILE] p3mg_unrolling | CPU self time: 6862.86 ms | CPU mem peak: 18.98 MB | CUDA self time: 2228.35 ms | CUDA mem peak: 5724.85 MB
+[COMPARE][unrolling][p3mg] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][p3mg] MSE=9.5552e-06 SNR=-9.9210e+00 Temps=57.1358s (5.7136e-01s/signal) (poids: runs/p3mg/unrolling/data_1/20260826-171040_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][hq] Progression : 10/100 signaux evalues.
+[TORCH-PROFILE] hq_unrolling | CPU self time: 593.15 ms | CPU mem peak: 0.01 MB | CUDA self time: 344.64 ms | CUDA mem peak: 389.21 MB
+[COMPARE][unrolling][hq] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][hq] MSE=1.8946e-05 SNR=-2.9627e+00 Temps=5.2182s (5.2182e-02s/signal) (poids: runs/hq/unrolling/data_1/20260826-220323_full/checkpoints/best_model.pt)
+[COMPARE][random_search][p3mg] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][p3mg] Progression : 10/100 signaux evalues.
+[AVERTISSEMENT] Echec de 'compare' pour data_1, poursuite avec les datasets restants.
+=== [COMPARE 1-HP] Dataset: data_2 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/compare/run_set_525969/data_2/20260903-215301_compare
+--- [COMPARE] Evaluation complete du jeu de test (100 signaux) | Data: data_2 ---
+[COMPARE][unrolling][p3mg] Progression : 10/100 signaux evalues.
+[TORCH-PROFILE] p3mg_unrolling | CPU self time: 6918.30 ms | CPU mem peak: 18.98 MB | CUDA self time: 2231.21 ms | CUDA mem peak: 5724.85 MB
+[COMPARE][unrolling][p3mg] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][p3mg] MSE=8.4314e-06 SNR=-2.8464e+00 Temps=58.1171s (5.8117e-01s/signal) (poids: runs/p3mg/unrolling/data_2/20260826-224854_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][hq] Progression : 10/100 signaux evalues.
+[TORCH-PROFILE] hq_unrolling | CPU self time: 615.94 ms | CPU mem peak: 0.01 MB | CUDA self time: 344.97 ms | CUDA mem peak: 389.21 MB
+[COMPARE][unrolling][hq] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][hq] MSE=8.9645e-06 SNR=-2.2683e+00 Temps=5.2775s (5.2775e-02s/signal) (poids: runs/hq/unrolling/data_2/20260827-011452_full/checkpoints/best_model.pt)
+[COMPARE][random_search][p3mg] Debut evaluation : 100 signaux, 10000 iterations/signal.
+[COMPARE][random_search][p3mg] Progression : 10/100 signaux evalues.
+[AVERTISSEMENT] Echec de 'compare' pour data_2, poursuite avec les datasets restants.
+--- Runs bruts consolides sous : runs/compare/run_set_525969/ ---
+--- Job de comparaison (1 hyperparametre) termine ---

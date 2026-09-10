@@ -1,0 +1,11 @@
+[2026-09-03T15:27:15.588] error: slurm_get_node_energy: Socket timed out on send/recv operation
+[2026-09-03T15:27:21.905] error: _get_joules_task: can't get info from slurmd
+[2026-09-03T15:27:43.934] error: slurm_get_node_energy: Socket timed out on send/recv operation
+[2026-09-03T15:27:44.685] error: _get_joules_task: can't get info from slurmd
+[2026-09-03T15:28:13.940] error: slurm_get_node_energy: Socket timed out on send/recv operation
+[2026-09-03T15:28:14.889] error: _get_joules_task: can't get info from slurmd
+[2026-09-03T15:28:43.926] error: slurm_get_node_energy: Socket timed out on send/recv operation
+[2026-09-03T15:28:45.959] error: _get_joules_task: can't get info from slurmd
+./scripts/run.sh: line 40: 2035657 Killed                  python main.py "${ARGS[@]}"
+./scripts/run.sh: line 40: 2040683 Killed                  python main.py "${ARGS[@]}"
+./scripts/run.sh: line 40: 2042051 Killed                  python main.py "${ARGS[@]}"

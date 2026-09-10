@@ -1,0 +1,95 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 12 ---
+--- Job Slurm ID: 544708 | Tache: 9/12 ---
+--- Modele: fctn | Strategie: unrolling | Dataset: data_1 | Mode: full ---
+--- Arguments specifiques : (aucun) ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : FCTN | Stratégie : UNROLLING | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/fctn/unrolling/data_1/20260906-185258_full
+[INFO] Modèle FCTN instancié.
+--- [TRAIN] FCTN (UNROLLING) | Epochs: 50 | Loss: MSE ---
+Ep 1/50 | Tr: 2.0772e-02 | Val: 2.1665e-05 | T: 3.8s
+Ep 2/50 | Tr: 2.3075e-05 | Val: 2.1618e-05 | T: 2.9s
+Ep 3/50 | Tr: 2.2847e-05 | Val: 2.1561e-05 | T: 2.9s
+Ep 4/50 | Tr: 2.2607e-05 | Val: 2.1319e-05 | T: 2.9s
+Ep 5/50 | Tr: 2.2116e-05 | Val: 2.0910e-05 | T: 2.9s
+Ep 6/50 | Tr: 2.1651e-05 | Val: 2.0167e-05 | T: 3.0s
+Ep 7/50 | Tr: 2.1131e-05 | Val: 1.9281e-05 | T: 3.0s
+Ep 8/50 | Tr: 2.0630e-05 | Val: 1.8548e-05 | T: 3.0s
+Ep 9/50 | Tr: 1.9981e-05 | Val: 1.7697e-05 | T: 3.0s
+Ep 10/50 | Tr: 1.9341e-05 | Val: 1.6933e-05 | T: 3.0s
+Ep 11/50 | Tr: 1.8800e-05 | Val: 1.6525e-05 | T: 3.0s
+Ep 12/50 | Tr: 1.8401e-05 | Val: 1.6185e-05 | T: 3.0s
+Ep 13/50 | Tr: 1.7952e-05 | Val: 1.5897e-05 | T: 3.0s
+Ep 14/50 | Tr: 1.7612e-05 | Val: 1.5772e-05 | T: 3.0s
+Ep 15/50 | Tr: 1.7268e-05 | Val: 1.5697e-05 | T: 3.0s
+Ep 16/50 | Tr: 1.7112e-05 | Val: 1.5651e-05 | T: 3.0s
+Ep 17/50 | Tr: 1.6891e-05 | Val: 1.5591e-05 | T: 3.0s
+Ep 18/50 | Tr: 1.6709e-05 | Val: 1.5611e-05 | T: 3.0s
+Ep 19/50 | Tr: 1.6601e-05 | Val: 1.5581e-05 | T: 3.0s
+Ep 20/50 | Tr: 1.6523e-05 | Val: 1.5427e-05 | T: 3.0s
+Ep 21/50 | Tr: 1.6414e-05 | Val: 1.5490e-05 | T: 3.0s
+Ep 22/50 | Tr: 1.6407e-05 | Val: 1.5444e-05 | T: 3.0s
+Ep 23/50 | Tr: 1.6281e-05 | Val: 1.5699e-05 | T: 3.0s
+Ep 24/50 | Tr: 1.6236e-05 | Val: 1.5397e-05 | T: 3.0s
+Ep 25/50 | Tr: 1.6141e-05 | Val: 1.5465e-05 | T: 3.0s
+Ep 26/50 | Tr: 1.6192e-05 | Val: 1.5401e-05 | T: 3.0s
+Ep 27/50 | Tr: 1.6138e-05 | Val: 1.5409e-05 | T: 3.0s
+Ep 28/50 | Tr: 1.6118e-05 | Val: 1.5537e-05 | T: 3.0s
+Ep 29/50 | Tr: 1.6127e-05 | Val: 1.5437e-05 | T: 3.0s
+Ep 30/50 | Tr: 1.6021e-05 | Val: 1.5451e-05 | T: 3.0s
+Ep 31/50 | Tr: 1.5999e-05 | Val: 1.5332e-05 | T: 3.0s
+Ep 32/50 | Tr: 1.5952e-05 | Val: 1.5409e-05 | T: 3.0s
+Ep 33/50 | Tr: 1.5924e-05 | Val: 1.5281e-05 | T: 3.0s
+Ep 34/50 | Tr: 1.5951e-05 | Val: 1.5323e-05 | T: 3.0s
+Ep 35/50 | Tr: 1.5969e-05 | Val: 1.5413e-05 | T: 3.0s
+Ep 36/50 | Tr: 1.5914e-05 | Val: 1.5372e-05 | T: 3.0s
+Ep 37/50 | Tr: 1.5912e-05 | Val: 1.5331e-05 | T: 3.0s
+Ep 38/50 | Tr: 1.5898e-05 | Val: 1.5326e-05 | T: 3.0s
+Ep 39/50 | Tr: 1.5898e-05 | Val: 1.5391e-05 | T: 3.0s
+Ep 40/50 | Tr: 1.5851e-05 | Val: 1.5371e-05 | T: 3.0s
+Ep 41/50 | Tr: 1.5846e-05 | Val: 1.5309e-05 | T: 3.0s
+Ep 42/50 | Tr: 1.5866e-05 | Val: 1.5398e-05 | T: 3.0s
+Ep 43/50 | Tr: 1.5841e-05 | Val: 1.5315e-05 | T: 3.0s
+Ep 44/50 | Tr: 1.5858e-05 | Val: 1.5358e-05 | T: 3.0s
+Ep 45/50 | Tr: 1.5814e-05 | Val: 1.5371e-05 | T: 3.0s
+Ep 46/50 | Tr: 1.5823e-05 | Val: 1.5292e-05 | T: 3.0s
+Ep 47/50 | Tr: 1.5823e-05 | Val: 1.5289e-05 | T: 3.0s
+Ep 48/50 | Tr: 1.5800e-05 | Val: 1.5317e-05 | T: 3.0s
+Ep 49/50 | Tr: 1.5838e-05 | Val: 1.5375e-05 | T: 3.0s
+Ep 50/50 | Tr: 1.5818e-05 | Val: 1.5295e-05 | T: 3.0s
+[MEM-PROFILE] train_fctn_unrolling | Duree: 189.5s | CPU peak: 13.22 MB | GPU peak alloc: 78.70 MB | GPU peak reserve: 98.00 MB
+--- [TRAIN] Terminé en 3.16 min ---
+--- [TEST] FCTN (UNROLLING) | Metric: MSE | Samples: 100 ---
+[INFO] Chargement des poids depuis : runs/fctn/unrolling/data_1/20260906-185258_full/checkpoints/best_model.pt
+[RESULT] Mean MSE: 1.4652e-05 | Median: 1.4657e-05 | Std: 6.3924e-06 | Best: 2.3123e-06 | Worst: 2.9932e-05
+
+=== Exécution Terminée ===
+--- Tache 9 (fctn/unrolling/data_1) terminee ---

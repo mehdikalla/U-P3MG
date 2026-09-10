@@ -1,0 +1,18 @@
+/scratch/mkalla/miniconda3/envs/U-P3MG/lib/python3.13/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+/scratch/mkalla/miniconda3/envs/U-P3MG/lib/python3.13/site-packages/torch/nn/modules/transformer.py:392: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+Traceback (most recent call last):
+  File "/scratch/mkalla/U-P3MG/main.py", line 328, in <module>
+    main()
+    ~~~~^^
+  File "/scratch/mkalla/U-P3MG/main.py", line 254, in main
+    train_loader, val_loader, test_loader = get_dataloaders(
+                                            ~~~~~~~~~~~~~~~^
+        args.batch_size, dataset_dir=args.dataset_dir, data_folder=args.data_folder
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/scratch/mkalla/U-P3MG/main.py", line 210, in get_dataloaders
+    raise FileNotFoundError(f"Impossible de trouver {train_path}.")
+FileNotFoundError: Impossible de trouver ./Dataset/train.pt.

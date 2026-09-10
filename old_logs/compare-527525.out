@@ -1,0 +1,57 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Job Slurm ID: 527525 | Mode: compare | Critere: SNR | run_set: run_set_527525 ---
+=== [COMPARE] Dataset: data_0 ===
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : COMPARE ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/compare/run_set_527525/data_0/20260903-233630_compare
+--- [COMPARE] Evaluation complete du jeu de test (100 signaux) | Data: data_0 ---
+[COMPARE][unrolling][p3mg] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][p3mg] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][p3mg] MSE=9.8918e-06 SNR=-9.4923e+00 Temps=44.8376s (4.4838e-01s/signal) (poids: runs/p3mg/unrolling/data_0/20260826-154236_full/checkpoints/best_model.pt)
+[COMPARE][unrolling][hq] Progression : 10/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 20/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 30/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 40/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 50/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 60/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 70/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 80/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 90/100 signaux evalues.
+[COMPARE][unrolling][hq] Progression : 100/100 signaux evalues.
+[COMPARE][unrolling][hq] MSE=1.8946e-05 SNR=-2.9627e+00 Temps=4.1723s (4.1723e-02s/signal) (poids: runs/hq/unrolling/data_0/20260826-162333_full/checkpoints/best_model.pt)
+[COMPARE][random_search][p3mg] Debut evaluation : 100 signaux, 10000 iterations/signal.

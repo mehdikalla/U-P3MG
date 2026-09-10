@@ -50,11 +50,11 @@ mkdir -p logs
 # -----------------------------------------------------------------------------
 CONFIG="config.yaml"
 CRITERION="SNR"
-DATA_FOLDER="data_1"
+DATA_FOLDER="data_2"
 
-RS_MODELS="pd,hq,ista,p3mg"
-UNROLLING_MODELS="hq,ista,p3mg"
-DL_MODELS="fcun,fcae"
+#RS_MODELS="pd,hq,ista,p3mg"
+UNROLLING_MODELS="pd"
+#DL_MODELS="fcun,fcae"
 
 # Identifiant de l'iteration courante du script (run_set), base sur le job
 # Slurm afin de garantir l'independance entre deux soumissions successives.
@@ -73,9 +73,7 @@ echo "--- Job Slurm ID: ${SLURM_JOB_ID:-N/A} | Mode: compare (data_1, sous-ensem
     --run_tag "${RUN_SET_TAG}/${DATA_FOLDER}" \
     --criterion "${CRITERION}" \
     --epochs 30 \
-    --compare_random_search_models "${RS_MODELS}" \
     --compare_unrolling_models "${UNROLLING_MODELS}" \
-    --compare_dl_models "${DL_MODELS}"
 
 echo "--- Runs bruts consolides sous : runs/compare/${RUN_SET_TAG}/ ---"
 echo "--- Job de comparaison (data_1, sous-ensemble cible) termine ---"

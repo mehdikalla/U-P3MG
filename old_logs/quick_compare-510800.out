@@ -1,0 +1,32 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Job Slurm ID: 510800 | Quick Compare | Data: data_1 ---
+[QUICK_COMPARE] Signal selectionne : index 81 / 100 (data_folder=data_1)
+[QUICK_COMPARE] Resultats sauvegardes dans : quick_compare_results/job_510800/20260831-132349_signal81
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/p3mg_unrolling.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/ista_unrolling.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/hq_unrolling.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/pd_unrolling.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/pmms_unrolling.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/p3mg_random_search.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/ista_random_search.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/hq_random_search.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/pd_random_search.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/pmms_random_search.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/fcae_deep_learning.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/fctn_deep_learning.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/fcun_deep_learning.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_510800/20260831-132349_signal81/resu_deep_learning.png
+[QUICK_COMPARE] Termine.
+--- Job termine ---

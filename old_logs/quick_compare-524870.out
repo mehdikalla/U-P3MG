@@ -1,0 +1,42 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Job Slurm ID: 524870 | Quick Compare | Data: data_0 ---
+[QUICK_COMPARE] Signal selectionne : index 63 / 100 (data_folder=data_0)
+[QUICK_COMPARE] Resultats sauvegardes dans : quick_compare_results/job_524870/20260903-140058_signal63
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/p3mg_unrolling.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/hq_unrolling.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/p3mg_random_search.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/ista_random_search.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/hq_random_search.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/pd_random_search.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/fcae_deep_learning.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/fcun_deep_learning.png
+[QUICK_COMPARE] Sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/fctn_deep_learning.png
+Mini-rapport de comparaison - signal index 63 (data_folder=data_0)
+----------------------------------------------------------------
+Methode             Strategie             SNR (dB)           MSE
+----------------------------------------------------------------
+hq                  random_search          -2.0986    2.1405e-05
+hq                  unrolling              -2.1593    2.1256e-05
+fctn                deep_learning          -2.7601    1.9836e-05
+ista                random_search          -3.0643    1.9153e-05
+p3mg                random_search          -4.8950    1.5513e-05
+fcae                deep_learning          -7.4463    1.1565e-05
+p3mg                unrolling              -8.4150    1.0344e-05
+fcun                deep_learning          -9.5390    9.0887e-06
+pd                  random_search         -12.6991    6.3168e-06
+----------------------------------------------------------------
+[QUICK_COMPARE] Mini-rapport sauvegarde : quick_compare_results/job_524870/20260903-140058_signal63/report.txt / quick_compare_results/job_524870/20260903-140058_signal63/report.csv
+[QUICK_COMPARE] Termine.
+--- Job termine ---

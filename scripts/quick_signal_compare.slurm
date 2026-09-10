@@ -35,7 +35,7 @@ conda activate U-P3MG
 
 mkdir -p logs
 
-DATA_FOLDER="${1:-data_0}"
+DATA_FOLDER="${1:-data_2}"
 SIGNAL_INDEX="${2:-63}"
 
 echo "--- Job Slurm ID: ${SLURM_JOB_ID:-N/A} | Quick Compare | Data: ${DATA_FOLDER} ---"

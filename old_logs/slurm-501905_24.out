@@ -1,0 +1,194 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 30 ---
+--- Job Slurm ID: 502661 | Tache: 24/30 ---
+--- Modele: ista | Strategie: unrolling | Dataset: data_2 | Mode: full ---
+--- Arguments specifiques : --num_layers 50 --epochs 150 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : ISTA | Stratégie : UNROLLING | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ista/unrolling/data_2/20260827-010314_full
+[INFO] Modèle ISTA instancié.
+--- [TRAIN] ISTA (UNROLLING) | Epochs: 150 | Loss: MSE ---
+Ep 1/150 | Tr: 1.0785e-05 | Val: 1.0517e-05 | T: 4.1s
+Ep 2/150 | Tr: 1.0313e-05 | Val: 1.0050e-05 | T: 3.9s
+Ep 3/150 | Tr: 9.9957e-06 | Val: 9.8510e-06 | T: 3.8s
+Ep 4/150 | Tr: 9.8431e-06 | Val: 9.7348e-06 | T: 3.9s
+Ep 5/150 | Tr: 9.7648e-06 | Val: 9.6934e-06 | T: 3.8s
+Ep 6/150 | Tr: 9.7334e-06 | Val: 9.7892e-06 | T: 3.9s
+Ep 7/150 | Tr: 9.7235e-06 | Val: 9.6476e-06 | T: 3.8s
+Ep 8/150 | Tr: 9.6871e-06 | Val: 9.6282e-06 | T: 3.8s
+Ep 9/150 | Tr: 9.6908e-06 | Val: 9.6212e-06 | T: 3.8s
+Ep 10/150 | Tr: 9.6673e-06 | Val: 9.6094e-06 | T: 3.8s
+Ep 11/150 | Tr: 9.6979e-06 | Val: 9.6196e-06 | T: 3.8s
+Ep 12/150 | Tr: 9.6564e-06 | Val: 9.5959e-06 | T: 3.8s
+Ep 13/150 | Tr: 9.6521e-06 | Val: 9.5938e-06 | T: 3.9s
+Ep 14/150 | Tr: 9.6311e-06 | Val: 9.5695e-06 | T: 3.9s
+Ep 15/150 | Tr: 9.6101e-06 | Val: 9.5501e-06 | T: 3.9s
+Ep 16/150 | Tr: 9.5931e-06 | Val: 9.5224e-06 | T: 3.8s
+Ep 17/150 | Tr: 9.5540e-06 | Val: 9.5273e-06 | T: 3.8s
+Ep 18/150 | Tr: 9.4898e-06 | Val: 9.4266e-06 | T: 3.8s
+Ep 19/150 | Tr: 9.4686e-06 | Val: 9.4178e-06 | T: 3.8s
+Ep 20/150 | Tr: 9.4573e-06 | Val: 9.4508e-06 | T: 3.8s
+Ep 21/150 | Tr: 9.4549e-06 | Val: 9.4094e-06 | T: 3.8s
+Ep 22/150 | Tr: 9.4463e-06 | Val: 9.4215e-06 | T: 3.9s
+Ep 23/150 | Tr: 9.4446e-06 | Val: 9.4007e-06 | T: 3.8s
+Ep 24/150 | Tr: 9.4403e-06 | Val: 9.3993e-06 | T: 3.8s
+Ep 25/150 | Tr: 9.4397e-06 | Val: 9.4001e-06 | T: 3.8s
+Ep 26/150 | Tr: 9.4407e-06 | Val: 9.3985e-06 | T: 3.9s
+Ep 27/150 | Tr: 9.4384e-06 | Val: 9.3967e-06 | T: 3.9s
+Ep 28/150 | Tr: 9.4359e-06 | Val: 9.3940e-06 | T: 3.8s
+Ep 29/150 | Tr: 9.4321e-06 | Val: 9.3953e-06 | T: 3.9s
+Ep 30/150 | Tr: 9.4253e-06 | Val: 9.3870e-06 | T: 3.9s
+Ep 31/150 | Tr: 9.4243e-06 | Val: 9.3895e-06 | T: 3.9s
+Ep 32/150 | Tr: 9.4190e-06 | Val: 9.3844e-06 | T: 3.8s
+Ep 33/150 | Tr: 9.4133e-06 | Val: 9.3652e-06 | T: 3.9s
+Ep 34/150 | Tr: 9.4171e-06 | Val: 9.3681e-06 | T: 3.8s
+Ep 35/150 | Tr: 9.4091e-06 | Val: 9.3603e-06 | T: 3.8s
+Ep 36/150 | Tr: 9.3995e-06 | Val: 9.3506e-06 | T: 3.9s
+Ep 37/150 | Tr: 9.4075e-06 | Val: 9.3928e-06 | T: 3.8s
+Ep 38/150 | Tr: 9.4024e-06 | Val: 9.3492e-06 | T: 3.8s
+Ep 39/150 | Tr: 9.3906e-06 | Val: 9.3361e-06 | T: 3.8s
+Ep 40/150 | Tr: 9.3795e-06 | Val: 9.3486e-06 | T: 3.8s
+Ep 41/150 | Tr: 9.3729e-06 | Val: 9.3130e-06 | T: 3.9s
+Ep 42/150 | Tr: 9.3464e-06 | Val: 9.2796e-06 | T: 3.8s
+Ep 43/150 | Tr: 9.3320e-06 | Val: 9.2796e-06 | T: 3.9s
+Ep 44/150 | Tr: 1.3666e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 45/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 46/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 47/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 48/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 49/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 50/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 51/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 52/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 53/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 54/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 55/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 56/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 57/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 58/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 59/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 60/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 61/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 62/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 63/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 64/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 65/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 66/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 67/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 68/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 69/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 70/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 71/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 72/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 73/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 74/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 75/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 76/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 77/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 78/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 79/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 80/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 81/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 82/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 83/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 84/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 85/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 86/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 87/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 88/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 89/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 90/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 91/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 92/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 93/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 94/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 95/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 96/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 97/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 98/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 99/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 100/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 101/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 102/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 103/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 104/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 105/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 106/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 107/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 108/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 109/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 110/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 111/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 112/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 113/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 114/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 115/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 116/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 117/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 118/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 119/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 120/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 121/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 122/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 123/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 124/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 125/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 126/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 127/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 128/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 129/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 130/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 131/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 132/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 133/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 134/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 135/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 136/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 137/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 138/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 139/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 140/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 141/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 142/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 143/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 144/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 145/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 146/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 147/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.9s
+Ep 148/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 149/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+Ep 150/150 | Tr: 1.1541e-05 | Val: 1.1485e-05 | T: 3.8s
+--- [TRAIN] Terminé en 10.13 min ---
+--- [TEST] ISTA (UNROLLING) | Metric: MSE | Samples: 100 ---
+[INFO] Chargement des poids depuis : runs/ista/unrolling/data_2/20260827-010314_full/checkpoints/best_model.pt
+[RESULT] Mean MSE: 9.4330e-06 | Median: 9.3186e-06 | Std: 1.3103e-06 | Best: 5.8308e-06 | Worst: 1.3357e-05
+
+=== Exécution Terminée ===
+--- Tache 24 (ista/unrolling/data_2) terminee ---

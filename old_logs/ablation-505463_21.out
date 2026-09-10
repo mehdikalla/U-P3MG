@@ -1,0 +1,72 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Job Slurm ID: 505463_21 ---
+--- Volet: intern | num_layers=30 | num_pd_layers=50 | mlp_hidden= | run_tag=ablation_intern/run_set_505463 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : UNROLLING | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_0
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ablation/p3mg/ablation_intern/run_set_505463/20260829-170945_full
+[INFO] Modèle P3MG instancié.
+--- [TRAIN] P3MG (UNROLLING) | Epochs: 30 | Loss: MSE ---
+Ep 1/30 | Tr: 2.3467e-05 | Val: 2.2848e-05 | T: 1544.4s
+Ep 2/30 | Tr: 2.1224e-05 | Val: 1.9050e-05 | T: 1560.9s
+Ep 3/30 | Tr: 1.8387e-05 | Val: 1.7178e-05 | T: 1561.8s
+Ep 4/30 | Tr: 1.7060e-05 | Val: 1.6093e-05 | T: 1560.7s
+Ep 5/30 | Tr: 1.6859e-05 | Val: 1.6304e-05 | T: 1568.0s
+Ep 6/30 | Tr: 1.6873e-05 | Val: 1.5985e-05 | T: 1561.1s
+Ep 7/30 | Tr: 1.6735e-05 | Val: 1.6224e-05 | T: 1558.8s
+Ep 8/30 | Tr: 1.6519e-05 | Val: 1.5636e-05 | T: 1566.2s
+Ep 9/30 | Tr: 1.6465e-05 | Val: 1.5566e-05 | T: 1564.4s
+Ep 10/30 | Tr: 1.6298e-05 | Val: 1.5518e-05 | T: 1564.1s
+Ep 11/30 | Tr: 1.6222e-05 | Val: 1.5262e-05 | T: 1559.4s
+Ep 12/30 | Tr: 1.6054e-05 | Val: 1.4627e-05 | T: 1568.1s
+Ep 13/30 | Tr: 1.5497e-05 | Val: 1.4630e-05 | T: 1566.2s
+Ep 14/30 | Tr: 1.5281e-05 | Val: 1.4157e-05 | T: 1562.4s
+Ep 15/30 | Tr: 1.5210e-05 | Val: 1.4460e-05 | T: 1566.2s
+Ep 16/30 | Tr: 1.5124e-05 | Val: 1.4302e-05 | T: 1560.9s
+Ep 17/30 | Tr: 1.5102e-05 | Val: 1.4394e-05 | T: 1562.4s
+Ep 18/30 | Tr: 1.5971e-05 | Val: 1.4320e-05 | T: 1563.4s
+Ep 19/30 | Tr: 1.5172e-05 | Val: 1.3914e-05 | T: 1561.8s
+Ep 20/30 | Tr: 1.4762e-05 | Val: 1.3857e-05 | T: 1555.7s
+Ep 21/30 | Tr: 1.4586e-05 | Val: 1.3606e-05 | T: 1565.9s
+Ep 22/30 | Tr: 1.4544e-05 | Val: 1.3722e-05 | T: 1563.2s
+Ep 23/30 | Tr: 1.4621e-05 | Val: 1.3695e-05 | T: 1558.8s
+Ep 24/30 | Tr: 1.4494e-05 | Val: 1.3555e-05 | T: 1563.5s
+Ep 25/30 | Tr: 1.4405e-05 | Val: 1.3573e-05 | T: 1560.8s
+Ep 26/30 | Tr: 1.4709e-05 | Val: 1.3836e-05 | T: 1563.8s
+Ep 27/30 | Tr: 1.4351e-05 | Val: 1.3459e-05 | T: 1564.3s
+Ep 28/30 | Tr: 1.4323e-05 | Val: 1.3503e-05 | T: 1557.3s
+Ep 29/30 | Tr: 1.4351e-05 | Val: 1.3486e-05 | T: 1564.4s
+Ep 30/30 | Tr: 1.4184e-05 | Val: 1.3429e-05 | T: 1564.8s
+--- [TRAIN] Terminé en 789.28 min ---
+--- [TEST] P3MG (UNROLLING) | Metric: MSE | Samples: 100 ---
+[INFO] Chargement des poids depuis : runs/ablation/p3mg/ablation_intern/run_set_505463/20260829-170945_full/checkpoints/best_model.pt
+[RESULT] Mean MSE: 1.4913e-05 | Median: 1.4794e-05 | Std: 4.6578e-06 | Best: 2.9807e-06 | Worst: 2.9271e-05
+
+=== Exécution Terminée ===
+--- Tache 21 terminee (volet: intern) ---

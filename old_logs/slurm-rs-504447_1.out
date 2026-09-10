@@ -1,0 +1,46 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 3 ---
+--- Job Slurm ID: 504449 | Tache: 1/3 ---
+--- Modele: p3mg | Strategie: random_search | Dataset: data_1 | Mode: full ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : P3MG | Stratégie : RANDOM_SEARCH | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/p3mg/random_search/data_1/20260827-142132_full
+--- [TRAIN] P3MG (RANDOM_SEARCH) | Trials: 100 | Loss: MSE ---
+   [1/100] New Best! lmbd=6.0438e-04 tau=0.0598 | Loss=1.1887e-05
+   [60/100] New Best! lmbd=3.2058e-04 tau=0.3142 | Loss=1.1176e-05
+[RESULT] Best Params: {'lmbd': np.float64(0.0003205817646639107), 'tau': 0.31415014441377326}
+--- [TRAIN] Terminé en 447.50 min ---
+--- [TEST] P3MG (RANDOM_SEARCH) | Metric: MSE | Samples: 100 ---
+[INFO] Paramètres chargés depuis runs/p3mg/random_search/data_1/20260827-142132_full/checkpoints/best_params.json : {'lmbd': 0.0003205817646639107, 'tau': 0.31415014441377326}
+[INFO] Application sur 10 batchs avec lmbd=3.2058e-04 tau=0.3142...
+[RESULT] Mean MSE: 1.5443e-05 | Median: 1.5328e-05 | Std: 6.6172e-06 | Best: 2.4122e-06 | Worst: 3.6951e-05
+
+=== Exécution Terminée ===
+--- Tache 1 (p3mg/random_search/data_1) terminee ---

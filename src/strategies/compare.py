@@ -53,7 +53,7 @@ def _make_profiler(path_logs, tag, device, args):
     return _NullProfiler()
 
 
-UNROLLING_MODELS = ['p3mg', 'hq']
+UNROLLING_MODELS = ['p3mg', 'hq', 'pd']
 RANDOM_SEARCH_MODELS = ['p3mg', 'ista', 'hq', 'pd', 'pmms', 'ipiano', 'vmfb', 'fista']
 DL_MODELS = ['fcae', 'fcun', 'fctn']
 REPORT_METRICS = ['MSE', 'SNR']

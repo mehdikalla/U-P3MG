@@ -1,0 +1,2 @@
+/var/spool/slurmd/job515084/slurm_script: line 45: COMPARE_JOB_ID: command not found
+[ERREUR] COMPARE_JOB_ID non fourni (variable d'environnement ou argument positionnel).

@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/scratch/mkalla/miniconda3/envs/U-P3MG/lib/python3.13/multiprocessing/util.py", line 371, in _run_finalizers
+    finalizer()
+    ~~~~~~~~~^^
+  File "/scratch/mkalla/miniconda3/envs/U-P3MG/lib/python3.13/multiprocessing/util.py", line 295, in __call__
+    res = self._callback(*self._args, **self._kwargs)
+  File "/scratch/mkalla/miniconda3/envs/U-P3MG/lib/python3.13/multiprocessing/util.py", line 147, in _remove_temp_dir
+    rmtree(tempdir)
+    ~~~~~~^^^^^^^^^
+  File "/scratch/mkalla/miniconda3/envs/U-P3MG/lib/python3.13/shutil.py", line 763, in rmtree
+    _rmtree_safe_fd(stack, onexc)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/scratch/mkalla/miniconda3/envs/U-P3MG/lib/python3.13/shutil.py", line 707, in _rmtree_safe_fd
+    onexc(func, path, err)
+    ~~~~~^^^^^^^^^^^^^^^^^
+  File "/scratch/mkalla/miniconda3/envs/U-P3MG/lib/python3.13/shutil.py", line 658, in _rmtree_safe_fd
+    os.rmdir(name, dir_fd=dirfd)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 39] Directory not empty: '/tmp/pymp-5ruice2c'

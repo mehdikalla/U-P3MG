@@ -1,0 +1,2 @@
+[AVERTISSEMENT] SLURM_ARRAY_TASK_COUNT (5) != TOTAL calcule (9). Mettez a jour '#SBATCH --array' en tete de ce script (ou relancez avec 'sbatch --array=0-8 scripts/run_fista_pmms_ipiano_random_search.slurm').
+[2026-09-08T11:14:53.225] error: *** JOB 554168 ON margpu032 CANCELLED AT 2026-09-08T11:14:53 DUE to SIGNAL Terminated ***

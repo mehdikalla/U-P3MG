@@ -1,0 +1,23 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Consolidation et generation des graphes d'ablation pour le job array 507755 ---
+--- Volet extern : reconstruction de summary.csv depuis runs/ablation/p3mg/ablation_extern/run_set_507755 ---
+[build_ablation_summary] 10 run(s) consolide(s) -> runs/ablation/p3mg/ablation_extern/results_507755/summary.csv
+[plot_ablation] Graphe sauvegarde : runs/ablation/p3mg/ablation_extern/results_507755/loss_vs_layers.png
+--- Volet intern : reconstruction de summary.csv depuis runs/ablation/p3mg/ablation_intern/run_set_507755 ---
+[build_ablation_summary] 12 run(s) consolide(s) -> runs/ablation/p3mg/ablation_intern/results_507755/summary.csv
+[plot_ablation] Graphe sauvegarde : runs/ablation/p3mg/ablation_intern/results_507755/loss_vs_layers.png
+--- Volet mlp : reconstruction de summary.csv depuis runs/ablation/p3mg/ablation_mlp/run_set_507755 ---
+[build_ablation_summary] 5 run(s) consolide(s) -> runs/ablation/p3mg/ablation_mlp/results_507755/summary.csv
+[plot_ablation] Graphe sauvegarde : runs/ablation/p3mg/ablation_mlp/results_507755/loss_vs_layers.png

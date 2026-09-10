@@ -1,0 +1,4 @@
+[W901 12:52:51.297433172 collection.cpp:663] Warning: void gemvNSP_kernel<double, double, double, double, 1, 32, 4, 1024, false, cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<double const>, cublasGemvTensorStridedBatched<double const>, cublasGemvTensorStridedBatched<double>, double> >(cublasGemvParamsEx<int, cublasGemvTensorStridedBatched<double const>, cublasGemvTensorStridedBatched<double const>, cublasGemvTensorStridedBatched<double>, double>) (function operator())
+./scripts/run.sh: line 40: 3998789 Killed                  python main.py "${ARGS[@]}"
+./scripts/run.sh: line 40: 4013523 Killed                  python main.py "${ARGS[@]}"
+./scripts/run.sh: line 40: 4021452 Killed                  python main.py "${ARGS[@]}"

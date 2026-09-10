@@ -1,0 +1,94 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 6 ---
+--- Job Slurm ID: 504407 | Tache: 2/6 ---
+--- Modele: ista | Strategie: unrolling | Dataset: data_1 | Mode: full ---
+--- Arguments specifiques : --num_layers 50 --epochs 50 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : ISTA | Stratégie : UNROLLING | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/ista/unrolling/data_1/20260827-141532_full
+[INFO] Modèle ISTA instancié.
+--- [TRAIN] ISTA (UNROLLING) | Epochs: 50 | Loss: MSE ---
+Ep 1/50 | Tr: 2.4139e-05 | Val: 2.3084e-05 | T: 2.7s
+Ep 2/50 | Tr: 2.3417e-05 | Val: 2.2708e-05 | T: 2.4s
+Ep 3/50 | Tr: 2.3216e-05 | Val: 2.2595e-05 | T: 2.4s
+Ep 4/50 | Tr: 2.3125e-05 | Val: 2.2516e-05 | T: 2.4s
+Ep 5/50 | Tr: 2.3049e-05 | Val: 2.2439e-05 | T: 2.4s
+Ep 6/50 | Tr: 2.2966e-05 | Val: 2.2343e-05 | T: 2.4s
+Ep 7/50 | Tr: 2.2892e-05 | Val: 2.2282e-05 | T: 2.4s
+Ep 8/50 | Tr: 2.2834e-05 | Val: 2.2210e-05 | T: 2.4s
+Ep 9/50 | Tr: 2.2814e-05 | Val: 2.2204e-05 | T: 2.4s
+Ep 10/50 | Tr: 2.2723e-05 | Val: 2.2088e-05 | T: 3.2s
+Ep 11/50 | Tr: 2.2654e-05 | Val: 2.2022e-05 | T: 2.4s
+Ep 12/50 | Tr: 2.2567e-05 | Val: 2.2054e-05 | T: 2.4s
+Ep 13/50 | Tr: 2.2627e-05 | Val: 2.1948e-05 | T: 2.5s
+Ep 14/50 | Tr: 2.2441e-05 | Val: 2.1747e-05 | T: 2.4s
+Ep 15/50 | Tr: 2.2307e-05 | Val: 2.1541e-05 | T: 2.5s
+Ep 16/50 | Tr: 2.2231e-05 | Val: 2.1375e-05 | T: 2.4s
+Ep 17/50 | Tr: 2.1629e-05 | Val: 2.0902e-05 | T: 2.4s
+Ep 18/50 | Tr: 2.1288e-05 | Val: 2.0581e-05 | T: 2.5s
+Ep 19/50 | Tr: 2.1357e-05 | Val: 2.0533e-05 | T: 2.4s
+Ep 20/50 | Tr: 2.0795e-05 | Val: 2.0373e-05 | T: 2.4s
+Ep 21/50 | Tr: 2.0632e-05 | Val: 2.0093e-05 | T: 2.4s
+Ep 22/50 | Tr: 2.0232e-05 | Val: 2.0147e-05 | T: 2.4s
+Ep 23/50 | Tr: 2.0299e-05 | Val: 1.9709e-05 | T: 2.4s
+Ep 24/50 | Tr: 1.9845e-05 | Val: 1.9813e-05 | T: 2.4s
+Ep 25/50 | Tr: 1.9787e-05 | Val: 1.9285e-05 | T: 2.4s
+Ep 26/50 | Tr: 1.9660e-05 | Val: 1.9020e-05 | T: 2.4s
+Ep 27/50 | Tr: 1.9352e-05 | Val: 1.8952e-05 | T: 2.5s
+Ep 28/50 | Tr: 1.9323e-05 | Val: 1.9056e-05 | T: 2.4s
+Ep 29/50 | Tr: 1.9304e-05 | Val: 1.9946e-05 | T: 2.4s
+Ep 30/50 | Tr: 1.9163e-05 | Val: 1.8565e-05 | T: 2.4s
+Ep 31/50 | Tr: 1.8682e-05 | Val: 1.7862e-05 | T: 2.4s
+Ep 32/50 | Tr: 1.8158e-05 | Val: 1.7459e-05 | T: 2.4s
+Ep 33/50 | Tr: 1.7648e-05 | Val: 1.7724e-05 | T: 2.4s
+Ep 34/50 | Tr: 1.8291e-05 | Val: 1.7717e-05 | T: 2.4s
+Ep 35/50 | Tr: 1.7781e-05 | Val: 1.7872e-05 | T: 2.4s
+Ep 36/50 | Tr: 1.8450e-05 | Val: 1.7739e-05 | T: 2.5s
+Ep 37/50 | Tr: 1.7930e-05 | Val: 1.7680e-05 | T: 2.5s
+Ep 38/50 | Tr: 1.7682e-05 | Val: 1.7729e-05 | T: 2.4s
+Ep 39/50 | Tr: 1.7401e-05 | Val: 1.7011e-05 | T: 2.4s
+Ep 40/50 | Tr: 1.7175e-05 | Val: 1.6838e-05 | T: 2.4s
+Ep 41/50 | Tr: 1.6931e-05 | Val: 1.6801e-05 | T: 2.4s
+Ep 42/50 | Tr: 1.6891e-05 | Val: 1.6731e-05 | T: 2.4s
+Ep 43/50 | Tr: 1.6932e-05 | Val: 1.7061e-05 | T: 2.4s
+Ep 44/50 | Tr: 1.6980e-05 | Val: 1.6701e-05 | T: 2.4s
+Ep 45/50 | Tr: 1.6721e-05 | Val: 1.6540e-05 | T: 2.4s
+Ep 46/50 | Tr: 1.6624e-05 | Val: 1.6220e-05 | T: 2.5s
+Ep 47/50 | Tr: 1.6436e-05 | Val: 1.6402e-05 | T: 2.5s
+Ep 48/50 | Tr: 1.6551e-05 | Val: 1.6621e-05 | T: 2.4s
+Ep 49/50 | Tr: 1.6593e-05 | Val: 1.6996e-05 | T: 2.4s
+Ep 50/50 | Tr: 1.6593e-05 | Val: 1.6530e-05 | T: 2.4s
+--- [TRAIN] Terminé en 2.15 min ---
+--- [TEST] ISTA (UNROLLING) | Metric: MSE | Samples: 100 ---
+[INFO] Chargement des poids depuis : runs/ista/unrolling/data_1/20260827-141532_full/checkpoints/best_model.pt
+[RESULT] Mean MSE: 1.7482e-05 | Median: 1.7196e-05 | Std: 4.9053e-06 | Best: 8.8244e-06 | Worst: 3.3358e-05
+
+=== Exécution Terminée ===
+--- Tache 2 (ista/unrolling/data_1) terminee ---

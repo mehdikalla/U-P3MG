@@ -1,0 +1,51 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 30 ---
+--- Job Slurm ID: 502667 | Tache: 29/30 ---
+--- Modele: pd | Strategie: random_search | Dataset: data_2 | Mode: full ---
+--- Arguments specifiques : --num_layers 50 --algo_iters 5000 ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : PD | Stratégie : RANDOM_SEARCH | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_2
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/pd/random_search/data_2/20260827-013430_full
+--- [TRAIN] PD (RANDOM_SEARCH) | Trials: 100 | Loss: MSE ---
+   [1/100] New Best! tau=1.0000 lambda_tau=6.0438e-04 | Loss=9.0560e-06
+   [5/100] New Best! tau=1.0000 lambda_tau=4.5575e-03 | Loss=8.9120e-06
+   [7/100] New Best! tau=1.0000 lambda_tau=1.1656e-01 | Loss=8.5523e-06
+   [29/100] New Best! tau=1.0000 lambda_tau=4.5976e-02 | Loss=8.4862e-06
+   [39/100] New Best! tau=1.0000 lambda_tau=6.1806e-02 | Loss=8.4822e-06
+   [100/100] New Best! tau=1.0000 lambda_tau=6.0624e-02 | Loss=8.4819e-06
+[RESULT] Best Params: {'tau': 1.0, 'lambda_tau': np.float64(0.06062437904695187)}
+--- [TRAIN] Terminé en 37.71 min ---
+--- [TEST] PD (RANDOM_SEARCH) | Metric: MSE | Samples: 100 ---
+[INFO] Paramètres chargés depuis runs/pd/random_search/data_2/20260827-013430_full/checkpoints/best_params.json : {'tau': 1.0, 'lambda_tau': 0.06062437904695187}
+[INFO] Application sur 10 batchs avec tau=1.0000 lambda_tau=6.0624e-02...
+[RESULT] Mean MSE: 8.2659e-06 | Median: 8.1639e-06 | Std: 1.5433e-06 | Best: 4.6655e-06 | Worst: 1.1787e-05
+
+=== Exécution Terminée ===
+--- Tache 29 (pd/random_search/data_2) terminee ---

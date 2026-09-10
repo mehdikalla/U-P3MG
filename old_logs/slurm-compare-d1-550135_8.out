@@ -1,0 +1,95 @@
+no change     /scratch/mkalla/miniconda3/condabin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda
+no change     /scratch/mkalla/miniconda3/bin/conda-env
+no change     /scratch/mkalla/miniconda3/bin/activate
+no change     /scratch/mkalla/miniconda3/bin/deactivate
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.sh
+no change     /scratch/mkalla/miniconda3/etc/fish/conf.d/conda.fish
+no change     /scratch/mkalla/miniconda3/shell/condabin/Conda.psm1
+no change     /scratch/mkalla/miniconda3/shell/condabin/conda-hook.ps1
+no change     /scratch/mkalla/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
+no change     /scratch/mkalla/miniconda3/etc/profile.d/conda.csh
+no change     /home/opis/mkalla/.bashrc
+No action taken.
+--- Nombre total de combinaisons definies : 9 ---
+--- Job Slurm ID: 550135 | Tache: 8/9 ---
+--- Modele: fcae | Strategie: unrolling | Dataset: data_1 | Mode: full ---
+--- Arguments specifiques : (aucun) ---
+[INFO] Exécution verrouillée sur le GPU : 0
+[AVERTISSEMENT] Paramètre 'train' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'save_dir' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'train_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'val_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'test_batch_size' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'Loss' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'number_pd_layers' du YAML non reconnu par argparse.
+[AVERTISSEMENT] Paramètre 'resume' du YAML non reconnu par argparse.
+=== Lancement : FCAE | Stratégie : UNROLLING | Mode : FULL ===
+--- Préparation des DataLoaders ---
+[INFO] Chargement des données depuis : ./Dataset/data_1
+[INFO] Instanciation des MyDataset...
+[INFO] Train: 800 | Val: 100 | Test: 100
+[INFO] Résultats sauvegardés dans : runs/fcae/unrolling/data_1/20260907-164037_full
+[INFO] Modèle FCAE instancié.
+--- [TRAIN] FCAE (UNROLLING) | Epochs: 50 | Loss: MSE ---
+Ep 1/50 | Tr: 2.7058e-02 | Val: 5.0234e-04 | T: 1.3s
+Ep 2/50 | Tr: 1.8345e-04 | Val: 2.6236e-04 | T: 1.1s
+Ep 3/50 | Tr: 1.2861e-04 | Val: 1.6790e-04 | T: 1.0s
+Ep 4/50 | Tr: 8.9037e-05 | Val: 9.9401e-05 | T: 1.0s
+Ep 5/50 | Tr: 6.2878e-05 | Val: 8.1469e-05 | T: 1.0s
+Ep 6/50 | Tr: 5.2766e-05 | Val: 6.1410e-05 | T: 1.1s
+Ep 7/50 | Tr: 4.5635e-05 | Val: 5.5863e-05 | T: 1.1s
+Ep 8/50 | Tr: 4.0320e-05 | Val: 4.6465e-05 | T: 1.1s
+Ep 9/50 | Tr: 3.3790e-05 | Val: 4.0356e-05 | T: 1.1s
+Ep 10/50 | Tr: 3.1849e-05 | Val: 3.3262e-05 | T: 1.1s
+Ep 11/50 | Tr: 2.9503e-05 | Val: 3.0807e-05 | T: 1.1s
+Ep 12/50 | Tr: 2.6205e-05 | Val: 3.0768e-05 | T: 1.1s
+Ep 13/50 | Tr: 2.6432e-05 | Val: 2.7454e-05 | T: 1.1s
+Ep 14/50 | Tr: 2.5070e-05 | Val: 2.4574e-05 | T: 1.1s
+Ep 15/50 | Tr: 2.4200e-05 | Val: 2.5187e-05 | T: 1.1s
+Ep 16/50 | Tr: 2.3835e-05 | Val: 2.3771e-05 | T: 1.1s
+Ep 17/50 | Tr: 2.2698e-05 | Val: 2.0320e-05 | T: 1.1s
+Ep 18/50 | Tr: 2.2321e-05 | Val: 2.1183e-05 | T: 1.1s
+Ep 19/50 | Tr: 2.1423e-05 | Val: 2.0395e-05 | T: 1.1s
+Ep 20/50 | Tr: 2.0872e-05 | Val: 1.9762e-05 | T: 1.1s
+Ep 21/50 | Tr: 2.0954e-05 | Val: 1.8794e-05 | T: 1.1s
+Ep 22/50 | Tr: 2.0372e-05 | Val: 1.8991e-05 | T: 1.1s
+Ep 23/50 | Tr: 2.0313e-05 | Val: 1.8423e-05 | T: 1.1s
+Ep 24/50 | Tr: 2.0271e-05 | Val: 1.7945e-05 | T: 1.1s
+Ep 25/50 | Tr: 1.9171e-05 | Val: 1.8128e-05 | T: 1.1s
+Ep 26/50 | Tr: 1.9102e-05 | Val: 1.7371e-05 | T: 1.1s
+Ep 27/50 | Tr: 1.8612e-05 | Val: 1.6839e-05 | T: 1.1s
+Ep 28/50 | Tr: 1.8747e-05 | Val: 1.6869e-05 | T: 1.1s
+Ep 29/50 | Tr: 1.8616e-05 | Val: 1.6433e-05 | T: 1.1s
+Ep 30/50 | Tr: 1.8209e-05 | Val: 1.6069e-05 | T: 1.1s
+Ep 31/50 | Tr: 1.7794e-05 | Val: 1.6045e-05 | T: 1.1s
+Ep 32/50 | Tr: 1.7777e-05 | Val: 1.5646e-05 | T: 1.1s
+Ep 33/50 | Tr: 1.7908e-05 | Val: 1.5406e-05 | T: 1.1s
+Ep 34/50 | Tr: 1.7710e-05 | Val: 1.5314e-05 | T: 1.1s
+Ep 35/50 | Tr: 1.7153e-05 | Val: 1.5095e-05 | T: 1.1s
+Ep 36/50 | Tr: 1.7215e-05 | Val: 1.4901e-05 | T: 1.1s
+Ep 37/50 | Tr: 1.6872e-05 | Val: 1.5108e-05 | T: 1.1s
+Ep 38/50 | Tr: 1.6688e-05 | Val: 1.4594e-05 | T: 1.1s
+Ep 39/50 | Tr: 1.7084e-05 | Val: 1.4639e-05 | T: 1.1s
+Ep 40/50 | Tr: 1.6372e-05 | Val: 1.4491e-05 | T: 1.1s
+Ep 41/50 | Tr: 1.6368e-05 | Val: 1.4395e-05 | T: 1.1s
+Ep 42/50 | Tr: 1.6241e-05 | Val: 1.4173e-05 | T: 1.1s
+Ep 43/50 | Tr: 1.6589e-05 | Val: 1.4084e-05 | T: 1.1s
+Ep 44/50 | Tr: 1.6270e-05 | Val: 1.4215e-05 | T: 1.1s
+Ep 45/50 | Tr: 1.6114e-05 | Val: 1.3894e-05 | T: 1.1s
+Ep 46/50 | Tr: 1.5998e-05 | Val: 1.3665e-05 | T: 1.1s
+Ep 47/50 | Tr: 1.5984e-05 | Val: 1.3839e-05 | T: 1.1s
+Ep 48/50 | Tr: 1.5698e-05 | Val: 1.3640e-05 | T: 1.1s
+Ep 49/50 | Tr: 1.5797e-05 | Val: 1.3400e-05 | T: 1.1s
+Ep 50/50 | Tr: 1.5786e-05 | Val: 1.3436e-05 | T: 1.1s
+[MEM-PROFILE] train_fcae_unrolling | Duree: 85.4s | CPU peak: 12.74 MB | GPU peak alloc: 20.97 MB | GPU peak reserve: 26.00 MB
+--- [TRAIN] Terminé en 1.42 min ---
+--- [TEST] FCAE (UNROLLING) | Metric: MSE | Samples: 100 ---
+[INFO] Chargement des poids depuis : runs/fcae/unrolling/data_1/20260907-164037_full/checkpoints/best_model.pt
+[RESULT] Mean MSE: 1.2219e-05 | Median: 1.1896e-05 | Std: 5.4212e-06 | Best: 2.2750e-06 | Worst: 2.6080e-05
+
+=== Exécution Terminée ===
+--- Tache 8 (fcae/unrolling/data_1) terminee ---
